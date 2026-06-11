@@ -33,6 +33,6 @@ public class EngineScreen extends AbstractContainerScreen<EngineMenu> implements
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         int left = (this.width - this.imageWidth) / 2;
         int top = (this.height - this.imageHeight) / 2;
-        guiGraphics.blit(BACKGROUND, left, top, 0, 0, this.imageWidth, this.imageHeight);
+        guiGraphics.blit(BACKGROUND, left, top, 0, 0, this.imageWidth, this.imageHeight, 256, 256);
     }
 }
