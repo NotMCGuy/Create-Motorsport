@@ -105,11 +105,7 @@ public class EngineBlockEntity extends GeneratingKineticBlockEntity {
         }
 
         boolean poweredBeforeTick = engine.isFueled();
-        if (engine.burnTicks > 0) {
-            engine.burnTicks--;
-        } else if (engine.tryDrainLava(level, pos)) {
-            engine.burnTicks = BURN_TICKS;
-        }
+        engine.updateFuel(level, pos);
 
         engine.updateThrottle();
         engine.updateKineticSpeedIfNeeded();
@@ -212,6 +208,28 @@ public class EngineBlockEntity extends GeneratingKineticBlockEntity {
 
     private boolean isFueled() {
         return burnTicks > 0;
+    }
+
+    private void updateFuel(Level level, BlockPos pos) {
+        if (!shouldConsumeFuel()) {
+            if (burnTicks > 0) {
+                burnTicks--;
+            }
+            return;
+        }
+
+        if (burnTicks <= 1 && tryDrainLava(level, pos)) {
+            burnTicks = BURN_TICKS;
+            return;
+        }
+
+        if (burnTicks > 0) {
+            burnTicks--;
+        }
+    }
+
+    private boolean shouldConsumeFuel() {
+        return !hasThrottleLink() || linkedThrottleSignal > 0;
     }
 
     private void updateThrottle() {
