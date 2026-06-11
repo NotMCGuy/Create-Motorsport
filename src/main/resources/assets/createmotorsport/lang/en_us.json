@@ -1,0 +1,16 @@
+{
+  "itemGroup.createmotorsport": "Create: Motorsport",
+  "block.createmotorsport.engine_block": "Engine Block",
+  "block.createmotorsport.gearbox": "Gearbox",
+  "block.createmotorsport.clutch": "Clutch",
+  "item.createmotorsport.air_intake": "Air Intake",
+  "item.createmotorsport.exhaust_manifold": "Exhaust Manifold",
+  "item.createmotorsport.racing_component": "Racing Component",
+  "container.createmotorsport.engine": "Engine Block",
+  "container.createmotorsport.clutch": "Clutch",
+
+  "createmotorsport.configuration.title": "Create: Motorsport Configs",
+  "createmotorsport.configuration.section.createmotorsport.common.toml": "Create: Motorsport Configs",
+  "createmotorsport.configuration.section.createmotorsport.common.toml.title": "Create: Motorsport Configs",
+  "createmotorsport.configuration.enableDebugLogging": "Enable Debug Logging"
+}

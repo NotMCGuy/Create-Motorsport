@@ -1,0 +1,59 @@
+{
+  "multipart": [
+    {
+      "when": {
+        "axis": "x"
+      },
+      "apply": {
+        "model": "createmotorsport:block/engine"
+      }
+    },
+    {
+      "when": {
+        "axis": "z"
+      },
+      "apply": {
+        "model": "createmotorsport:block/engine",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "axis": "x",
+        "has_intake": "true"
+      },
+      "apply": {
+        "model": "createmotorsport:block/intake"
+      }
+    },
+    {
+      "when": {
+        "axis": "z",
+        "has_intake": "true"
+      },
+      "apply": {
+        "model": "createmotorsport:block/intake",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "axis": "x",
+        "has_exhaust": "true"
+      },
+      "apply": {
+        "model": "createmotorsport:block/exhaust"
+      }
+    },
+    {
+      "when": {
+        "axis": "z",
+        "has_exhaust": "true"
+      },
+      "apply": {
+        "model": "createmotorsport:block/exhaust",
+        "y": 90
+      }
+    }
+  ]
+}

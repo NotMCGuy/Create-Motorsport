@@ -1,0 +1,11 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "createmotorsport:block/transmission"
+    },
+    "axis=z": {
+      "model": "createmotorsport:block/transmission",
+      "y": 90
+    }
+  }
+}

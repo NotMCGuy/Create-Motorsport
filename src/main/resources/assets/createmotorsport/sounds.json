@@ -1,0 +1,22 @@
+{
+  "engine_idle": {
+    "sounds": [
+      "createmotorsport:engine_idle"
+    ]
+  },
+  "engine_low": {
+    "sounds": [
+      "createmotorsport:engine_low"
+    ]
+  },
+  "engine_mid": {
+    "sounds": [
+      "createmotorsport:engine_mid"
+    ]
+  },
+  "engine_fast": {
+    "sounds": [
+      "createmotorsport:engine_fast"
+    ]
+  }
+}
