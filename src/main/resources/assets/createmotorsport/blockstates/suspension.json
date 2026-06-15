@@ -1,0 +1,11 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "createmotorsport:block/suspension"
+    },
+    "axis=z": {
+      "model": "createmotorsport:block/suspension",
+      "y": 90
+    }
+  }
+}

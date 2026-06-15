@@ -1,0 +1,256 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"left_suspension": {
+			"loop": true,
+			"animation_length": 1,
+			"bones": {
+				"LeftUpperWishbone": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"1.0": [30, 0, 0]
+					}
+				},
+				"LeftLowerWishbone": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"1.0": [27.5, 0, 0]
+					}
+				},
+				"SteeringShaftLeft": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"1.0": [30, 0, 0]
+					}
+				},
+				"group26": {
+					"position": {
+						"0.0": [0, 0, 0],
+						"1.0": [-1.2, 0, 0]
+					}
+				},
+				"group27": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"1.0": [0, 35, 0]
+					}
+				},
+				"group28": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"1.0": [27.5, 0, 0]
+					},
+					"position": {
+						"0.0": [0, 0, 0],
+						"1.0": [0, 7, 0]
+					}
+				},
+				"LeftAttachment": {
+					"position": {
+						"0.0": [0, 0, 0],
+						"1.0": [0, 7, 0]
+					}
+				},
+				"LeftShaftRotation": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"1.0": [35, 0, 0]
+					}
+				},
+				"bone": {
+					"position": {
+						"0.0": [0, 0, 0],
+						"1.0": [0, 0, 0]
+					}
+				},
+				"bone3": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"1.0": [0, 35, 0]
+					}
+				}
+			}
+		},
+		"steer_left": {
+			"animation_length": 1,
+			"bones": {
+				"RightSteer": {
+					"position": {
+						"0.0": [0, 0, 0],
+						"1.0": [0, 0, 3]
+					}
+				},
+				"MiddleSteer": {
+					"position": {
+						"0.0": [0, 0, 0],
+						"1.0": [0, 0, 3]
+					}
+				},
+				"SteeringShaftLeft": {
+					"position": {
+						"0.0": [0, 0, 0],
+						"1.0": [0, 0, 3]
+					}
+				},
+				"RightAttachment": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"1.0": [0, -30, 0]
+					}
+				},
+				"LeftAttachment": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"1.0": [0, -30, 0]
+					}
+				}
+			}
+		},
+		"steer_right": {
+			"animation_length": 1,
+			"bones": {
+				"RightSteer": {
+					"position": {
+						"0.0": [0, 0, 0],
+						"1.0": [0, 0, -3]
+					}
+				},
+				"MiddleSteer": {
+					"position": {
+						"0.0": [0, 0, 0],
+						"1.0": [0, 0, -3]
+					}
+				},
+				"SteeringShaftLeft": {
+					"position": {
+						"0.0": [0, 0, 0],
+						"1.0": [0, 0, -3]
+					}
+				},
+				"RightAttachment": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"1.0": [0, 30, 0]
+					}
+				},
+				"LeftAttachment": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"1.0": [0, 30, 0]
+					}
+				}
+			}
+		},
+		"axle_rotation": {
+			"loop": true,
+			"animation_length": 1,
+			"bones": {
+				"MainShaft": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"0.5": [180, 0, 0],
+						"1.0": [360, 0, 0]
+					}
+				},
+				"MiddleShaft": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"0.5": [0, 0, 180],
+						"1.0": [0, 0, 360]
+					}
+				},
+				"bone5": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"0.5": [0, 0, 180],
+						"1.0": [0, 0, 360]
+					}
+				},
+				"ShaftRightRotation": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"0.5": [0, 0, 180],
+						"1.0": [0, 0, 360]
+					}
+				},
+				"RightWheel": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"0.5": [0, 0, 180],
+						"1.0": [0, 0, 360]
+					}
+				},
+				"LeftWheel": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"0.5": [0, 0, 180],
+						"1.0": [0, 0, 360]
+					}
+				}
+			}
+		},
+		"right_suspension": {
+			"animation_length": 1.625,
+			"bones": {
+				"RightUpperWishbone": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"1.0": [-32.5, 0, 0]
+					}
+				},
+				"RightLowerWishbone": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"1.0": [-27.5, 0, 0]
+					}
+				},
+				"RightSteer": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"1.0": [-30, 0, 0]
+					}
+				},
+				"group17": {
+					"position": {
+						"0.0": [0, 0, 0],
+						"1.0": [-1.2, 0, 0]
+					}
+				},
+				"group10": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"1.0": [0, -35, 0]
+					}
+				},
+				"group13": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"1.0": [-27.5, 0, 0]
+					},
+					"position": {
+						"0.0": [0, 0, 0],
+						"1.0": [0, 7, 0]
+					}
+				},
+				"RightAttachment": {
+					"position": {
+						"0.0": [0, 0, 0],
+						"1.0": [0, 7, 0]
+					}
+				},
+				"ShaftRight": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"1.0": [-37.5, 0, 0]
+					}
+				},
+				"bone4": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"1.0": [0, -35, 0]
+					}
+				}
+			}
+		}
+	}
+}

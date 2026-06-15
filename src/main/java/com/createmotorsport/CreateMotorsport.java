@@ -4,9 +4,11 @@ import com.mojang.logging.LogUtils;
 import com.createmotorsport.block.EngineBlock;
 import com.createmotorsport.block.GearboxBlock;
 import com.createmotorsport.block.ClutchBlock;
+import com.createmotorsport.block.SuspensionBlock;
 import com.createmotorsport.block.entity.ClutchBlockEntity;
 import com.createmotorsport.block.entity.EngineBlockEntity;
 import com.createmotorsport.block.entity.GearboxBlockEntity;
+import com.createmotorsport.block.entity.SuspensionBlockEntity;
 import com.createmotorsport.menu.ClutchMenu;
 import com.createmotorsport.menu.EngineMenu;
 import net.minecraft.core.registries.Registries;
@@ -92,6 +94,17 @@ public class CreateMotorsport {
             "clutch",
             CLUTCH
     );
+    public static final DeferredBlock<SuspensionBlock> SUSPENSION = BLOCKS.register(
+            "suspension",
+            () -> new SuspensionBlock(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.METAL)
+                    .strength(3.5F, 6.0F)
+                    .requiresCorrectToolForDrops())
+    );
+    public static final DeferredItem<BlockItem> SUSPENSION_ITEM = ITEMS.registerSimpleBlockItem(
+            "suspension",
+            SUSPENSION
+    );
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<EngineBlockEntity>> ENGINE_BLOCK_ENTITY =
             BLOCK_ENTITY_TYPES.register("engine_block", () -> BlockEntityType.Builder.of(
                     EngineBlockEntity::new,
@@ -106,6 +119,11 @@ public class CreateMotorsport {
             BLOCK_ENTITY_TYPES.register("clutch", () -> BlockEntityType.Builder.of(
                     ClutchBlockEntity::new,
                     CLUTCH.get()
+            ).build(null));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<SuspensionBlockEntity>> SUSPENSION_BLOCK_ENTITY =
+            BLOCK_ENTITY_TYPES.register("suspension", () -> BlockEntityType.Builder.of(
+                    SuspensionBlockEntity::new,
+                    SUSPENSION.get()
             ).build(null));
     public static final DeferredHolder<MenuType<?>, MenuType<EngineMenu>> ENGINE_MENU = MENUS.register(
             "engine",
@@ -129,6 +147,7 @@ public class CreateMotorsport {
                         output.accept(ENGINE_BLOCK_ITEM.get());
                         output.accept(GEARBOX_ITEM.get());
                         output.accept(CLUTCH_ITEM.get());
+                        output.accept(SUSPENSION_ITEM.get());
                         output.accept(AIR_INTAKE.get());
                         output.accept(EXHAUST_MANIFOLD.get());
                         output.accept(RACING_COMPONENT.get());
