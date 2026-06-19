@@ -135,7 +135,15 @@ dependencies {
     runtimeOnly("dev.engine-room.flywheel:flywheel-neoforge-${minecraft_version}:${flywheel_version}")
     implementation("com.tterrag.registrate:Registrate:${registrate_version}")
     implementation("software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}")
+    compileOnly("curse.maven:sable-${sable_curse_project}:${sable_curse_file}")
     localRuntime("curse.maven:sable-${sable_curse_project}:${sable_curse_file}")
+    compileOnly(files(
+            "libs/simulated-neoforge-1.21.1-1.3.0.jar",
+            "libs/aeronautics-neoforge-1.21.1-1.3.0.jar",
+            "libs/offroad-neoforge-1.21.1-1.3.0.jar"
+    ))
+    compileOnly(files("libs/create-aeronautics-bundled-1.21.1-1.3.0.jar"))
+    localRuntime(files("libs/create-aeronautics-bundled-1.21.1-1.3.0.jar"))
 
     // Example optional mod dependency with JEI
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime

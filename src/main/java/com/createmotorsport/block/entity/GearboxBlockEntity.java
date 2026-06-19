@@ -12,10 +12,20 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class GearboxBlockEntity extends SplitShaftBlockEntity {
-    private static final float[] RATIOS = {0.0F, 0.50F, 0.75F, 1.00F, 1.50F, 2.00F};
-    private static final String[] GEAR_NAMES = {"N", "1", "2", "3", "4", "5"};
+    private static final float[] RATIOS = {0.0F, 0.35F, 0.55F, 0.80F, 1.10F, 1.45F, 1.85F};
+    private static final String[] GEAR_NAMES = {"N", "1", "2", "3", "4", "5", "6"};
+    private static final String[] GEAR_BEHAVIOR = {
+            "Neutral",
+            "Launch gear: strong pull, low top speed",
+            "Low gear: strong pull",
+            "Mid gear: balanced acceleration",
+            "Cruise gear: more speed, less pull",
+            "High gear: high speed, weak pull",
+            "Overdrive: top speed, needs momentum"
+    };
+    private static final float GEAR_LOAD = 48.0F;
 
-    private int gear = 3;
+    private int gear = 1;
 
     public GearboxBlockEntity(BlockPos pos, BlockState state) {
         super(CreateMotorsport.GEARBOX_BLOCK_ENTITY.get(), pos, state);
@@ -34,6 +44,11 @@ public class GearboxBlockEntity extends SplitShaftBlockEntity {
         return RATIOS[gear];
     }
 
+    @Override
+    public float calculateStressApplied() {
+        return gear == 0 ? 0.0F : GEAR_LOAD * RATIOS[gear];
+    }
+
     public void changeGear(Player player, boolean downshift) {
         int previousGear = gear;
         gear = downshift ? Math.max(0, gear - 1) : Math.min(RATIOS.length - 1, gear + 1);
@@ -46,7 +61,8 @@ public class GearboxBlockEntity extends SplitShaftBlockEntity {
         attachKinetics();
         setChanged();
         notifyUpdate();
-        player.displayClientMessage(Component.literal("Gear " + GEAR_NAMES[gear] + " (" + RATIOS[gear] + ":1)"), true);
+        player.displayClientMessage(Component.literal("Gear " + GEAR_NAMES[gear]
+                + " (" + RATIOS[gear] + ":1) - " + GEAR_BEHAVIOR[gear]), true);
     }
 
     @Override

@@ -9,6 +9,7 @@ import com.createmotorsport.block.entity.ClutchBlockEntity;
 import com.createmotorsport.block.entity.EngineBlockEntity;
 import com.createmotorsport.block.entity.GearboxBlockEntity;
 import com.createmotorsport.block.entity.SuspensionBlockEntity;
+import com.createmotorsport.item.SuspensionWrenchItem;
 import com.createmotorsport.menu.ClutchMenu;
 import com.createmotorsport.menu.EngineMenu;
 import net.minecraft.core.registries.Registries;
@@ -61,11 +62,16 @@ public class CreateMotorsport {
             "exhaust_manifold",
             new Item.Properties()
     );
+    public static final DeferredItem<SuspensionWrenchItem> SUSPENSION_WRENCH = ITEMS.register(
+            "suspension_wrench",
+            () -> new SuspensionWrenchItem(new Item.Properties().stacksTo(1))
+    );
     public static final DeferredBlock<EngineBlock> ENGINE_BLOCK = BLOCKS.register(
             "engine_block",
             () -> new EngineBlock(BlockBehaviour.Properties.of()
                     .mapColor(MapColor.METAL)
                     .strength(3.5F, 6.0F)
+                    .noOcclusion()
                     .requiresCorrectToolForDrops())
     );
     public static final DeferredItem<BlockItem> ENGINE_BLOCK_ITEM = ITEMS.registerSimpleBlockItem(
@@ -99,6 +105,7 @@ public class CreateMotorsport {
             () -> new SuspensionBlock(BlockBehaviour.Properties.of()
                     .mapColor(MapColor.METAL)
                     .strength(3.5F, 6.0F)
+                    .noOcclusion()
                     .requiresCorrectToolForDrops())
     );
     public static final DeferredItem<BlockItem> SUSPENSION_ITEM = ITEMS.registerSimpleBlockItem(
@@ -150,6 +157,7 @@ public class CreateMotorsport {
                         output.accept(SUSPENSION_ITEM.get());
                         output.accept(AIR_INTAKE.get());
                         output.accept(EXHAUST_MANIFOLD.get());
+                        output.accept(SUSPENSION_WRENCH.get());
                         output.accept(RACING_COMPONENT.get());
                     })
                     .build());

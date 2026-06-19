@@ -34,14 +34,16 @@ public class EngineBlockEntity extends GeneratingKineticBlockEntity {
     private static final int BURN_TICKS = 100;
     private static final float IDLE_SPEED = 16.0F;
     private static final float MAX_SPEED = 96.0F;
-    private static final float THROTTLE_UP_RATE = 0.01F;
-    private static final float THROTTLE_DOWN_RATE = 0.025F;
+    private static final float THROTTLE_UP_RATE = 0.012F;
+    private static final float THROTTLE_DOWN_RATE = 0.020F;
     private static final float STRESS_CAPACITY = 96.0F;
-    private static final int SOUND_INTERVAL = 28;
+    private static final int SOUND_INTERVAL = 20;
+    private static final float LOAD_SMOOTHING = 0.08F;
 
     private int burnTicks;
     private int soundCooldown;
     private float throttle;
+    private float drivetrainLoad;
     private float lastGeneratedSpeed;
     private boolean wasPowered;
     private int linkedThrottleSignal = 15;
@@ -107,6 +109,7 @@ public class EngineBlockEntity extends GeneratingKineticBlockEntity {
         boolean poweredBeforeTick = engine.isFueled();
         engine.updateFuel(level, pos);
 
+        engine.updateDrivetrainLoad();
         engine.updateThrottle();
         engine.updateKineticSpeedIfNeeded();
         engine.playEngineSound(level, pos);
@@ -121,12 +124,20 @@ public class EngineBlockEntity extends GeneratingKineticBlockEntity {
 
     @Override
     public float getGeneratedSpeed() {
-        return throttle <= 0.0F ? 0.0F : IDLE_SPEED + ((MAX_SPEED - IDLE_SPEED) * throttle);
+        if (!isFueled()) {
+            return 0.0F;
+        }
+
+        return IDLE_SPEED + ((MAX_SPEED - IDLE_SPEED) * throttle * getLoadSpeedFactor());
     }
 
     @Override
     public float calculateAddedStressCapacity() {
-        return throttle > 0.0F ? STRESS_CAPACITY : 0.0F;
+        if (!isFueled()) {
+            return 0.0F;
+        }
+
+        return STRESS_CAPACITY * (0.30F + (throttle * 0.70F)) * getTorqueCurveFactor();
     }
 
     @Override
@@ -134,6 +145,7 @@ public class EngineBlockEntity extends GeneratingKineticBlockEntity {
         super.write(tag, registries, clientPacket);
         tag.putInt("BurnTicks", burnTicks);
         tag.putFloat("Throttle", throttle);
+        tag.putFloat("DrivetrainLoad", drivetrainLoad);
         ContainerHelper.saveAllItems(tag, items, registries);
     }
 
@@ -142,6 +154,7 @@ public class EngineBlockEntity extends GeneratingKineticBlockEntity {
         super.read(tag, registries, clientPacket);
         burnTicks = tag.getInt("BurnTicks");
         throttle = tag.getFloat("Throttle");
+        drivetrainLoad = tag.getFloat("DrivetrainLoad");
         lastGeneratedSpeed = getGeneratedSpeed();
         wasPowered = isFueled();
         ContainerHelper.loadAllItems(tag, items, registries);
@@ -203,6 +216,7 @@ public class EngineBlockEntity extends GeneratingKineticBlockEntity {
                 .setValue(com.createmotorsport.block.EngineBlock.HAS_INTAKE, hasIntake());
         if (updated != state) {
             level.setBlock(worldPosition, updated, 3);
+            notifyUpdate();
         }
     }
 
@@ -211,13 +225,6 @@ public class EngineBlockEntity extends GeneratingKineticBlockEntity {
     }
 
     private void updateFuel(Level level, BlockPos pos) {
-        if (!shouldConsumeFuel()) {
-            if (burnTicks > 0) {
-                burnTicks--;
-            }
-            return;
-        }
-
         if (burnTicks <= 1 && tryDrainLava(level, pos)) {
             burnTicks = BURN_TICKS;
             return;
@@ -226,10 +233,6 @@ public class EngineBlockEntity extends GeneratingKineticBlockEntity {
         if (burnTicks > 0) {
             burnTicks--;
         }
-    }
-
-    private boolean shouldConsumeFuel() {
-        return !hasThrottleLink() || linkedThrottleSignal > 0;
     }
 
     private void updateThrottle() {
@@ -243,11 +246,21 @@ public class EngineBlockEntity extends GeneratingKineticBlockEntity {
         }
     }
 
+    private void updateDrivetrainLoad() {
+        float targetLoad = 0.0F;
+        if (isFueled() && capacity > 0.0F) {
+            targetLoad = Math.clamp(stress / capacity, 0.0F, 1.50F);
+        }
+
+        drivetrainLoad += (targetLoad - drivetrainLoad) * LOAD_SMOOTHING;
+    }
+
     private float getTargetThrottle() {
         if (!hasThrottleLink()) {
             return 1.0F;
         }
 
+        // A linked throttle behaves like a pedal: signal 0 is idle, signal 15 is wide open.
         return Math.clamp(linkedThrottleSignal / 15.0F, 0.0F, 1.0F);
     }
 
@@ -292,7 +305,7 @@ public class EngineBlockEntity extends GeneratingKineticBlockEntity {
     }
 
     private void playEngineSound(Level level, BlockPos pos) {
-        if (throttle <= 0.0F) {
+        if (!isFueled()) {
             soundCooldown = 0;
             return;
         }
@@ -303,24 +316,49 @@ public class EngineBlockEntity extends GeneratingKineticBlockEntity {
         }
 
         soundCooldown = SOUND_INTERVAL;
-        level.playSound(null, pos, getSoundForThrottle(), SoundSource.BLOCKS, 0.85F, getPitchForThrottle());
+        level.playSound(null, pos, getSoundForThrottle(), SoundSource.BLOCKS, getSoundVolume(), getPitchForThrottle());
     }
 
     private SoundEvent getSoundForThrottle() {
-        if (throttle < 0.25F) {
+        float soundThrottle = getSoundThrottle();
+        if (soundThrottle < 0.25F) {
             return CreateMotorsport.ENGINE_IDLE.get();
         }
-        if (throttle < 0.55F) {
+        if (soundThrottle < 0.55F) {
             return CreateMotorsport.ENGINE_LOW.get();
         }
-        if (throttle < 0.82F) {
+        if (soundThrottle < 0.82F) {
             return CreateMotorsport.ENGINE_MID.get();
         }
         return CreateMotorsport.ENGINE_FAST.get();
     }
 
+    private float getSoundThrottle() {
+        return Math.clamp((getGeneratedSpeed() - IDLE_SPEED) / (MAX_SPEED - IDLE_SPEED), 0.0F, 1.0F);
+    }
+
+    private float getLoadSpeedFactor() {
+        if (drivetrainLoad <= 0.65F) {
+            return 1.0F;
+        }
+
+        float overload = Math.clamp((drivetrainLoad - 0.65F) / 0.60F, 0.0F, 1.0F);
+        return 1.0F - (overload * 0.55F);
+    }
+
+    private float getTorqueCurveFactor() {
+        float rpmRatio = Math.clamp(throttle * getLoadSpeedFactor(), 0.0F, 1.0F);
+        float midRangeTorque = 1.15F - (Math.abs(rpmRatio - 0.55F) * 0.70F);
+        float redlineFalloff = rpmRatio > 0.82F ? (rpmRatio - 0.82F) * 0.85F : 0.0F;
+        return Math.clamp(midRangeTorque - redlineFalloff, 0.65F, 1.15F);
+    }
+
+    private float getSoundVolume() {
+        return 0.35F + (getSoundThrottle() * 0.55F);
+    }
+
     private float getPitchForThrottle() {
-        return 0.85F + (throttle * 0.35F);
+        return 0.80F + (getSoundThrottle() * 0.55F);
     }
 
     private boolean tryDrainLava(Level level, BlockPos pos) {
