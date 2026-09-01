@@ -63,8 +63,6 @@ public final class DrivetrainSim {
     private boolean pitLimiter;
     public double update(boolean running, double throttle, boolean clutchHeld, boolean semiAuto,
                          boolean shiftUpEdge, boolean shiftDownEdge, double wheelOmega, double dt, boolean pitLimiter) {
-    public double update(boolean running, double throttle, boolean clutchHeld, boolean semiAuto,
-                         boolean shiftUpEdge, boolean shiftDownEdge, double wheelOmega, double dt) {
         double inertia = Config.ENGINE_INERTIA.getAsDouble();
         double omega = this.rpm / RAD_TO_RPM;
         double maxOmega = this.spec.redlineRpm() * 1.05 / RAD_TO_RPM;

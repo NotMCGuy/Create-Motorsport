@@ -378,7 +378,6 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity {
         if (engine != null) {
             engine.setDriverControls(throttle01, clutch, shiftUp, shiftDown);
             engine.setDriverAids(overtake, modeUp, modeDown, tractionControl, PitLimiter);
-            engine.setDriverAids(overtake, modeUp, modeDown, tractionControl);
             engine.setDriveMode(driveMode);
         }
         if (suspensions.isEmpty()) {

@@ -46,7 +46,6 @@ public class EngineBlockEntity extends SmartBlockEntity implements dev.ryanhcode
         SHIFT_UP("Shift Up"),
         SHIFT_DOWN("Shift Down"),
         PIT_LIMITER("Pit Limiter");
-        SHIFT_DOWN("Shift Down");
 
         private final String displayName;
 
@@ -243,7 +242,6 @@ public class EngineBlockEntity extends SmartBlockEntity implements dev.ryanhcode
         boolean semiAuto = Config.SEMI_AUTO_SHIFT.get();
         double totalTorque = drivetrain.update(running, throttle, clutchHeld, semiAuto, shiftUpEdge, shiftDownEdge,
                 avgOmega, 1.0 / 20.0, pitLimiter);
-                avgOmega, 1.0 / 20.0);
         totalTorque *= Config.DRIVETRAIN_TORQUE_SCALE.getAsDouble();
         totalTorque *= powerFactor(driving && auxOvertake, avgOmega, repRadius, running);
 
@@ -419,7 +417,6 @@ public class EngineBlockEntity extends SmartBlockEntity implements dev.ryanhcode
 
     // driving aids that affect torque: engine mode, overtake boost, traction control. Pushed here from steering wheel
     public void setDriverAids(boolean overtake, boolean modeUp, boolean modeDown, boolean tcToggle, boolean pitLimiterToggle) {
-    public void setDriverAids(boolean overtake, boolean modeUp, boolean modeDown, boolean tcToggle) {
         if (level == null || level.isClientSide) {
             return;
         }
@@ -451,16 +448,6 @@ public class EngineBlockEntity extends SmartBlockEntity implements dev.ryanhcode
     
         factor *= tractionControlCap(avgOmega, repRadius, running);
 
-        boosting = wantBoost && boostReserve > 0.0;
-        if (boosting) {
-            factor *= BOOST_FACTOR;
-            boostReserve = Math.max(0.0, boostReserve - BOOST_DRAIN);
-        } else {
-            boostReserve = Math.min(1.0, boostReserve + BOOST_RECHARGE);
-        }
-
-        factor *= tractionControlCap(avgOmega, repRadius, running);
-
         telemPowerFactor = factor;
         return factor;
     }
@@ -477,9 +464,7 @@ public class EngineBlockEntity extends SmartBlockEntity implements dev.ryanhcode
         double factor = 1.0;
         double slip = wheelSurface - ground; // m/s of wheelspin
         if (slip > TCL_SLIP) {
-            factor = Mth.clamp(1.0 - (slip - TCL_SLIP) / TCL_RANGE, 1.0, 1.0);
-            factor = Mth.clamp(1.0 - (slip - TCL_SLIP) / TCL_RANGE, 0.0, 1.0);
-        }
+            factor = Mth.clamp(1.0 - (slip - TCL_SLIP) / TCL_RANGE, 1.0, 1.0);        }
 
         Vec3 fwd = headingForward();
         double sideSlip = Math.abs(vel.x * fwd.z - vel.z * fwd.x);
