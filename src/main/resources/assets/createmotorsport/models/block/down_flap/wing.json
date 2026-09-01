@@ -1,0 +1,24 @@
+{
+	"format_version": "1.21.11",
+	"credit": "Made with Blockbench",
+	"texture_size": [32, 32],
+	"textures": {
+		"6": "createmotorsport:block/down_flap/wing"
+	},
+	"elements": [
+		{
+			"name": "wing_partial",
+			"from": [0, -1, 2],
+			"to": [16, 1, 9],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 0, 6.5]},
+			"faces": {
+				"north": {"uv": [8, 1.5, 16, 2.5], "texture": "#6"},
+				"east": {"uv": [8, 3.5, 11.5, 4.5], "texture": "#6"},
+				"south": {"uv": [8, 2.5, 16, 3.5], "texture": "#6"},
+				"west": {"uv": [8, 4.5, 11.5, 5.5], "texture": "#6"},
+				"up": {"uv": [8, 3.5, 0, 0], "texture": "#6"},
+				"down": {"uv": [8, 3.5, 0, 7], "texture": "#6"}
+			}
+		}
+	]
+}

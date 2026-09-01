@@ -3,6 +3,7 @@
   "block.createmotorsport.engine_block": "Engine Block",
   "block.createmotorsport.suspension": "Suspension",
   "block.createmotorsport.steering_wheel": "Steering Wheel",
+  "block.createmotorsport.down_flap": "Down Flap",
   "item.createmotorsport.air_intake": "Air Intake",
   "item.createmotorsport.exhaust_manifold": "Exhaust Manifold",
   "item.createmotorsport.suspension_wrench": "Suspension Wrench",
@@ -15,6 +16,7 @@
   "container.createmotorsport.engine": "Engine Block",
   "container.createmotorsport.suspension": "Suspension Steering",
   "container.createmotorsport.steering_wheel": "Steering Wheel",
+  "container.createmotorsport.down_flap": "Down Flap",
 
   "key.categories.createmotorsport": "Create: Motorsport",
   "key.createmotorsport.throttle": "Throttle",
@@ -31,5 +33,7 @@
   "createmotorsport.configuration.section.createmotorsport.common.toml": "Create: Motorsport Configs",
   "createmotorsport.configuration.section.createmotorsport.common.toml.title": "Create: Motorsport Configs",
   "createmotorsport.configuration.enableDebugLogging": "Enable Debug Logging",
-  "createmotorsport.configuration.drivetrainTorqueScale": "Drivetrain Torque Scale"
+  "createmotorsport.configuration.drivetrainTorqueScale": "Drivetrain Torque Scale",
+
+  "create.tooltip.flapState": "Flap State: %1$s/15"
 }

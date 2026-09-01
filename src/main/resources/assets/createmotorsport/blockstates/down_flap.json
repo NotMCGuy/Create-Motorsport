@@ -1,0 +1,147 @@
+{
+  "multipart": [
+    {
+      "when": {
+        "facing": "north",
+        "pillar": "false"
+      },
+      "apply": {
+        "model": "createmotorsport:block/down_flap/block"
+      }
+    },
+    {
+      "when": {
+        "facing": "east",
+        "pillar": "false"
+      },
+      "apply": {
+        "model": "createmotorsport:block/down_flap/block", "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "south",
+        "pillar": "false"
+      },
+      "apply": {
+        "model": "createmotorsport:block/down_flap/block", "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "west",
+        "pillar": "false"
+      },
+      "apply": {
+        "model": "createmotorsport:block/down_flap/block", "y": 270
+      }
+    },
+    {
+      "when": {
+        "facing": "north",
+        "pillar": "true"
+      },
+      "apply": {
+        "model": "createmotorsport:block/down_flap/pillar"
+      }
+    },
+    {
+      "when": {
+        "facing": "east",
+        "pillar": "true"
+      },
+      "apply": {
+        "model": "createmotorsport:block/down_flap/pillar", "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "south",
+        "pillar": "true"
+      },
+      "apply": {
+        "model": "createmotorsport:block/down_flap/pillar", "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "west",
+        "pillar": "true"
+      },
+      "apply": {
+        "model": "createmotorsport:block/down_flap/pillar", "y": 270
+      }
+    },    {
+      "when": {
+        "facing": "north",
+        "left": "true"
+      },
+      "apply": {
+        "model": "createmotorsport:block/down_flap/left"
+      }
+    },
+    {
+      "when": {
+        "facing": "east",
+        "left": "true"
+      },
+      "apply": {
+        "model": "createmotorsport:block/down_flap/left", "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "south",
+        "left": "true"
+      },
+      "apply": {
+        "model": "createmotorsport:block/down_flap/left", "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "west",
+        "left": "true"
+      },
+      "apply": {
+        "model": "createmotorsport:block/down_flap/left", "y": 270
+      }
+    },
+    {
+      "when": {
+        "facing": "north",
+        "right": "true"
+      },
+      "apply": {
+        "model": "createmotorsport:block/down_flap/right"
+      }
+    },
+    {
+      "when": {
+        "facing": "east",
+        "right": "true"
+      },
+      "apply": {
+        "model": "createmotorsport:block/down_flap/right", "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "south",
+        "right": "true"
+      },
+      "apply": {
+        "model": "createmotorsport:block/down_flap/right", "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "west",
+        "right": "true"
+      },
+      "apply": {
+        "model": "createmotorsport:block/down_flap/right", "y": 270
+      }
+    }
+  ]
+}

@@ -3,6 +3,8 @@ package com.createmotorsport;
 import com.createmotorsport.block.EngineBlock;
 import com.createmotorsport.block.SteeringWheelBlock;
 import com.createmotorsport.block.SuspensionBlock;
+import com.createmotorsport.block.DownFlapBlock;
+import com.createmotorsport.block.entity.DownFlapBlockEntity;
 import com.createmotorsport.block.entity.EngineBlockEntity;
 import com.createmotorsport.block.entity.SteeringWheelBlockEntity;
 import com.createmotorsport.block.entity.SuspensionBlockEntity;
@@ -151,6 +153,24 @@ public class CreateMotorsport {
                     SteeringWheelBlockEntity::new,
                     STEERING_WHEEL.get()
             ).build(null));
+    public static final DeferredBlock<DownFlapBlock> DOWN_FLAP_BLOCK = BLOCKS.register(
+            "down_flap",
+            () -> new DownFlapBlock(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.METAL)
+                    .strength(2F, 6.0F)
+                    .noOcclusion()
+                    .requiresCorrectToolForDrops())
+    );
+    public static final DeferredItem<BlockItem> DOWN_FLAP_ITEM = ITEMS.registerSimpleBlockItem(
+            "down_flap",
+            DOWN_FLAP_BLOCK
+    );
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<DownFlapBlockEntity>> DOWN_FLAP_BLOCK_ENTITY =
+            BLOCK_ENTITY_TYPES.register("down_flap", () -> BlockEntityType.Builder.of(
+                    DownFlapBlockEntity::new,
+                    DOWN_FLAP_BLOCK.get()
+            ).build(null));
+
     public static final DeferredHolder<MenuType<?>, MenuType<EngineMenu>> ENGINE_MENU = MENUS.register(
             "engine",
             () -> IMenuTypeExtension.create((id, inv, buf) -> new EngineMenu(id, inv, buf.readBlockPos()))
@@ -177,6 +197,7 @@ public class CreateMotorsport {
                         output.accept(ENGINE_BLOCK_ITEM.get());
                         output.accept(SUSPENSION_ITEM.get());
                         output.accept(STEERING_WHEEL_ITEM.get());
+                        output.accept(DOWN_FLAP_ITEM.get());
                         output.accept(AIR_INTAKE.get());
                         output.accept(EXHAUST_MANIFOLD.get());
                         output.accept(SUSPENSION_WRENCH.get());
