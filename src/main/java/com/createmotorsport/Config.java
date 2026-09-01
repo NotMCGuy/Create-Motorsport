@@ -47,7 +47,7 @@ public class Config {
     public static final ModConfigSpec.DoubleValue DRIVETRAIN_TORQUE_SCALE = BUILDER
             .comment("Converts real crank torque (Nm) into Sable's world scale,",
                     "to account for Minecraft-scale car mass")
-            .defineInRange("drivetrainTorqueScale", 0.05, 0.0001, 10.0);
+            .defineInRange("drivetrainTorqueScale", 0.11, 0.0001, 10.0);
 
     public static final ModConfigSpec.DoubleValue DRIVELINE_EFFICIENCY = BUILDER
             .comment("Driveline efficiency %",
