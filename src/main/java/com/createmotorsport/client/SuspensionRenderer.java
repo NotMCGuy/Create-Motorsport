@@ -1,5 +1,6 @@
 package com.createmotorsport.client;
 
+import com.createmotorsport.Config;
 import com.createmotorsport.block.entity.SuspensionBlockEntity;
 import com.createmotorsport.block.entity.SuspensionBlockEntity.WheelSide;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -24,6 +25,7 @@ import software.bernie.geckolib.renderer.GeoBlockRenderer;
 public class SuspensionRenderer extends GeoBlockRenderer<SuspensionBlockEntity> {
     private static final float SPIN_SIGN = 1.0F;
     private static final float STEER_SIGN = 1.0F;
+    private static final float CAMBER_RENDER_SIGN = -1.0F; // which sign leans when inward
 
     private static final float DROP_HEIGHT = 0.5F;
 
@@ -88,6 +90,12 @@ public class SuspensionRenderer extends GeoBlockRenderer<SuspensionBlockEntity> 
         ms.mulPose(Axis.YP.rotation(steer * STEER_SIGN)); // steering yaw
         if (flip) {
             ms.mulPose(Axis.YP.rotation((float) Math.PI));
+        }
+
+        float camberDeg = (float) (be.isFrontAxle()
+                ? Config.CAMBER_FRONT.getAsDouble() : Config.CAMBER_REAR.getAsDouble());
+        if (camberDeg != 0.0F) {
+            ms.mulPose(Axis.XP.rotation((float) Math.toRadians(camberDeg) * CAMBER_RENDER_SIGN));
         }
         ms.mulPose(Axis.ZP.rotation(spin * SPIN_SIGN * (flip ? -1.0F : 1.0F)));
 

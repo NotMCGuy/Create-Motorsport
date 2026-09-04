@@ -1,0 +1,383 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.unknown",
+				"texture_width": 128,
+				"texture_height": 128,
+				"visible_bounds_width": 4,
+				"visible_bounds_height": 2.5,
+				"visible_bounds_offset": [0, 0.75, 0]
+			},
+			"bones": [
+				{
+					"name": "SuspensionAssembly",
+					"pivot": [0, 0, 0]
+				},
+				{
+					"name": "RightUpperWishbone",
+					"parent": "SuspensionAssembly",
+					"pivot": [0, 15, -8],
+					"rotation": [15, 0, 0],
+					"cubes": [
+						{"origin": [5.31219, 15, -20.89334], "size": [2, 1, 16], "pivot": [-0.14852, 16, -7.04877], "rotation": [23.78773, 18.42031, 7.92945], "uv": [40, 18]},
+						{"origin": [-8.13856, 15, -20.58882], "size": [2, 1, 16], "pivot": [-0.14852, 16, -7.04877], "rotation": [24.56202, -22.9824, -10.11783], "uv": [40, 35]}
+					]
+				},
+				{
+					"name": "LeftUpperWishbone",
+					"parent": "SuspensionAssembly",
+					"pivot": [0, 15, 8],
+					"rotation": [-12.5, 0, 0],
+					"cubes": [
+						{"origin": [5.31219, 15, 4.89334], "size": [2, 1, 16], "pivot": [-0.14852, 16, 7.04877], "rotation": [-23.78773, -18.42031, 7.92945], "uv": [36, 52]},
+						{"origin": [-8.13856, 15, 4.58882], "size": [2, 1, 16], "pivot": [-0.14852, 16, 7.04877], "rotation": [-24.56202, 22.9824, -10.11783], "uv": [0, 58]}
+					]
+				},
+				{
+					"name": "RightLowerWishbone",
+					"parent": "SuspensionAssembly",
+					"pivot": [-0.08921, -0.05113, -8.30945],
+					"rotation": [15, 0, 0],
+					"cubes": [
+						{"origin": [5.31219, 0, -19.89334], "size": [2, 1, 15], "pivot": [-0.14852, 1, -7.04877], "rotation": [5.31911, 19.92067, 1.81694], "uv": [72, 52]},
+						{"origin": [-8.13856, 0, -19.58882], "size": [2, 1, 15], "pivot": [-0.14852, 1, -7.04877], "rotation": [5.51385, -24.89838, -2.3273], "uv": [72, 68]}
+					]
+				},
+				{
+					"name": "LeftLowerWishbone",
+					"parent": "SuspensionAssembly",
+					"pivot": [-0.08921, -0.05113, 8.30945],
+					"rotation": [-32.5, 0, 0],
+					"cubes": [
+						{"origin": [5.31219, 0, 4.89334], "size": [2, 1, 15], "pivot": [-0.14852, 1, 7.04877], "rotation": [10.62758, -19.6835, -3.61644], "uv": [0, 75]},
+						{"origin": [-8.13856, 0, 4.58882], "size": [2, 1, 15], "pivot": [-0.14852, 1, 7.04877], "rotation": [11.00966, 24.59477, 4.62934], "uv": [76, 0]}
+					]
+				},
+				{
+					"name": "Steering",
+					"parent": "SuspensionAssembly",
+					"pivot": [6, 6, -22]
+				},
+				{
+					"name": "RightSteer",
+					"parent": "Steering",
+					"pivot": [5, 7, -8],
+					"rotation": [10, 0, 0],
+					"cubes": [
+						{"origin": [4, 6, -22], "size": [2, 2, 14], "pivot": [5, 7, -8], "rotation": [15, 0, 0], "uv": [76, 16]}
+					]
+				},
+				{
+					"name": "MiddleSteer",
+					"parent": "Steering",
+					"pivot": [6, 6, -8],
+					"cubes": [
+						{"origin": [4, 6, -8], "size": [2, 2, 16], "uv": [0, 40]}
+					]
+				},
+				{
+					"name": "LeftSteer",
+					"parent": "Steering",
+					"pivot": [6, 25, -22]
+				},
+				{
+					"name": "SteeringShaftLeft",
+					"parent": "LeftSteer",
+					"pivot": [5, 7, 8],
+					"rotation": [-10, 0, 0],
+					"cubes": [
+						{"origin": [4, 6, 8], "size": [2, 2, 14], "pivot": [5, 7, 8], "rotation": [-15, 0, 0], "uv": [76, 32]}
+					]
+				},
+				{
+					"name": "RightPushrod",
+					"parent": "SuspensionAssembly",
+					"pivot": [-3, 12.5, -5.5],
+					"cubes": [
+						{"origin": [-6, 13.5, -5.5], "size": [2, 2, 2], "uv": [104, 90]}
+					]
+				},
+				{
+					"name": "group14",
+					"parent": "RightPushrod",
+					"pivot": [0, 13, -5],
+					"cubes": [
+						{"origin": [-4, 14, -5], "size": [4, 1, 1], "uv": [62, 98]}
+					]
+				},
+				{
+					"name": "group17",
+					"parent": "RightPushrod",
+					"pivot": [0, 12.5, -5.6],
+					"cubes": [
+						{"origin": [-2.5, 13.5, -5.5], "size": [1, 2, 2], "uv": [88, 103]}
+					]
+				},
+				{
+					"name": "group10",
+					"parent": "RightPushrod",
+					"pivot": [0, 14, -7],
+					"cubes": [
+						{"origin": [0, 12.5, -7], "size": [4, 2, 4], "uv": [94, 100]}
+					]
+				},
+				{
+					"name": "group13",
+					"parent": "RightPushrod",
+					"pivot": [2, 2, -20],
+					"cubes": [
+						{"origin": [-0.83227, 1.25882, -19.95125], "size": [2, 2, 18], "pivot": [1, 1, -21], "rotation": [37, 9.65594, 2.61298], "uv": [0, 0]}
+					]
+				},
+				{
+					"name": "LeftPushrod",
+					"parent": "SuspensionAssembly",
+					"pivot": [-3, 12.5, 5.5],
+					"cubes": [
+						{"origin": [-6, 13.5, 3.5], "size": [2, 2, 2], "uv": [104, 94]}
+					]
+				},
+				{
+					"name": "group25",
+					"parent": "LeftPushrod",
+					"pivot": [0, 13, 5],
+					"cubes": [
+						{"origin": [-4, 14, 4], "size": [4, 1, 1], "uv": [62, 98]}
+					]
+				},
+				{
+					"name": "group26",
+					"parent": "LeftPushrod",
+					"pivot": [0, -6.5, -5.6],
+					"cubes": [
+						{"origin": [-2.5, 13.5, 3.5], "size": [1, 2, 2], "uv": [36, 105]}
+					]
+				},
+				{
+					"name": "group27",
+					"parent": "LeftPushrod",
+					"pivot": [0, 14, 7],
+					"cubes": [
+						{"origin": [0, 12.5, 3], "size": [4, 2, 4], "uv": [62, 103]}
+					]
+				},
+				{
+					"name": "group28",
+					"parent": "LeftPushrod",
+					"pivot": [1, 2, 20],
+					"cubes": [
+						{"origin": [-0.66454, 1.85211, 1.73857], "size": [2, 2, 18], "pivot": [1, 1, 20], "rotation": [-37, -9.65594, 2.61298], "uv": [0, 20]}
+					]
+				},
+				{
+					"name": "RightAttachment",
+					"parent": "SuspensionAssembly",
+					"pivot": [0, -1, -21],
+					"cubes": [
+						{"origin": [4, -1, -23], "size": [3, 4, 2], "uv": [62, 92]},
+						{
+							"origin": [-4, -3, -23],
+							"size": [8, 8, 3],
+							"uv": {
+								"north": {"uv": [108, 40], "uv_size": [8, 8]},
+								"east": {"uv": [29, 109], "uv_size": [3, 8]},
+								"south": {"uv": [78, 108], "uv_size": [8, 8]},
+								"west": {"uv": [32, 109], "uv_size": [3, 8]},
+								"up": {"uv": [106, 79], "uv_size": [8, 3]},
+								"down": {"uv": [108, 51], "uv_size": [8, -3]}
+							}
+						},
+						{
+							"origin": [-1, -5, -22],
+							"size": [2, 12, 3],
+							"uv": {
+								"north": {"uv": [35, 109], "uv_size": [2, 12]},
+								"east": {"uv": [36, 40], "uv_size": [3, 12]},
+								"south": {"uv": [37, 109], "uv_size": [2, 12]},
+								"west": {"uv": [56, 105], "uv_size": [3, 12]},
+								"up": {"uv": [34, 75], "uv_size": [2, 3]},
+								"down": {"uv": [34, 81], "uv_size": [2, -3]}
+							}
+						}
+					]
+				},
+				{
+					"name": "bone2",
+					"parent": "RightAttachment",
+					"pivot": [1, 0, -19],
+					"cubes": [
+						{"origin": [-1.5, -0.5, -19], "size": [3, 3, 2], "uv": [78, 103]}
+					]
+				},
+				{
+					"name": "LeftAttachment",
+					"parent": "SuspensionAssembly",
+					"pivot": [0, -1, 21],
+					"cubes": [
+						{"origin": [4, -1, 21], "size": [3, 4, 2], "uv": [26, 98]},
+						{
+							"origin": [-1, -5, 19],
+							"size": [2, 12, 3],
+							"uv": {
+								"north": {"uv": [39, 109], "uv_size": [2, 12]},
+								"east": {"uv": [59, 105], "uv_size": [3, 12]},
+								"south": {"uv": [62, 109], "uv_size": [2, 12]},
+								"west": {"uv": [26, 109], "uv_size": [3, 12]},
+								"up": {"uv": [34, 81], "uv_size": [2, 3]},
+								"down": {"uv": [70, 89], "uv_size": [2, -3]}
+							}
+						},
+						{
+							"origin": [-4, -3, 20],
+							"size": [8, 8, 3],
+							"uv": {
+								"north": {"uv": [86, 108], "uv_size": [8, 8]},
+								"east": {"uv": [64, 109], "uv_size": [3, 8]},
+								"south": {"uv": [108, 106], "uv_size": [8, 8]},
+								"west": {"uv": [67, 109], "uv_size": [3, 8]},
+								"up": {"uv": [70, 109], "uv_size": [8, 3]},
+								"down": {"uv": [110, 3], "uv_size": [8, -3]}
+							}
+						}
+					]
+				},
+				{
+					"name": "bone",
+					"parent": "LeftAttachment",
+					"pivot": [0, 1, 18],
+					"cubes": [
+						{"origin": [-1.5, -0.5, 17], "size": [3, 3, 2], "uv": [26, 104]}
+					]
+				},
+				{
+					"name": "Shaft",
+					"parent": "SuspensionAssembly",
+					"pivot": [-2, 6, -2]
+				},
+				{
+					"name": "MainShaft",
+					"parent": "Shaft",
+					"pivot": [-2, 8, 0]
+				},
+				{
+					"name": "ShaftRight",
+					"parent": "Shaft",
+					"pivot": [0, 8, -8],
+					"rotation": [37.5, 0, 0]
+				},
+				{
+					"name": "ShaftRightRotation",
+					"parent": "ShaftRight",
+					"pivot": [0, 8, -8],
+					"cubes": [
+						{"origin": [-1, 7, -19], "size": [2, 2, 11], "uv": [36, 92]}
+					]
+				},
+				{
+					"name": "MiddleShaft",
+					"parent": "Shaft",
+					"pivot": [0, 8, -8],
+					"cubes": [
+						{"origin": [-1, 7, -8], "size": [2, 2, 16], "uv": [40, 0]}
+					]
+				},
+				{
+					"name": "LeftShaft",
+					"parent": "SuspensionAssembly",
+					"pivot": [-2, 25, -2]
+				},
+				{
+					"name": "LeftShaftRotation",
+					"parent": "LeftShaft",
+					"pivot": [0, 8, 8],
+					"rotation": [-37.5, 0, 0]
+				},
+				{
+					"name": "bone5",
+					"parent": "LeftShaftRotation",
+					"pivot": [0, 8, 8],
+					"cubes": [
+						{"origin": [-1, 7, 8], "size": [2, 2, 11], "uv": [0, 98]}
+					]
+				},
+				{
+					"name": "Housing",
+					"parent": "SuspensionAssembly",
+					"pivot": [8, 0, -8],
+					"cubes": [
+						{"origin": [5, 14, -7], "size": [2, 2, 14], "uv": [72, 84]},
+						{"origin": [-7, 10, -7], "size": [14, 1, 2], "uv": [76, 48]},
+						{"origin": [-7, 10, 5], "size": [14, 1, 2], "uv": [62, 100]},
+						{"origin": [-1, 15, -8], "size": [2, 1, 16], "uv": [36, 69]},
+						{"origin": [-7, 0, 4], "size": [14, 2, 4], "uv": [34, 86]},
+						{"origin": [-15, 8, 4], "size": [14, 2, 4], "pivot": [-8, 8, 1], "rotation": [0, 0, 90], "uv": [34, 86]},
+						{"origin": [-15, 8, -8], "size": [14, 2, 4], "pivot": [-8, 8, -11], "rotation": [0, 0, 90], "uv": [34, 86]},
+						{"origin": [-1, 8, 4], "size": [14, 2, 4], "pivot": [6, 8, 1], "rotation": [0, 0, 90], "uv": [34, 86]},
+						{"origin": [-1, 8, -8], "size": [14, 2, 4], "pivot": [6, 8, -11], "rotation": [0, 0, 90], "uv": [34, 86]},
+						{"origin": [-7, 0, -8], "size": [14, 2, 4], "uv": [0, 92]}
+					]
+				},
+				{
+					"name": "bone3",
+					"parent": "Housing",
+					"pivot": [0, 11, 7],
+					"cubes": [
+						{"origin": [-1, 11, 6], "size": [2, 4, 2], "uv": [104, 84]}
+					]
+				},
+				{
+					"name": "bone4",
+					"parent": "Housing",
+					"pivot": [0, 11, -7],
+					"cubes": [
+						{"origin": [-1, 11, -8], "size": [2, 4, 2], "uv": [104, 84]}
+					]
+				},
+				{
+					"name": "Transmission",
+					"pivot": [-1, 21, -13],
+					"cubes": [
+						{
+							"origin": [-7, 5, -5],
+							"size": [14, 8, 10],
+							"uv": {
+								"north": {"uv": [106, 61], "uv_size": [14, 8]},
+								"east": {"uv": [108, 24], "uv_size": [10, 8]},
+								"south": {"uv": [106, 69], "uv_size": [14, 8]},
+								"west": {"uv": [108, 32], "uv_size": [10, 8]},
+								"up": {"uv": [42, 105], "uv_size": [14, 10]},
+								"down": {"uv": [106, 61], "uv_size": [14, -10]}
+							}
+						},
+						{
+							"origin": [-7, 3, -4],
+							"size": [14, 2, 8],
+							"uv": {
+								"north": {"uv": [104, 98], "uv_size": [14, 2]},
+								"east": {"uv": [106, 82], "uv_size": [8, 2]},
+								"south": {"uv": [106, 77], "uv_size": [14, 2]},
+								"west": {"uv": [110, 3], "uv_size": [8, 2]},
+								"up": {"uv": [94, 106], "uv_size": [14, 8]},
+								"down": {"uv": [108, 24], "uv_size": [14, -8]}
+							}
+						},
+						{
+							"origin": [-8, 6, -2],
+							"size": [1, 4, 4],
+							"uv": {
+								"north": {"uv": [39, 40], "uv_size": [1, 4]},
+								"east": {"uv": [110, 5], "uv_size": [4, 4]},
+								"south": {"uv": [39, 44], "uv_size": [1, 4]},
+								"west": {"uv": [110, 9], "uv_size": [4, 4]},
+								"up": {"uv": [39, 48], "uv_size": [1, 4]},
+								"down": {"uv": [41, 113], "uv_size": [1, -4]}
+							}
+						}
+					]
+				}
+			]
+		}
+	]
+}

@@ -1,6 +1,7 @@
 package com.createmotorsport.physics;
 
 import com.createmotorsport.Config;
+import com.createmotorsport.physics.spec.DamperSpec;
 import net.minecraft.util.Mth;
 
 // slip-based tire friction
@@ -158,6 +159,14 @@ public final class TireModel {
                 * Mth.clamp(groundSpeed / ROLL_RESIST_SMOOTH, -1.0, 1.0);
     }
 
+    public static double gripUtilisation(double forwardImpulse, double sideImpulse, double maxImpulse) {
+        if (maxImpulse <= 1.0e-9) {
+            return 0.0;
+        }
+        double x = forwardImpulse * Config.FRICTION_ELLIPSE_LONG_WEIGHT.getAsDouble();
+        return Math.sqrt(x * x + sideImpulse * sideImpulse) / maxImpulse;
+    }
+
     /** Clamps a pair of impulses from each side to the friction ellipse
     // maxImpulse = N * mu * dt, same thing that Rapier does in DynamicRayCastVehicleController for the sliding check
     // Longitudinal is weighted 0.5, Bullet does this fwd_factor that is for braking/driving to feel smoother I think
@@ -174,24 +183,97 @@ public final class TireModel {
         return maxImpulse / Math.sqrt(lenSq);
     }
 
-    /** critically-damped-spring suspension force
-     * @param effectiveMass -> 1/inverseNormalMass, only what the individual wheel carries
-     * @param naturalFreqHz -> ride frequency; ~1.5 Hz normal road car, ~3.5 Hz race car
-     * @param dampingRatio -> 0.2 = boat, 0.7 = sporty, 1.0 = no overshooting
-     * @param compression -> rest length minus current spring length (m), positive when compressed
-     * @param relVelocity -> vertical velocity of the hardpoint along the suspension axis (m/s)
-     *                    positive when extending away from ground
-     * @return -> spring force along the contact normal (N), positive only since springs dont pull
+    /** Suspension force for one corner (N)
+     * @param rateMass      sprung mass this corner holds up (kg), sets the spring rate
+     * @param naturalFreqHz ~1.5 Hz road car, ~3.5 Hz race car
+     * @param dampingRatio  0.2 = boat, 0.7 = sporty, 1.0 = no overshooting
+     * @param compression   rest length minus current spring length (m), positive compressed
+     * @param relVelocity   hardpoint velocity along the suspension axis (m/s), positive extending
+     * @param damper        force-velocity curve, DamperSpec.LINEAR for no knee
+     * @param responseMass  mass the body shows to a force here, Sable's normal mass
+     * @param dt            substep length (s)
      */
-    public static double suspensionForce(double effectiveMass, double naturalFreqHz, double dampingRatio,
-                                         double compression, double relVelocity) {
+    public static double suspensionForce(double rateMass, double naturalFreqHz, double dampingRatio,
+                                         double compression, double relVelocity, DamperSpec damper,
+                                         double responseMass, double dt) {
         double omega0 = 2.0 * Math.PI * naturalFreqHz;
-        double k = effectiveMass * omega0 * omega0;
-        // rebound damping intentionally stiffer than compression like real dampers
+        double k = rateMass * omega0 * omega0;
+        // real dampers have stiffer rebound
         double zeta = relVelocity > 0.0 ? dampingRatio * 1.15 : dampingRatio;
-        double c = 2.0 * zeta * Math.sqrt(k * effectiveMass);
-        double force = k * compression - c * relVelocity;
+        double c = 2.0 * zeta * Math.sqrt(k * rateMass);
+        double force = k * compression
+                - effectiveDamping(c, relVelocity, damper, dt, responseMass) * relVelocity;
         return Math.max(0.0, force);
+    }
+
+    // Damper curve first, then the timestep correction
+    public static double effectiveDamping(double c, double relVelocity, DamperSpec damper,
+                                          double dt, double responseMass) {
+        return implicitDamping(digressiveDamping(c, relVelocity, damper), dt, responseMass);
+    }
+
+    // See DamperSpec for the curve
+    public static double digressiveDamping(double c, double relVelocity, DamperSpec damper) {
+        if (damper == null) {
+            return c;
+        }
+        double v = Math.abs(relVelocity);
+        double knee = damper.kneeVelocity();
+        if (knee <= 0.0 || v <= knee || c <= 0.0) {
+            return c;
+        }
+        double force = c * knee + c * damper.blowOffSlope() * (v - knee);
+        return force / v;
+    }
+
+    public static double implicitDamping(double c, double dt, double responseMass) {
+        if (responseMass <= 1.0e-9 || dt <= 0.0 || c <= 0.0) {
+            return c;
+        }
+        double r = c * dt / responseMass;
+        if (r < 1.0e-4) {
+            return c;
+        }
+        return responseMass / dt * (1.0 - Math.exp(-r));
+    }
+
+    // Suspension spring rate in N/m
+    public static double springRate(double effectiveMass, double naturalFreqHz) {
+        double omega0 = 2.0 * Math.PI * naturalFreqHz;
+        return effectiveMass * omega0 * omega0;
+    }
+
+    // Suspension damping coefficient in N*s/m
+    public static double springDamping(double effectiveMass, double naturalFreqHz, double dampingRatio,
+                                       boolean rebound) {
+        double zeta = rebound ? dampingRatio * 1.15 : dampingRatio;
+        return 2.0 * zeta * effectiveMass * 2.0 * Math.PI * naturalFreqHz;
+    }
+
+    /** One step of the unsprung mass. Backwards euler fixes all our Sable substep problems
+     * @param unsprungMass  wheel mass (kg)
+     * @param dt            substep (s)
+     * @param unsprungVel   current wheel vertical velocity (m/s, positive up)
+     * @param hardpointVel  body vertical velocity at the hardpoint (m/s, positive up)
+     * @param springRate    suspension rate (N/m)
+     * @param springDamp    suspension damping (N.s/m)
+     * @param compression   current suspension compression (m, positive)
+     * @param tireRate      tyre vertical rate (N/m)
+     * @param tireDamp      tyre damping (N.s/m)
+     * @param tireDeflect   current tyre squash (m, positive, zero when off the ground)
+     * @return the new wheel vertical velocity (m/s, positive up)
+     */
+    public static double solveUnsprung(double unsprungMass, double dt,
+                                       double unsprungVel, double hardpointVel,
+                                       double springRate, double springDamp, double compression,
+                                       double tireRate, double tireDamp, double tireDeflect) {
+        double denom = unsprungMass / dt + tireRate * dt + tireDamp + springRate * dt + springDamp;
+        double rhs = unsprungMass * unsprungVel / dt
+                + tireRate * tireDeflect
+                - springRate * compression
+                + (springRate * dt + springDamp) * hardpointVel
+                - unsprungMass * 9.81;
+        return rhs / denom;
     }
 
 
@@ -210,7 +292,16 @@ public final class TireModel {
                                        double brakeTorque, double tireForce, double groundSpeed, double dt) {
         double reaction = tireForce * radius;
         double brake = -Math.signum(omega) * brakeTorque;
-        double newOmega = omega + (driveTorque - reaction + brake) / inertia * dt;
+
+        // implicitly solve k so it doesnt overshoot
+        double rollingOmega = groundSpeed / radius;
+        double slipOmega = omega - rollingOmega;
+        double k = 0.0;
+        if (Math.abs(slipOmega) > 1.0e-3) {
+            k = Math.max(0.0, reaction / slipOmega);
+        }
+        double newOmega = (omega + dt / inertia * (driveTorque + brake + k * rollingOmega))
+                / (1.0 + dt * k / inertia);
 
 
         // dont let brakes reverse the wheel
@@ -218,8 +309,7 @@ public final class TireModel {
             newOmega = 0.0;
         }
 
-        double rollingOmega = groundSpeed / radius;
-        double slipBefore = omega - rollingOmega;
+        double slipBefore = slipOmega;
         double slipAfter = newOmega - rollingOmega;
         if (slipBefore * slipAfter < 0.0 && brakeTorque < 1.0e-3) {
             newOmega = rollingOmega;

@@ -13,6 +13,7 @@ import dev.ryanhcode.sable.sublevel.ServerSubLevel;
 import dev.ryanhcode.sable.sublevel.SubLevel;
 import net.createmod.catnip.data.Couple;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
@@ -49,7 +50,8 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity {
         LIFT_UP("Lift Up"),
         LIFT_DOWN("Lift Down"),
         DIFF_MODE("Diff Mode"),
-        HUD_TOGGLE("HUD Toggle");
+        HUD_TOGGLE("HUD Toggle"),
+        STEER_ASSIST("Steer Assist");
 
         private final String displayName;
 
@@ -138,12 +140,18 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity {
     // for drivers' differential controls
     private int prevMomentaryMask;
     private boolean driftDiffMode;
+    private boolean steerAssistOff;
+    private boolean assistOffSynced;
+    private boolean diffModeSynced;
 
     // More telemetry for HUD
     private int throttlePct;
     private int[] hudTireTempsC = new int[0];
     private int hudSlipMask;// 1 = slipping
     private int hudEffMuX100;//avg friction coef across tires
+    private int hudGripUsePct; // grip of worst tire
+    private int hudGripLonPct;
+    private int hudGripLatPct;
 
     // Client-side wheel-rotation interpolation.
     private double clientWheelAngle;
@@ -151,6 +159,26 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity {
 
     public static Iterable<SteeringWheelBlockEntity> clientLoaded() {
         return CLIENT_LOADED;
+    }
+
+    // needs to be on the server too for the lap timer block
+    public static Iterable<SteeringWheelBlockEntity> serverLoaded() { return SERVER_LOADED; }
+
+    public static SteeringWheelBlockEntity findLoadedAt(BlockPos pos) {
+        for (SteeringWheelBlockEntity wheel : SERVER_LOADED) {
+            if (!wheel.isRemoved() && wheel.getBlockPos().equals(pos)) {
+                return wheel;
+            }
+        }
+        return null;
+    }
+
+    public Vec3 carWorldPosition() {
+        SubLevel subLevel = Sable.HELPER.getContaining(this);
+        if (subLevel == null) {
+            return null;
+        }
+        return subLevel.logicalPose().transformPosition(Vec3.atCenterOf(worldPosition));
     }
 
     // returns which wheel a given player is currently driving or null
@@ -343,12 +371,17 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity {
         int liftUpBit = 1 << SteeringControl.LIFT_UP.ordinal();
         int liftDownBit = 1 << SteeringControl.LIFT_DOWN.ordinal();
         int diffBit = 1 << SteeringControl.DIFF_MODE.ordinal();
+        int assistBit = 1 << SteeringControl.STEER_ASSIST.ordinal();
         boolean liftUpEdge = (inputMask & liftUpBit) != 0 && (prevMomentaryMask & liftUpBit) == 0;
         boolean liftDownEdge = (inputMask & liftDownBit) != 0 && (prevMomentaryMask & liftDownBit) == 0;
         boolean diffEdge = (inputMask & diffBit) != 0 && (prevMomentaryMask & diffBit) == 0;
+        boolean assistEdge = (inputMask & assistBit) != 0 && (prevMomentaryMask & assistBit) == 0;
         prevMomentaryMask = inputMask;
         if (diffEdge) {
             driftDiffMode = !driftDiffMode;
+        }
+        if (assistEdge) {
+            steerAssistOff = !steerAssistOff;
         }
 
         float throttle01 = driverThrottle01;
@@ -392,6 +425,7 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity {
                 s.adjustLift(-liftDelta);
             }
             s.setDriftDiffMode(driftDiffMode);
+            s.setSteerAssistOff(steerAssistOff);
             s.setDriverSteering(s.isFrontAxle() ? steerSignal : 0.0, brakeSignal);
         }
     }
@@ -456,6 +490,19 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity {
             // appends the full config to every csv so its easier to identify issues with bug reports
             sendLine(TelemetryLinePacket.KIND_ROW, "");
             sendLine(TelemetryLinePacket.KIND_ROW, "config_option,value");
+            CarActors logged = gatherCar();
+            if (logged != null) {
+                for (int a = 0; a < logged.suspensions().size(); a++) {
+                    SuspensionBlockEntity axle = logged.suspensions().get(a);
+                    sendLine(TelemetryLinePacket.KIND_ROW,
+                            "axle" + a + ".springPreset,\"" + axle.getSetting().getDisplayName() + "\"");
+                    BlockPos ap = axle.getBlockPos();
+                    sendLine(TelemetryLinePacket.KIND_ROW, "axle" + a + ".pos,\""
+                            + (ap.getX() + 0.5) + " " + (ap.getY() + 0.5) + " " + (ap.getZ() + 0.5) + "\"");
+                    sendLine(TelemetryLinePacket.KIND_ROW, "axle" + a + ".facing,\""
+                            + axle.getFacing() + (axle.isFrontAxle() ? " front" : " rear") + "\"");
+                }
+            }
             for (String configLine : com.createmotorsport.Config.dumpForLog()) {
                 sendLine(TelemetryLinePacket.KIND_ROW, configLine);
             }
@@ -477,15 +524,48 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity {
     private static final String[] WHEEL_COLS = {
             "grounded", "load_N", "slip_ratio", "slip_angle_deg", "vlon_ms", "vlat_ms", "Fx_N", "Fy_N",
             "omega", "wheelspeed_ms", "spring_m", "compress_m", "mu", "steer_deg", "brake_Nm",
-            "grip_mult", "drive_Nm", "tire_temp_C"
+            "grip_mult", "drive_Nm", "tire_temp_C","rigid_m", "defl_m", "unsprung_v", "eff_mass_kg",
+            "hardpoint_v", "spring_N", "hpv_world", "hpv_body", "hpv_diff", "hpv_normal", "cast_lift",
+            "damp_frac", "assist_m", "grip_use"
     };
+
+    public String raceTelemetryHeader() {
+        CarActors car = gatherCar();
+        return car == null ? null : buildHeader(car);
+    }
+
+    public String raceTelemetryRow() {
+        CarActors car = gatherCar();
+        return car == null ? null : buildRow(car);
+    }
+
+    private static SuspensionBlockEntity.WheelSide[] carSideOrder(SuspensionBlockEntity axle,
+                                                                  Direction carRight) {
+        return axle.getSideDirection(SuspensionBlockEntity.WheelSide.RIGHT) == carRight
+                ? new SuspensionBlockEntity.WheelSide[]{
+                        SuspensionBlockEntity.WheelSide.LEFT, SuspensionBlockEntity.WheelSide.RIGHT}
+                : new SuspensionBlockEntity.WheelSide[]{
+                        SuspensionBlockEntity.WheelSide.RIGHT, SuspensionBlockEntity.WheelSide.LEFT};
+    }
+
+    private static Direction carRight(CarActors car) {
+        for (SuspensionBlockEntity s : car.suspensions()) {
+            if (s.isFrontAxle()) {
+                return s.getSideDirection(SuspensionBlockEntity.WheelSide.RIGHT);
+            }
+        }
+        return car.suspensions().isEmpty()
+                ? Direction.EAST
+                : car.suspensions().get(0).getSideDirection(SuspensionBlockEntity.WheelSide.RIGHT);
+    }
 
     private String buildHeader(CarActors car) {
         StringBuilder sb = new StringBuilder(
                 "t_s,tick,speed_ms,speed_kmh,mass_kg,gear,rpm,throttle,clutch_locked,"
                         + "engine_torque_Nm,gear_ratio,wheel_torque_Nm,wheel_torque_applied,avg_wheel_omega,driven_wheels,"
                         + "power_mode,tc_on,boost_reserve,torque_factor,pos_x,pos_y,pos_z,vel_x,vel_y,vel_z,"
-                        + "bodypos_x,bodypos_y,bodypos_z,quat_x,quat_y,quat_z,quat_w");
+                        + "bodypos_x,bodypos_y,bodypos_z,quat_x,quat_y,quat_z,quat_w,"
+                        + "com_x,com_y,com_z");
         for (int a = 0; a < car.suspensions().size(); a++) {
             for (String sideTag : new String[]{"L", "R"}) {
                 for (String col : WHEEL_COLS) {
@@ -512,6 +592,9 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity {
                 ? car.subLevel().logicalPose().orientation() : new org.joml.Quaterniond();
         double mass = car.subLevel() instanceof ServerSubLevel ssl && ssl.getMassTracker() != null
                 ? ssl.getMassTracker().getMass() : -1.0;
+        org.joml.Vector3dc com = car.subLevel() instanceof ServerSubLevel ssl2 && ssl2.getMassTracker() != null
+                && ssl2.getMassTracker().getCenterOfMass() != null
+                ? ssl2.getMassTracker().getCenterOfMass() : new org.joml.Vector3d();
 
         EngineBlockEntity engine = car.engine();
         String gear = engine != null ? engine.getDrivetrain().gearDisplay() : "-";
@@ -529,23 +612,30 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity {
         double boostReserve = engine != null ? engine.getBoostReserve() : 0.0;
         double torqueFactor = engine != null ? engine.getPowerFactor() : 0.0;
 
-        sb.append(String.format(l, "%.2f,%d,%.3f,%.2f,%.1f,%s,%d,%.3f,%d,%.2f,%.3f,%.2f,%.2f,%.3f,%d,%d,%d,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.4f,%.4f,%.4f,%.6f,%.6f,%.6f,%.6f",
+        sb.append(String.format(l, "%.2f,%d,%.3f,%.2f,%.1f,%s,%d,%.3f,%d,%.2f,%.3f,%.2f,%.2f,%.3f,%d,%d,%d,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.4f,%.4f,%.4f,%.6f,%.6f,%.6f,%.6f,%.4f,%.4f,%.4f",
                 tS, level.getGameTime(), speed, speed * 3.6, mass, gear, rpm, throttle,
                 clutchLocked ? 1 : 0, engineTorque, gearRatio, wheelTorque, wheelTorqueApplied,
                 avgOmega, drivenWheels, powerMode, tcOn ? 1 : 0, boostReserve, torqueFactor,
                 worldPos.x, worldPos.y, worldPos.z, velocity.x, velocity.y, velocity.z,
-                bodyPos.x(), bodyPos.y(), bodyPos.z(), quat.x(), quat.y(), quat.z(), quat.w()));
+                bodyPos.x(), bodyPos.y(), bodyPos.z(), quat.x(), quat.y(), quat.z(), quat.w(),
+                com.x(), com.y(), com.z()));
 
+        Direction carRight = carRight(car);
         for (SuspensionBlockEntity s : car.suspensions()) {
             double steerDeg = Math.toDegrees(s.getSteerAngleRad());
-            for (SuspensionBlockEntity.WheelSide side : SuspensionBlockEntity.WheelSide.values()) {
+            for (SuspensionBlockEntity.WheelSide side : carSideOrder(s, carRight)) {
                 SuspensionBlockEntity.WheelTelemetry t = s.getTelemetry(side);
                 sb.append(String.format(l,
-                        ",%d,%.1f,%.4f,%.3f,%.3f,%.3f,%.1f,%.1f,%.2f,%.3f,%.4f,%.4f,%.3f,%.2f,%.1f,%.3f,%.2f,%.1f",
+                        ",%d,%.1f,%.4f,%.3f,%.3f,%.3f,%.1f,%.1f,%.2f,%.3f,%.4f,%.4f,%.3f,%.2f,%.1f,%.3f,%.2f,%.1f"
+                                + ",%.4f,%.5f,%.4f,%.2f,%.4f,%.1f,%.4f,%.4f,%.4f,%.4f,%.5f,%.4f,%.5f,%.4f",
                         t.grounded() ? 1 : 0, t.loadN(), t.slipRatio(), t.slipAngleDeg(),
                         t.vLonMs(), t.vLatMs(), t.longForceN(), t.latForceN(), t.omega(),
                         t.wheelSpeedMs(), t.springLenM(), t.compressionM(), t.surfaceMu(),
-                        steerDeg, t.brakeTorqueNm(), t.gripMult(), t.driveTorqueNm(), t.tireTempC()));
+                        steerDeg, t.brakeTorqueNm(), t.gripMult(), t.driveTorqueNm(), t.tireTempC(),
+                        t.rigidLenM(), t.tireDeflM(), t.unsprungVMs(), t.effMassKg(),
+                        t.hardpointVMs(), t.springForceN(),
+                        t.velWorld(), t.velBody(), t.velDiff(), t.velNormal(), t.castLift(),
+                        t.dampFraction(), t.assistLift(), t.gripUse()));
             }
         }
         return sb.toString();
@@ -590,6 +680,9 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity {
         boolean thermal = Config.TIRE_THERMAL_MODEL.get();
         int[] temps = new int[thermal ? susp.size() * 2 : 0];
         int slipMask = 0;
+        double gripUseMax = 0.0;
+        double worstLon = 0.0;
+        double worstLat = 0.0;
         double muSum = 0.0;
         int muCount = 0;
         int ti = 0;
@@ -603,6 +696,11 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity {
                     if (Math.abs(t.slipRatio()) > HUD_SLIP_RATIO || Math.abs(t.slipAngleDeg()) > HUD_SLIP_ANGLE) {
                         slipMask |= (1 << ti);
                     }
+                    if (t.gripUse() > gripUseMax) {
+                        gripUseMax = t.gripUse();
+                        worstLon = t.gripLon();
+                        worstLat = t.gripLat();
+                    }
                     muSum += s.getPeakMu(side);
                     muCount++;
                 }
@@ -610,6 +708,12 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity {
             }
         }
         int effMu = muCount > 0 ? (int) Math.round(muSum / muCount * 100.0) : 0;
+
+        int gripUse = (int) Math.round(Math.min(gripUseMax, 1.5) * 100.0);
+        int gripLon = (int) Math.round(Mth.clamp(worstLon, -1.5, 1.5) * 100.0);
+        int gripLat = (int) Math.round(Mth.clamp(worstLat, -1.5, 1.5) * 100.0);
+
+
         int thr = Math.round(Mth.clamp(driverThrottle01, 0.0F, 1.0F) * 100.0F);
 
         boolean braking = (inputMask & (1 << SteeringControl.BRAKE.ordinal())) != 0;
@@ -622,7 +726,12 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity {
                 || braking != brake || Math.abs(steering - steer) > 2
                 || mode != powerMode || tc != tractionControlOn || boost != boosting
                 || thr != throttlePct || slipMask != hudSlipMask || effMu != hudEffMuX100
+                || Math.abs(gripUse - hudGripUsePct) >= 2
+                || Math.abs(gripLon - hudGripLonPct) >= 2 || Math.abs(gripLat - hudGripLatPct) >= 2
+                || steerAssistOff != assistOffSynced || driftDiffMode != diffModeSynced
                 || !java.util.Arrays.equals(temps, hudTireTempsC);
+        assistOffSynced = steerAssistOff;
+        diffModeSynced = driftDiffMode;
         speedKmh = speed;
         gearCode = gear;
         rpm = enginRpm;
@@ -635,6 +744,9 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity {
         hudTireTempsC = temps;
         hudSlipMask = slipMask;
         hudEffMuX100 = effMu;
+        hudGripUsePct = gripUse;
+        hudGripLonPct = gripLon;
+        hudGripLatPct = gripLat;
 
         if (telemetryCooldown > 0) {
             telemetryCooldown--;
@@ -661,6 +773,18 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity {
         return hudEffMuX100 / 100.0;
     }
 
+    public int getGripUsePct() {
+        return hudGripUsePct;
+    }
+
+    public int getGripLonPct() {
+        return hudGripLonPct;
+    }
+
+    public int getGripLatPct() {
+        return hudGripLatPct;
+    }
+
     public int getSpeedKmh() {
         return speedKmh;
     }
@@ -683,6 +807,14 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity {
 
     public boolean isTractionControlOn() {
         return tractionControlOn;
+    }
+
+    public boolean isSteerAssistOff() {
+        return steerAssistOff;
+    }
+
+    public boolean isDiffModeOn() {
+        return driftDiffMode;
     }
 
     public boolean isBoosting() {
@@ -850,6 +982,11 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity {
             tag.putIntArray("TireTemps", hudTireTempsC);
             tag.putInt("SlipMask", hudSlipMask);
             tag.putInt("EffMu", hudEffMuX100);
+            tag.putInt("GripUse", hudGripUsePct);
+            tag.putInt("GripLon", hudGripLonPct);
+            tag.putInt("GripLat", hudGripLatPct);
+            tag.putBoolean("AssistOff", steerAssistOff);
+            tag.putBoolean("DiffMode", driftDiffMode);
         }
     }
 
@@ -891,6 +1028,11 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity {
             hudTireTempsC = tag.getIntArray("TireTemps");
             hudSlipMask = tag.getInt("SlipMask");
             hudEffMuX100 = tag.getInt("EffMu");
+            hudGripUsePct = tag.getInt("GripUse");
+            hudGripLonPct = tag.getInt("GripLon");
+            hudGripLatPct = tag.getInt("GripLat");
+            steerAssistOff = tag.getBoolean("AssistOff");
+            driftDiffMode = tag.getBoolean("DiffMode");
         }
         refreshLinks();
     }

@@ -30,9 +30,8 @@ public class Config {
     public static final ModConfigSpec.ConfigValue<String> GEAR_RATIOS = BUILDER
             .comment("Forward gear ratios, highest (1st gear) to lowest (top gear), comma-separated.",
                     "Higher ratio = more torque but lower speed per gear",
-                    "Multiplied by finalDrive to get the final crank to wheel ratio.",
-                    "Default \"3.2, 2.49, 2.0, 1.67, 1.44, 1.26, 1.0\".")
-            .define("gearRatios", "3.2, 2.49, 2.0, 1.67, 1.44, 1.26, 1.0");
+                    "Multiplied by finalDrive to get the final crank to wheel ratio.")
+            .define("gearRatios", "3.2,2.6,2.0,1.6,1.3,1.0,0.85");
 
     public static final ModConfigSpec.DoubleValue FINAL_DRIVE = BUILDER
             .comment("Final-drive ratio, multiplied onto every gear (and reverse).",
@@ -45,9 +44,11 @@ public class Config {
             .defineInRange("reverseRatio", 3.2, 0.1, 20.0);
 
     public static final ModConfigSpec.DoubleValue DRIVETRAIN_TORQUE_SCALE = BUILDER
-            .comment("Converts real crank torque (Nm) into Sable's world scale,",
-                    "to account for Minecraft-scale car mass")
-            .defineInRange("drivetrainTorqueScale", 0.11, 0.0001, 10.0);
+            .comment("Converts real crank torque (Nm) into Sable's world scale",
+                    "Scale this linearly with car mass. 69kpg is used for this number",
+                    "I confirmed this number by calculating and measuring kW from the car log. ",
+                    "So 560 kW real x .1207 = 67.6 kW measured in the log")
+            .defineInRange("drivetrainTorqueScale", 0.1207, 0.0001, 10.0);
 
     public static final ModConfigSpec.DoubleValue DRIVELINE_EFFICIENCY = BUILDER
             .comment("Driveline efficiency %",
@@ -74,6 +75,10 @@ public class Config {
             .comment("How hard the clutch pulls the engine speed to the gearbox speed once it is engaged and no",
                     "longer slipping (Nm per rad/s of speed mismatch). Default 400")
             .defineInRange("clutchLockStiffness", 400.0, 10.0, 5000.0);
+
+    public static final ModConfigSpec.DoubleValue SHIFT_INTERRUPT_TIME = BUILDER
+            .comment("F1 cars have seamless shifting. Default 0.0")
+            .defineInRange("shiftInterruptTime", 0.0, 0.0, 2.0);
 
     public static final ModConfigSpec.DoubleValue LAUNCH_RPM = BUILDER
             .comment("The RPM which the auto-clutch holds the engine at during a standing start, like an F1 launch",
@@ -129,8 +134,10 @@ public class Config {
     public static final ModConfigSpec.DoubleValue TIRE_FORCE_RELAXATION = BUILDER
             .comment("How fast the longitudinal tire force chases its target each substep",
                     "(speed dreams' FLOAT_RELAXATION); 1.0 = instant (might judder on launch)",
-                    "lower = smoother but laggier; default 0.3")
-            .defineInRange("tireForceRelaxation", 0.3, 0.05, 1.0);
+                    "lower = smoother but laggier.",
+                    "",
+                    "This will probably be part of the difficulty settings. Raise to make it harder")
+            .defineInRange("tireForceRelaxation", 0.22, 0.05, 1.0);
 
     public static final ModConfigSpec.DoubleValue LATERAL_GRIP_FRACTION = BUILDER
             .comment("Fraction of a wheel's sideways velocity killed per substep by lateral grip",
@@ -156,10 +163,58 @@ public class Config {
             .defineInRange("rollingResistanceCoef", 0.015, 0.0, 0.2);
 
     public static final ModConfigSpec.DoubleValue MAX_CORNERING_G = BUILDER
-            .comment("Cap on suspension spring force in g (multiples of static wheel load), " +
-                    "Stops a force spike (like a bump) from launching the car, also affects/caps the max load a tire can carry," +
-                    "Lower = tamer over bumps, higher = allows bigger forces / more grip under load. Default 6.0")
-            .defineInRange("maxCorneringG", 6.0, 1.0, 20.0);
+            .comment("Cap on suspension spring force, as a multiple of the effective mass at the wheel's",
+                    "hardpoint multiplied by gravity")
+            .defineInRange("maxCorneringG", 12.0, 1.0, 20.0);
+
+    public static final ModConfigSpec.BooleanValue TIRE_COMPLIANCE = BUILDER
+            .comment("")
+            .define("tireCompliance", true);
+
+    public static final ModConfigSpec.DoubleValue TIRE_STIFFNESS_RATIO = BUILDER
+            .comment("Tyre vertical rate as a multiple of the suspension rate at the same corner",
+                    "Its a ratio so that changing the suspension setting applies to the tire also to be more helpful",
+                    "Default 1.3")
+            .defineInRange("tireStiffnessRatio", 1.3, 0.5, 40.0);
+
+    public static final ModConfigSpec.DoubleValue TIRE_VERTICAL_DAMPING = BUILDER
+            .comment("")
+            .defineInRange("tireVerticalDamping", 0.06, 0.0, 1.0);
+
+
+    // suspension
+
+    public static final ModConfigSpec.DoubleValue SUSPENSION_SOFT_HZ = BUILDER
+            .comment("")
+            .defineInRange("suspensionSoftHz", 1.6, 0.5, 10.0);
+
+    public static final ModConfigSpec.DoubleValue SUSPENSION_SOFT_DAMPING = BUILDER
+            .comment("")
+            .defineInRange("suspensionSoftDamping", 0.35, 0.05, 2.0);
+
+    public static final ModConfigSpec.DoubleValue SUSPENSION_MEDIUM_HZ = BUILDER
+            .comment("")
+            .defineInRange("suspensionMediumHz", 2.2, 0.5, 10.0);
+
+    public static final ModConfigSpec.DoubleValue SUSPENSION_MEDIUM_DAMPING = BUILDER
+            .comment("")
+            .defineInRange("suspensionMediumDamping", 0.55, 0.05, 2.0);
+
+    public static final ModConfigSpec.DoubleValue SUSPENSION_FIRM_HZ = BUILDER
+            .comment("")
+            .defineInRange("suspensionFirmHz", 3.0, 0.5, 10.0);
+
+    public static final ModConfigSpec.DoubleValue SUSPENSION_FIRM_DAMPING = BUILDER
+            .comment("")
+            .defineInRange("suspensionFirmDamping", 0.70, 0.05, 2.0);
+
+    public static final ModConfigSpec.DoubleValue SUSPENSION_RACE_HZ = BUILDER
+            .comment("")
+            .defineInRange("suspensionRaceHz", 3.8, 0.5, 10.0);
+
+    public static final ModConfigSpec.DoubleValue SUSPENSION_RACE_DAMPING = BUILDER
+            .comment("")
+            .defineInRange("suspensionRaceDamping", 0.70, 0.05, 2.0);
 
     public static final ModConfigSpec.DoubleValue ROLL_INFLUENCE = BUILDER
             .comment("Where the lateral tire force is applied vertically; 0 is ground level",
@@ -174,9 +229,38 @@ public class Config {
             .defineInRange("frictionEllipseLongWeight", 0.5, 0.1, 2.0);
 
     public static final ModConfigSpec.DoubleValue SABLE_DRAG_SCALE = BUILDER
-            .comment("Temporary fix for Sable's universal drag. It applies in their units, which ends up making the ",
-                    "drag force roughly 7x too strong, making the default 0.14 until we improve the aerodynamics modeling")
-            .defineInRange("sableDragScale", 0.14, 0.0, 1.0);
+            .comment("How much Sable drag to apply to the car, 0 = none, 1 = all",
+                    "We cancel it then apply it correctly, instead of mixin to Sable. ",
+                    "If you have a mod that also fixes Aero drag, then",
+                    "this probably isnt going to be correct canceling for now, I'll fix that later")
+            .defineInRange("sableDragScale", 0.0, 0.0, 1.0);
+
+    public static final ModConfigSpec.DoubleValue AERO_DRAG_COEFFICIENT = BUILDER
+            .comment("drag force = k * speed^2; my assumptions for this number are:",
+                    "0.5 * rho * Cd*A * v^2; Cd*A should be 1.4, 1.05 with DRS on.",
+                    "Then you have to apply the proper force and drag scaling to get this number.",
+                    "This number will be affected by the new wings, but it doesnt actually do that now")
+            .defineInRange("aeroDragCoefficient", 0.0359, 0.0, 5.0);
+
+    public static final ModConfigSpec.DoubleValue TC_TARGET_SLIP = BUILDER
+            .comment("Should be kept right under tmeasySlipAtPeakLong")
+            .defineInRange("tcTargetSlip", 0.14, 0.02, 1.0);
+
+    public static final ModConfigSpec.DoubleValue TC_PROPORTIONAL = BUILDER
+            .comment("")
+            .defineInRange("tcProportional", 2.5, 0.0, 20.0);
+
+    public static final ModConfigSpec.DoubleValue TC_INTEGRAL = BUILDER
+            .comment("")
+            .defineInRange("tcIntegral", 6.0, 0.0, 40.0);
+
+    public static final ModConfigSpec.DoubleValue TC_MIN_THROTTLE = BUILDER
+            .comment("Throttle applied at minimum by traction control")
+            .defineInRange("tcMinThrottle", 0.02, 0.0, 1.0);
+
+    public static final ModConfigSpec.DoubleValue TC_RECOVER_RATE = BUILDER
+            .comment("")
+            .defineInRange("tcRecoverRate", 0.08, 0.005, 1.0);
 
     public static final ModConfigSpec.IntValue TIRE_MODEL = BUILDER
             .comment("Which tire model to use:",
@@ -218,8 +302,8 @@ public class Config {
     public static final ModConfigSpec.DoubleValue TMEASY_SLIDE_GRIP = BUILDER
             .comment("TMeasy tire model only; grip once the tire is fully sliding, as a fraction of its peak.",
                     "Rill's data suggested as high as ~0.97 is still realistic, which was surprising to me",
-                    "Default 0.95")
-            .defineInRange("tmeasySlideGrip", 0.95, 0.1, 1.0);
+                    "This will also be a mechanism for diffuclty, so right now it is set to the easiest.")
+            .defineInRange("tmeasySlideGrip", 0.98, 0.1, 1.0);
 
     public static final ModConfigSpec.DoubleValue TMEASY_SLIP_PEAK_LONG = BUILDER
             .comment("TMeasy tire model only; longitudinal slip ratio at which grip peaks (drive/brake).",
@@ -283,16 +367,29 @@ public class Config {
 
     // ---- Tire grip per axle (all tire models) ---------------------------------------------------
     public static final ModConfigSpec.DoubleValue TIRE_GRIP_FRONT = BUILDER
-            .comment("Friction coefficient of FRONT racing slicks.",
-                    "Separated per axle as a simple way to adjust the",
-                    "oversteering balance. Default 1.9")
-            .defineInRange("tireGripFront", 1.9, 0.1, 2.5);
+            .comment("Friction coefficient of FRONT racing slicks",
+                    "Separated per axle as a simple way to adjust the oversteering balance")
+            .defineInRange("tireGripFront", 1.7, 0.1, 2.5);
 
     public static final ModConfigSpec.DoubleValue TIRE_GRIP_REAR = BUILDER
             .comment("Friction coefficient of REAR racing slicks.",
                     "Separated per axle as a simple way to adjust the",
-                    "oversteering balance. Default 1.7")
-            .defineInRange("tireGripRear", 1.7, 0.1, 2.5);
+                    "oversteering balance",
+                    "Being a bit generous right now, maybe 1.7 is more realistic, we'll see")
+            .defineInRange("tireGripRear", 1.9, 0.1, 2.5);
+
+    // Camber
+    public static final ModConfigSpec.DoubleValue CAMBER_FRONT = BUILDER
+            .comment("Negative angle leans the top of the tyre in")
+            .defineInRange("camberFront", -3, -8.0, 8.0);
+
+    public static final ModConfigSpec.DoubleValue CAMBER_REAR = BUILDER
+            .comment("Negative angle leans the top of the tyre in")
+            .defineInRange("camberRear", -1.5, -8.0, 8.0);
+
+    public static final ModConfigSpec.DoubleValue CAMBER_STIFFNESS = BUILDER
+            .comment("Multiple for the slip physics effects of camber")
+            .defineInRange("camberStiffness", 1.0, 0.0, 6.0);
 
     // ---- Tire temperature (Speed Dreams style; applies to all tire models) ----------------------
     public static final ModConfigSpec.BooleanValue TIRE_THERMAL_MODEL = BUILDER
@@ -325,11 +422,9 @@ public class Config {
             .defineInRange("tireCoolingRate", 0.02, 0.0, 5.0);
 
     public static final ModConfigSpec.DoubleValue AERO_DOWNFORCE = BUILDER
-            .comment("Configurable aerodynamic downforce for testing purposes",
-                    "(load = this * speed_m/s^2)",
-                    "Will be incorporated into spoilers/wings/diffusers later",
-                    "0 = off. Default is 0.06")
-            .defineInRange("aeroDownforce", 0.06, 0.0, 2.0);
+            .comment("Derived from F1 car doing ~30kN at 300km/h",
+                    "Default 0.0479")
+            .defineInRange("aeroDownforce", 0.0479, 0.0, 2.0);
 
     public static final ModConfigSpec.DoubleValue BRAKE_STRENGTH = BUILDER
             .comment("Peak braking torque per wheel at full brake, before grip limits it",
@@ -355,9 +450,8 @@ public class Config {
             .defineInRange("absMinSpeed", 1.5, 0.0, 10.0);
 
     public static final ModConfigSpec.DoubleValue WHEEL_MASS = BUILDER
-            .comment("Configurable tire mass for testing purposes",
-                    "Default 20kg")
-            .defineInRange("tireMass", 20.0, 1, 100);
+            .comment("")
+            .defineInRange("tireMass", 2.0, 0.2, 100);
 
 
     public static final ModConfigSpec.DoubleValue STEERING_MAX_DEGREES = BUILDER
@@ -375,16 +469,22 @@ public class Config {
     // =======================================================================
     static { BUILDER.push("controls"); }
 
+    public static final ModConfigSpec.BooleanValue OFFROADING_ASSIST = BUILDER
+            .comment("A clever offroading assist I'm trying: cap the slope of the ground under the raycast, basically.")
+            .define("offroadingAssist", true);
+
+    public static final ModConfigSpec.DoubleValue STEER_ASSIST_AERO_SPEED = BUILDER
+            .comment("")
+            .defineInRange("steerAssistAeroSpeed", 153.0, 0.0, 1000.0);
+
     public static final ModConfigSpec.BooleanValue SEMI_AUTO_SHIFT = BUILDER
             .comment("false = full manual: you must hold the clutch channel to change gear",
                     "true = paddle shifters like F1 actually uses")
             .define("semiAutoShift", true);
 
-    public static final ModConfigSpec.DoubleValue STEER_SPEED_SENSITIVITY = BUILDER
-            .comment("Gamepad Controller 'Assist': velocity based steering lock",
-                    "Max steer angle is scaled by 1/(1 + k*speed^2), so you",
-                    "cant steer as much at higher speed and spin out")
-            .defineInRange("steerSpeedSensitivity", 0.003, 0.0, 1.0);
+    public static final ModConfigSpec.DoubleValue STEER_FULL_LOCK_SPEED = BUILDER
+            .comment("Steering assist wont affect steering angle under this speed")
+            .defineInRange("steerFullLockSpeed", 60.0, 10.0, 400.0);
 
     public static final ModConfigSpec.DoubleValue KEYPRESS_STEERING_RAMP = BUILDER
             .comment("1 / RAMP / 20 seconds, is the formula for how long",
@@ -396,6 +496,19 @@ public class Config {
             .comment("Gamepad Controller 'Assist': Exponent applied to analog steering input",
                     "1.0 = linear; softens small stick movements near centre for finer control")
             .defineInRange("steerInputGamma", 1.8, 1.0, 4.0);
+
+    public static final ModConfigSpec.DoubleValue STEER_INPUT_SENSITIVITY = BUILDER
+            .comment("Increase the sensitivity of the steering input, for racing wheel controllers",
+                    "Default 1.0")
+            .defineInRange("steerInputSensitivity", 1.0, 0.25, 4.0);
+
+    public static final ModConfigSpec.DoubleValue PEDAL_INPUT_SENSITIVITY = BUILDER
+            .comment("")
+            .defineInRange("pedalInputSensitivity", 1.0, 0.25, 4.0);
+
+    public static final ModConfigSpec.DoubleValue ADVANCED_INPUT_GAMMA = BUILDER
+            .comment("Separate steering assist gamma for advanced controllers")
+            .defineInRange("advancedInputGamma", 1.0, 1.0, 4.0);
 
     public static final ModConfigSpec.DoubleValue PEDAL_KEY_RAMP = BUILDER
             .comment("1 / RAMP / 20 seconds, is the formula for how long",
@@ -503,6 +616,31 @@ public class Config {
             .comment("On certain blocks (currently just dirt, sand, gravel, snow, grass) kick up matching particles instead",
                     "instead of smoke. Smoke is on every other surface. Default true")
             .define("tireSmokeGroundDust", true);
+
+    public static final ModConfigSpec.BooleanValue SKIDMARKS = BUILDER
+            .comment("")
+            .define("skidmarks", true);
+
+    public static final ModConfigSpec.DoubleValue SKIDMARK_LIFETIME = BUILDER
+            .comment("")
+            .defineInRange("skidmarkLifetime", 40.0, 2.0, 600.0);
+
+    public static final ModConfigSpec.IntValue SKIDMARK_MAX = BUILDER
+            .comment("Lower it for better FPS",
+                    "Default 4096")
+            .defineInRange("skidmarkMax", 4096, 256, 32768);
+
+    public static final ModConfigSpec.DoubleValue SKIDMARK_OPACITY = BUILDER
+            .comment("")
+            .defineInRange("skidmarkOpacity", 0.65, 0.05, 1.0);
+
+    public static final ModConfigSpec.DoubleValue SKIDMARK_WIDTH = BUILDER
+            .comment("")
+            .defineInRange("skidmarkWidth", 0.55, 0.1, 1.5);
+
+    public static final ModConfigSpec.DoubleValue SKIDMARK_TRAIL_TIME = BUILDER
+            .comment("How long after slip that skidmarks appear")
+            .defineInRange("skidmarkTrailTime", 0.35, 0.0, 3.0);
 
     static { BUILDER.pop(); }
 

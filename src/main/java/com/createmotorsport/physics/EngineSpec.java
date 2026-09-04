@@ -40,11 +40,11 @@ public record EngineSpec(
 
         double factor;
         if (n < idleFrac) {
-            factor = Mth.lerp(n / idleFrac, 0.20, 0.38);
+            factor = Mth.lerp(n / idleFrac, 0.30, 0.55);
         } else if (n < powerBandEntry) {
-            factor = Mth.lerp((n - idleFrac) / (powerBandEntry - idleFrac), 0.38, 0.65);
+            factor = Mth.lerp((n - idleFrac) / (powerBandEntry - idleFrac), 0.55, 0.80);
         } else if (n < peakStart) {
-            factor = Mth.lerp((n - powerBandEntry) / (peakStart - powerBandEntry), 0.65, 1.0);
+            factor = Mth.lerp((n - powerBandEntry) / (peakStart - powerBandEntry), 0.80, 1.0);
         } else {
             factor = 1.0;
         }

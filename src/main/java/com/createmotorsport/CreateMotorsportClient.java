@@ -36,6 +36,12 @@ public class CreateMotorsportClient {
         NeoForge.EVENT_BUS.addListener(com.createmotorsport.client.MouseSteerCamera::onCameraAngles);
         NeoForge.EVENT_BUS.addListener(MotorsportCommands::register);
         NeoForge.EVENT_BUS.addListener(com.createmotorsport.client.MotorsportHud::onRenderGui);
+        NeoForge.EVENT_BUS.addListener(com.createmotorsport.client.SkidmarkManager::onRenderLevel);
+        NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.event.level.LevelEvent.Unload e) -> {
+            if (e.getLevel().isClientSide()) {
+                com.createmotorsport.client.SkidmarkManager.clear();
+            }
+        });
     }
 
     private void registerMenuScreens(RegisterMenuScreensEvent event) {
