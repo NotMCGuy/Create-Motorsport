@@ -47,7 +47,9 @@ public final class MotorsportHud {
         lines.add("§eTHR §f" + w.getThrottlePct() + "%   §eBRK " + (w.isBraking() ? "§cON" : "§7off"));
         String aids = "§eMODE §f" + w.getPowerMode()
                 + (w.isTractionControlOn() ? "  §aTC" : "")
-                + (w.isBoosting() ? "  §bOT" : "");
+                + (w.isBoosting() ? "  §bOT" : "")
+                + (w.isDiffModeOn() ? "  §dDIFF" : "")
+                + (w.isSteerAssistOff() ? "  §6ASSIST OFF" : "");
         lines.add(aids);
 
         int[] temps = w.getTireTempsC();

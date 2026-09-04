@@ -148,13 +148,15 @@ public final class SteeringInputHandler {
 
 
         // Keypress assists create fake inputs so the input isnt instantaneous and its something for the Gamma to work on
-        float pedalGamma = (float) Config.PEDAL_INPUT_GAMMA.getAsDouble();
-        float steerGamma = (float) Config.STEER_INPUT_GAMMA.getAsDouble();
         float pedalRamp = (float) Config.PEDAL_KEY_RAMP.getAsDouble();
         float throttleInput = pedalInput(SteeringControl.THROTTLE, pedalRamp, true);
         float brakeInput = pedalInput(SteeringControl.BRAKE, pedalRamp, false);
-        float throttle = (float) Math.pow(throttleInput, pedalGamma);
-        float brake = (float) Math.pow(brakeInput, pedalGamma);
+        float throttle = (float) Math.pow(throttleInput, gammaFor(SteeringControl.THROTTLE, true));
+        float brake = (float) Math.pow(brakeInput, gammaFor(SteeringControl.BRAKE, true));
+
+        float steerGamma = isAdvancedAxisControl(SteeringControl.STEER_LEFT)
+                ? gammaFor(SteeringControl.STEER_LEFT, false)
+                : gammaFor(SteeringControl.STEER_RIGHT, false);
 
         float steerTarget = strength(SteeringControl.STEER_LEFT) - strength(SteeringControl.STEER_RIGHT);
         float steerInput;
@@ -225,6 +227,23 @@ public final class SteeringInputHandler {
         return code >= 0 && (GamepadCodes.isAnalogCode(code) || MouseCodes.isAnalog(code));
     }
 
+    private static boolean isAdvancedAxisControl(SteeringControl control) {
+        int idx = control.ordinal();
+        if (idx >= activeKeyCodes.length) {
+            return false;
+        }
+        int code = activeKeyCodes[idx];
+        return code >= 0 && (GamepadCodes.isRawAxisPos(code) || GamepadCodes.isRawAxisNeg(code));
+    }
+
+    private static float gammaFor(SteeringControl control, boolean pedal) {
+        if (isAdvancedAxisControl(control)) {
+            return (float) Config.ADVANCED_INPUT_GAMMA.getAsDouble();
+        }
+        return (float) (pedal ? Config.PEDAL_INPUT_GAMMA.getAsDouble()
+                : Config.STEER_INPUT_GAMMA.getAsDouble());
+    }
+
     private static float pedalInput(SteeringControl control, float ramp, boolean throttle) {
         float target = strength(control);
         if (isAnalogControl(control)) {
@@ -252,12 +271,25 @@ public final class SteeringInputHandler {
             return 0.0F;
         }
         if (GamepadCodes.isGamepadCode(code)) {
-            return GamepadInput.analogMagnitude(code);
+            return sensitised(control, GamepadInput.analogMagnitude(code));
         }
         if (MouseCodes.isMouseCode(code)) {
-            return MouseInput.analogMagnitude(code);
+            return sensitised(control, MouseInput.analogMagnitude(code));
         }
         return HELD_KEYS.contains(code) ? 1.0F : 0.0F;
+    }
+
+    // sensitivity is for racing wheel users who want to turn the wheel less
+    private static float sensitised(SteeringControl control, float raw) {
+        if (raw <= 0.0F) {
+            return raw;
+        }
+        double gain = switch (control) {
+            case STEER_LEFT, STEER_RIGHT -> Config.STEER_INPUT_SENSITIVITY.getAsDouble();
+            case THROTTLE, BRAKE -> Config.PEDAL_INPUT_SENSITIVITY.getAsDouble();
+            default -> 1.0;
+        };
+        return (float) Math.min(1.0, raw * gain);
     }
 
     public static void onScreenOpening(ScreenEvent.Opening event) {

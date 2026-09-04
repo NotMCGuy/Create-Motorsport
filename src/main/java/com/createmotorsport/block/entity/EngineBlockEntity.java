@@ -113,15 +113,20 @@ public class EngineBlockEntity extends SmartBlockEntity implements dev.ryanhcode
     private static final double BOOST_DRAIN = 1.0 / (20 * 8);    // ~8 s of full boost
     private static final double BOOST_RECHARGE = 1.0 / (20 * 20); // ~20 s to refill
 
-    // Traction control model from Speed-dreams / TORCS this time, maybe itll work better
-    private static final double TCL_SLIP = 2.5;          // m/s of wheelspin allowed before cutting
-    private static final double TCL_RANGE = 10.0;        // m/s past the threshold that trims throttle to 0
+    // Traction Control
+    private static final double TC_SPEED_FLOOR = 2.0;    // divide by zero otherwise
+    private static final double TC_INTEGRAL_CLAMP = 0.5;
+    private static final double TICK_SECONDS = 0.05;
     private static final double TCL_SIDE_SLIP = 4.0;     // m/s of sideways slide before the anti-oversteer cut
     private static final double TCL_SIDE_RANGE = 8.0;    // m/s past that over which the cut ramps to the floor
     private static final double TCL_SIDE_FLOOR = 0.5;    // most the lateral cut can trim throttle to
 
     private int powerMode = MAX_POWER_MODE; // 1 to 8;  torque caps at mode / MAX
     private boolean tractionControl;
+    private double telemTcSlipTarget;
+    private double telemTcFactor = 1.0;
+    private double tcIntegral;
+    private double tcFactor = 1.0; // last throttle multiplier
     private double boostReserve = 1.0;      // 0 to 1
     private boolean boosting;
 
@@ -213,6 +218,9 @@ public class EngineBlockEntity extends SmartBlockEntity implements dev.ryanhcode
         int wheelCount = 0;
         int actorCount = 0;
         double omegaSum = 0.0;
+        double peakOmega = 0.0;
+        double peakLatUse = 0.0;
+        double tractionForce = 0.0;
         double repRadius = 0.0;
         Direction engineFacing = getBlockState().getValue(EngineBlock.FACING);
 
@@ -234,6 +242,9 @@ public class EngineBlockEntity extends SmartBlockEntity implements dev.ryanhcode
                 int tireCount = (suspension.hasTire(SuspensionBlockEntity.WheelSide.LEFT) ? 1 : 0)
                         + (suspension.hasTire(SuspensionBlockEntity.WheelSide.RIGHT) ? 1 : 0);
                 omegaSum += suspension.averageDrivenOmega(sign) * tireCount;
+                peakOmega = Math.max(peakOmega, suspension.peakDrivenOmega(sign));
+                peakLatUse = Math.max(peakLatUse, suspension.peakLateralUse());
+                tractionForce += suspension.remainingTractionForce();
                 wheelCount += tireCount;
             }
         }
@@ -243,7 +254,8 @@ public class EngineBlockEntity extends SmartBlockEntity implements dev.ryanhcode
         double totalTorque = drivetrain.update(running, throttle, clutchHeld, semiAuto, shiftUpEdge, shiftDownEdge,
                 avgOmega, 1.0 / 20.0, pitLimiter);
         totalTorque *= Config.DRIVETRAIN_TORQUE_SCALE.getAsDouble();
-        totalTorque *= powerFactor(driving && auxOvertake, avgOmega, repRadius, running);
+        totalTorque *= powerFactor(driving && auxOvertake, peakOmega, peakLatUse, repRadius, running,
+                tractionForce, Math.abs(totalTorque));
 
         this.telemAvgWheelOmega = avgOmega;
         this.telemWheelTorqueTotal = totalTorque;
@@ -430,7 +442,8 @@ public class EngineBlockEntity extends SmartBlockEntity implements dev.ryanhcode
 
 
     // torque multiplier from driver aids (engine mode, overtake boost, traction control)
-    private double powerFactor(boolean wantBoost, double avgOmega, double repRadius, boolean running) {
+    private double powerFactor(boolean wantBoost, double peakOmega, double peakLatUse, double repRadius,
+                               boolean running, double tractionForce, double demandTorque) {
         double factor = powerMode / (double) MAX_POWER_MODE;
     
         // Pit limiter override: force drop power factor
@@ -448,25 +461,57 @@ public class EngineBlockEntity extends SmartBlockEntity implements dev.ryanhcode
     
         factor *= tractionControlCap(avgOmega, repRadius, running);
 
+        factor *= tractionControlCap(peakOmega, peakLatUse, repRadius, running, tractionForce,
+                demandTorque * factor);
+
         telemPowerFactor = factor;
         return factor;
     }
 
-    
-    private double tractionControlCap(double avgOmega, double repRadius, boolean running) {
+
+    private double tractionControlCap(double peakOmega, double peakLatUse, double repRadius,
+                                      boolean running, double tractionForce, double demandTorque) {
         if (!tractionControl || !running || repRadius <= 0.0 || throttle <= 0.1f) {
+            tcIntegral = 0.0;
+            tcFactor = 1.0;
+            telemTcSlipTarget = Config.TC_TARGET_SLIP.getAsDouble();
+            telemTcFactor = 1.0;
             return 1.0;
         }
         Vec3 vel = Sable.HELPER.getVelocity(level, Vec3.atCenterOf(worldPosition));
-        double wheelSurface = Math.abs(avgOmega) * repRadius;
-        double ground = vel.length();
-
-        double factor = 1.0;
-        double slip = wheelSurface - ground; // m/s of wheelspin
-        if (slip > TCL_SLIP) {
-            factor = Mth.clamp(1.0 - (slip - TCL_SLIP) / TCL_RANGE, 1.0, 1.0);        }
-
         Vec3 fwd = headingForward();
+
+        double ground = Math.abs(vel.x * fwd.x + vel.z * fwd.z);
+        double wheelSurface = Math.abs(peakOmega) * repRadius;
+        double slipRatio = (wheelSurface - ground) / Math.max(ground, TC_SPEED_FLOOR);
+        double latUse = Mth.clamp(peakLatUse, 0.0, 1.0);
+        double slipTarget = Config.TC_TARGET_SLIP.getAsDouble() * Math.sqrt(Math.max(0.0, 1.0 - latUse * latUse));
+        telemTcSlipTarget = slipTarget;
+        double error = slipRatio - slipTarget;
+
+        if (error > 0.0) {
+            tcIntegral = Math.min(tcIntegral + error * TICK_SECONDS, TC_INTEGRAL_CLAMP);
+        } else {
+            tcIntegral = Math.max(0.0, tcIntegral + error * TICK_SECONDS);
+        }
+
+        double cut = Config.TC_PROPORTIONAL.getAsDouble() * Math.max(0.0, error)
+                + Config.TC_INTEGRAL.getAsDouble() * tcIntegral;
+        double target = Mth.clamp(1.0 - cut, Config.TC_MIN_THROTTLE.getAsDouble(), 1.0);
+
+        if (target < tcFactor) {
+            tcFactor = target;
+        } else {
+            tcFactor = Math.min(target, tcFactor + Config.TC_RECOVER_RATE.getAsDouble());
+        }
+
+        if (tractionForce > 0.0 && demandTorque > 1.0e-6) {
+            double capacityTorque = tractionForce * repRadius;
+            tcFactor = Math.min(tcFactor, Mth.clamp(capacityTorque / demandTorque, 0.0, 1.0));
+        }
+        telemTcFactor = tcFactor;
+
+        double factor = tcFactor;
         double sideSlip = Math.abs(vel.x * fwd.z - vel.z * fwd.x);
         if (sideSlip > TCL_SIDE_SLIP) {
             factor *= Mth.clamp(1.0 - (sideSlip - TCL_SIDE_SLIP) / TCL_SIDE_RANGE, TCL_SIDE_FLOOR, 1.0);

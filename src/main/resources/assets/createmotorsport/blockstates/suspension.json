@@ -1,8 +1,8 @@
 {
   "variants": {
-    "facing=east":  { "model": "createmotorsport:block/suspension" },
-    "facing=south": { "model": "createmotorsport:block/suspension", "y": 90 },
-    "facing=west":  { "model": "createmotorsport:block/suspension", "y": 180 },
-    "facing=north": { "model": "createmotorsport:block/suspension", "y": 270 }
+    "facing=east":  { "model": "createmotorsport:block/suspension/suspension" },
+    "facing=south": { "model": "createmotorsport:block/suspension/suspension", "y": 90 },
+    "facing=west":  { "model": "createmotorsport:block/suspension/suspension", "y": 180 },
+    "facing=north": { "model": "createmotorsport:block/suspension/suspension", "y": 270 }
   }
 }

@@ -248,6 +248,9 @@ public class CreateMotorsport {
         registrar.playToServer(ToggleEngineDirectionPacket.TYPE, ToggleEngineDirectionPacket.CODEC,
                 ToggleEngineDirectionPacket::handle);
         registrar.playToClient(TelemetryLinePacket.TYPE, TelemetryLinePacket.CODEC, TelemetryLinePacket::handle);
+        registrar.playToClient(com.createmotorsport.network.SkidmarkPacket.TYPE,
+                com.createmotorsport.network.SkidmarkPacket.CODEC,
+                com.createmotorsport.network.SkidmarkPacket::handle);
     }
 
 

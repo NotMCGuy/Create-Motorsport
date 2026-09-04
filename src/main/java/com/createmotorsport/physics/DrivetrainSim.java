@@ -15,10 +15,9 @@ public final class DrivetrainSim {
     public static final int GEAR_NEUTRAL = 1;
     public static final int GEAR_FIRST = 2;
 
-    private static final double CLUTCH_ENGAGE_TIME = 0.4;
-    private static final double SHIFT_RELEASE_TIME = 0.2;
-
     private static final double IDLE_GAIN = 1.5;
+
+    private static final double CLUTCH_ENGAGE_TIME = 0.15;
 
     private static final double CLUTCH_LAUNCH_GRAB = 0.75;
     private static final double CLUTCH_HOLD_GRAB = 1.30;
@@ -73,14 +72,15 @@ public final class DrivetrainSim {
             return record(0.0, 0.0, 0.0, false);
         }
 
+        double interrupt = Config.SHIFT_INTERRUPT_TIME.getAsDouble();
         boolean canShift = semiAuto || clutchHeld;
         if (canShift) {
             if (shiftUpEdge) {
                 this.gear = Math.min(maxGear(), this.gear + 1);
-                if (semiAuto) this.shiftReleaseTimer = SHIFT_RELEASE_TIME;
+                if (semiAuto) this.shiftReleaseTimer = interrupt;
             } else if (shiftDownEdge) {
                 this.gear = Math.max(GEAR_REVERSE, this.gear - 1);
-                if (semiAuto) this.shiftReleaseTimer = SHIFT_RELEASE_TIME;
+                if (semiAuto) this.shiftReleaseTimer = interrupt;
             }
         }
         if (this.shiftReleaseTimer > 0.0) {
