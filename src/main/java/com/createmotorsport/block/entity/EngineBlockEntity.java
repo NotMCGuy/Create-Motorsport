@@ -44,7 +44,8 @@ public class EngineBlockEntity extends SmartBlockEntity implements dev.ryanhcode
         THROTTLE("Throttle"),
         CLUTCH("Clutch"),
         SHIFT_UP("Shift Up"),
-        SHIFT_DOWN("Shift Down");
+        SHIFT_DOWN("Shift Down"),
+        PIT_LIMITER("Pit Limiter");
 
         private final String displayName;
 
@@ -136,6 +137,9 @@ public class EngineBlockEntity extends SmartBlockEntity implements dev.ryanhcode
     private boolean lastAuxModeUp;
     private boolean lastAuxModeDown;
     private boolean lastAuxTc;
+    private boolean pitLimiter;
+    private boolean auxPitLimiter;
+    private boolean lastAuxPitLimiter;
     private double telemPowerFactor = 1.0;
 
     private final NonNullList<ItemStack> items = NonNullList.withSize(SLOT_COUNT, ItemStack.EMPTY);
@@ -185,6 +189,16 @@ public class EngineBlockEntity extends SmartBlockEntity implements dev.ryanhcode
         boolean modeUp = driving && auxModeUp;
         boolean modeDown = driving && auxModeDown;
         boolean tcToggle = driving && auxTc;
+        boolean pitToggle = driving && auxPitLimiter;
+        if (pitToggle && !lastAuxPitLimiter) {
+            pitLimiter = !pitLimiter;
+        }
+        lastAuxPitLimiter = pitToggle;
+        
+        // Also check redstone link signal if driver is not active
+        if (!driving && hasLink(ControlChannel.PIT_LIMITER)) {
+            pitLimiter = signalFor(ControlChannel.PIT_LIMITER) > 0;
+        }
         if (modeUp && !lastAuxModeUp) {
             powerMode = Math.min(MAX_POWER_MODE, powerMode + 1);
         }
@@ -238,9 +252,8 @@ public class EngineBlockEntity extends SmartBlockEntity implements dev.ryanhcode
         double avgOmega = wheelCount == 0 ? 0.0 : omegaSum / wheelCount;
         boolean semiAuto = Config.SEMI_AUTO_SHIFT.get();
         double totalTorque = drivetrain.update(running, throttle, clutchHeld, semiAuto, shiftUpEdge, shiftDownEdge,
-                avgOmega, 1.0 / 20.0);
-        totalTorque *= Config.DRIVETRAIN_TORQUE_SCALE.getAsDouble();
-        totalTorque *= powerFactor(driving && auxOvertake, peakOmega, peakLatUse, repRadius, running,
+                avgOmega, 1.0 / 20.0, pitLimiter);
+        totalTorque *= powerFactor(driving && auxOvertake, peakOmega, peakLatUse, avgOmega,repRadius, running,
                 tractionForce, Math.abs(totalTorque));
 
         this.telemAvgWheelOmega = avgOmega;
@@ -302,7 +315,7 @@ public class EngineBlockEntity extends SmartBlockEntity implements dev.ryanhcode
                     String.format("%.1f", totalTorque));
         }
         // muting engine for now
-        // playEngineSound(running);
+        //playEngineSound(running);
     }
 
     public int getRotationDirection() {
@@ -414,7 +427,7 @@ public class EngineBlockEntity extends SmartBlockEntity implements dev.ryanhcode
     }
 
     // driving aids that affect torque: engine mode, overtake boost, traction control. Pushed here from steering wheel
-    public void setDriverAids(boolean overtake, boolean modeUp, boolean modeDown, boolean tcToggle) {
+    public void setDriverAids(boolean overtake, boolean modeUp, boolean modeDown, boolean tcToggle, boolean pitLimiterToggle) {
         if (level == null || level.isClientSide) {
             return;
         }
@@ -422,23 +435,29 @@ public class EngineBlockEntity extends SmartBlockEntity implements dev.ryanhcode
         auxModeUp = modeUp;
         auxModeDown = modeDown;
         auxTc = tcToggle;
+        auxPitLimiter = pitLimiterToggle; // Added
         driverSignalTime = level.getGameTime();
     }
 
 
     // torque multiplier from driver aids (engine mode, overtake boost, traction control)
-    private double powerFactor(boolean wantBoost, double peakOmega, double peakLatUse, double repRadius,
+    private double powerFactor(boolean wantBoost, double peakOmega, double peakLatUse, double avgOmega, double repRadius,
                                boolean running, double tractionForce, double demandTorque) {
         double factor = powerMode / (double) MAX_POWER_MODE;
-
-        boosting = wantBoost && boostReserve > 0.0;
-        if (boosting) {
-            factor *= BOOST_FACTOR;
-            boostReserve = Math.max(0.0, boostReserve - BOOST_DRAIN);
+    
+        // Pit limiter override: force drop power factor
+        if (pitLimiter) {
+            factor *= 0.25; // idk
         } else {
-            boostReserve = Math.min(1.0, boostReserve + BOOST_RECHARGE);
+            boosting = wantBoost && boostReserve > 0.0;
+            if (boosting) {
+                factor *= BOOST_FACTOR;
+                boostReserve = Math.max(0.0, boostReserve - BOOST_DRAIN);
+            } else {
+                boostReserve = Math.min(1.0, boostReserve + BOOST_RECHARGE);
+            }
         }
-
+    
         factor *= tractionControlCap(peakOmega, peakLatUse, repRadius, running, tractionForce,
                 demandTorque * factor);
 

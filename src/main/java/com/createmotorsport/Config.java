@@ -168,7 +168,7 @@ public class Config {
             .defineInRange("maxCorneringG", 12.0, 1.0, 20.0);
 
     public static final ModConfigSpec.BooleanValue TIRE_COMPLIANCE = BUILDER
-            .comment("")
+            ////////.comment("")
             .define("tireCompliance", true);
 
     public static final ModConfigSpec.DoubleValue TIRE_STIFFNESS_RATIO = BUILDER
@@ -178,42 +178,42 @@ public class Config {
             .defineInRange("tireStiffnessRatio", 1.3, 0.5, 40.0);
 
     public static final ModConfigSpec.DoubleValue TIRE_VERTICAL_DAMPING = BUILDER
-            .comment("")
+            //////////.comment("")
             .defineInRange("tireVerticalDamping", 0.06, 0.0, 1.0);
 
 
     // suspension
 
     public static final ModConfigSpec.DoubleValue SUSPENSION_SOFT_HZ = BUILDER
-            .comment("")
+            //////////.comment("")
             .defineInRange("suspensionSoftHz", 1.6, 0.5, 10.0);
 
     public static final ModConfigSpec.DoubleValue SUSPENSION_SOFT_DAMPING = BUILDER
-            .comment("")
+            ////////.comment("")
             .defineInRange("suspensionSoftDamping", 0.35, 0.05, 2.0);
 
     public static final ModConfigSpec.DoubleValue SUSPENSION_MEDIUM_HZ = BUILDER
-            .comment("")
+            //////////.comment("")
             .defineInRange("suspensionMediumHz", 2.2, 0.5, 10.0);
 
     public static final ModConfigSpec.DoubleValue SUSPENSION_MEDIUM_DAMPING = BUILDER
-            .comment("")
+            //////.comment("")
             .defineInRange("suspensionMediumDamping", 0.55, 0.05, 2.0);
 
     public static final ModConfigSpec.DoubleValue SUSPENSION_FIRM_HZ = BUILDER
-            .comment("")
+            //////.comment("")
             .defineInRange("suspensionFirmHz", 3.0, 0.5, 10.0);
 
     public static final ModConfigSpec.DoubleValue SUSPENSION_FIRM_DAMPING = BUILDER
-            .comment("")
+            //////.comment("")
             .defineInRange("suspensionFirmDamping", 0.70, 0.05, 2.0);
 
     public static final ModConfigSpec.DoubleValue SUSPENSION_RACE_HZ = BUILDER
-            .comment("")
+            //////.comment("")
             .defineInRange("suspensionRaceHz", 3.8, 0.5, 10.0);
 
     public static final ModConfigSpec.DoubleValue SUSPENSION_RACE_DAMPING = BUILDER
-            .comment("")
+            //////.comment("")
             .defineInRange("suspensionRaceDamping", 0.70, 0.05, 2.0);
 
     public static final ModConfigSpec.DoubleValue ROLL_INFLUENCE = BUILDER
@@ -247,11 +247,11 @@ public class Config {
             .defineInRange("tcTargetSlip", 0.14, 0.02, 1.0);
 
     public static final ModConfigSpec.DoubleValue TC_PROPORTIONAL = BUILDER
-            .comment("")
+            //////.comment("")
             .defineInRange("tcProportional", 2.5, 0.0, 20.0);
 
     public static final ModConfigSpec.DoubleValue TC_INTEGRAL = BUILDER
-            .comment("")
+            //////.comment("")
             .defineInRange("tcIntegral", 6.0, 0.0, 40.0);
 
     public static final ModConfigSpec.DoubleValue TC_MIN_THROTTLE = BUILDER
@@ -259,7 +259,7 @@ public class Config {
             .defineInRange("tcMinThrottle", 0.02, 0.0, 1.0);
 
     public static final ModConfigSpec.DoubleValue TC_RECOVER_RATE = BUILDER
-            .comment("")
+            //////.comment("")
             .defineInRange("tcRecoverRate", 0.08, 0.005, 1.0);
 
     public static final ModConfigSpec.IntValue TIRE_MODEL = BUILDER
@@ -450,7 +450,7 @@ public class Config {
             .defineInRange("absMinSpeed", 1.5, 0.0, 10.0);
 
     public static final ModConfigSpec.DoubleValue WHEEL_MASS = BUILDER
-            .comment("")
+            //////.comment("")
             .defineInRange("tireMass", 2.0, 0.2, 100);
 
 
@@ -474,7 +474,7 @@ public class Config {
             .define("offroadingAssist", true);
 
     public static final ModConfigSpec.DoubleValue STEER_ASSIST_AERO_SPEED = BUILDER
-            .comment("")
+            //////.comment("")
             .defineInRange("steerAssistAeroSpeed", 153.0, 0.0, 1000.0);
 
     public static final ModConfigSpec.BooleanValue SEMI_AUTO_SHIFT = BUILDER
@@ -503,7 +503,7 @@ public class Config {
             .defineInRange("steerInputSensitivity", 1.0, 0.25, 4.0);
 
     public static final ModConfigSpec.DoubleValue PEDAL_INPUT_SENSITIVITY = BUILDER
-            .comment("")
+            //////.comment("")
             .defineInRange("pedalInputSensitivity", 1.0, 0.25, 4.0);
 
     public static final ModConfigSpec.DoubleValue ADVANCED_INPUT_GAMMA = BUILDER
@@ -618,11 +618,11 @@ public class Config {
             .define("tireSmokeGroundDust", true);
 
     public static final ModConfigSpec.BooleanValue SKIDMARKS = BUILDER
-            .comment("")
+            //////.comment("")
             .define("skidmarks", true);
 
     public static final ModConfigSpec.DoubleValue SKIDMARK_LIFETIME = BUILDER
-            .comment("")
+            //////.comment("")
             .defineInRange("skidmarkLifetime", 40.0, 2.0, 600.0);
 
     public static final ModConfigSpec.IntValue SKIDMARK_MAX = BUILDER
@@ -631,11 +631,11 @@ public class Config {
             .defineInRange("skidmarkMax", 4096, 256, 32768);
 
     public static final ModConfigSpec.DoubleValue SKIDMARK_OPACITY = BUILDER
-            .comment("")
+            //////.comment("")
             .defineInRange("skidmarkOpacity", 0.65, 0.05, 1.0);
 
     public static final ModConfigSpec.DoubleValue SKIDMARK_WIDTH = BUILDER
-            .comment("")
+            //////.comment("")
             .defineInRange("skidmarkWidth", 0.55, 0.1, 1.5);
 
     public static final ModConfigSpec.DoubleValue SKIDMARK_TRAIL_TIME = BUILDER

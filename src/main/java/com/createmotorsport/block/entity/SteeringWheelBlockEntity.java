@@ -51,6 +51,7 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity {
         LIFT_DOWN("Lift Down"),
         DIFF_MODE("Diff Mode"),
         HUD_TOGGLE("HUD Toggle"),
+        PIT_LIMITER("Pit Limiter"),
         STEER_ASSIST("Steer Assist");
 
         private final String displayName;
@@ -367,6 +368,7 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity {
         boolean modeUp = (inputMask & (1 << SteeringControl.ENGINE_MODE_UP.ordinal())) != 0;
         boolean modeDown = (inputMask & (1 << SteeringControl.ENGINE_MODE_DOWN.ordinal())) != 0;
         boolean tractionControl = (inputMask & (1 << SteeringControl.TRACTION_CONTROL.ordinal())) != 0;
+        boolean PitLimiter = (inputMask & (1 << SteeringControl.PIT_LIMITER.ordinal())) != 0;
 
         int liftUpBit = 1 << SteeringControl.LIFT_UP.ordinal();
         int liftDownBit = 1 << SteeringControl.LIFT_DOWN.ordinal();
@@ -408,7 +410,7 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity {
 
         if (engine != null) {
             engine.setDriverControls(throttle01, clutch, shiftUp, shiftDown);
-            engine.setDriverAids(overtake, modeUp, modeDown, tractionControl);
+            engine.setDriverAids(overtake, modeUp, modeDown, tractionControl, PitLimiter);
             engine.setDriveMode(driveMode);
         }
         if (suspensions.isEmpty()) {
