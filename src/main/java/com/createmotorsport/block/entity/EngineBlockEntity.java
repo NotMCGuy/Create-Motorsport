@@ -253,8 +253,7 @@ public class EngineBlockEntity extends SmartBlockEntity implements dev.ryanhcode
         boolean semiAuto = Config.SEMI_AUTO_SHIFT.get();
         double totalTorque = drivetrain.update(running, throttle, clutchHeld, semiAuto, shiftUpEdge, shiftDownEdge,
                 avgOmega, 1.0 / 20.0, pitLimiter);
-        totalTorque *= Config.DRIVETRAIN_TORQUE_SCALE.getAsDouble();
-        totalTorque *= powerFactor(driving && auxOvertake, peakOmega, peakLatUse, repRadius, running,
+        totalTorque *= powerFactor(driving && auxOvertake, peakOmega, peakLatUse, avgOmega,repRadius, running,
                 tractionForce, Math.abs(totalTorque));
 
         this.telemAvgWheelOmega = avgOmega;
@@ -442,7 +441,7 @@ public class EngineBlockEntity extends SmartBlockEntity implements dev.ryanhcode
 
 
     // torque multiplier from driver aids (engine mode, overtake boost, traction control)
-    private double powerFactor(boolean wantBoost, double peakOmega, double peakLatUse, double repRadius,
+    private double powerFactor(boolean wantBoost, double peakOmega, double peakLatUse, double avgOmega, double repRadius,
                                boolean running, double tractionForce, double demandTorque) {
         double factor = powerMode / (double) MAX_POWER_MODE;
     
@@ -459,8 +458,6 @@ public class EngineBlockEntity extends SmartBlockEntity implements dev.ryanhcode
             }
         }
     
-        factor *= tractionControlCap(avgOmega, repRadius, running);
-
         factor *= tractionControlCap(peakOmega, peakLatUse, repRadius, running, tractionForce,
                 demandTorque * factor);
 

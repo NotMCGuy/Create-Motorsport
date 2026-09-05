@@ -51,7 +51,7 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity {
         LIFT_DOWN("Lift Down"),
         DIFF_MODE("Diff Mode"),
         HUD_TOGGLE("HUD Toggle"),
-        PIT_LIMITER("Pit Limiter");
+        PIT_LIMITER("Pit Limiter"),
         STEER_ASSIST("Steer Assist");
 
         private final String displayName;
