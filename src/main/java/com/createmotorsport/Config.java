@@ -43,12 +43,11 @@ public class Config {
             .comment("Reverse gear ratio, default 3.2")
             .defineInRange("reverseRatio", 3.2, 0.1, 20.0);
 
-    public static final ModConfigSpec.DoubleValue DRIVETRAIN_TORQUE_SCALE = BUILDER
-            .comment("Converts real crank torque (Nm) into Sable's world scale",
-                    "Scale this linearly with car mass. 69kpg is used for this number",
-                    "I confirmed this number by calculating and measuring kW from the car log. ",
-                    "So 560 kW real x .1207 = 67.6 kW measured in the log")
-            .defineInRange("drivetrainTorqueScale", 0.1207, 0.0001, 10.0);
+    public static final ModConfigSpec.DoubleValue DRIVETRAIN_TRIM = BUILDER
+            .comment("Drivetrain Torque now scales with design load. ",
+                    "Keeping this as a backup way to affect torque",
+                    "Default 1.0")
+            .defineInRange("drivetrainTrim", 1.0, 0.01, 10.0);
 
     public static final ModConfigSpec.DoubleValue DRIVELINE_EFFICIENCY = BUILDER
             .comment("Driveline efficiency %",

@@ -61,7 +61,8 @@ public final class DrivetrainSim {
      */
     public double update(boolean running, double throttle, boolean clutchHeld, boolean semiAuto,
                          boolean shiftUpEdge, boolean shiftDownEdge, double wheelOmega, double dt) {
-        double inertia = Config.ENGINE_INERTIA.getAsDouble();
+        double engineScale = MassScale.design(this.spec.designVehicleMassBlocks());
+        double inertia = Config.ENGINE_INERTIA.getAsDouble() * engineScale;
         double omega = this.rpm / RAD_TO_RPM;
         double maxOmega = this.spec.redlineRpm() * 1.05 / RAD_TO_RPM;
 
@@ -113,7 +114,7 @@ public final class DrivetrainSim {
         double grabFrac = CLUTCH_LAUNCH_GRAB + (CLUTCH_HOLD_GRAB - CLUTCH_LAUNCH_GRAB) * over;
 
         double launchGrab = disengaged ? 0.0
-                : Mth.clamp(grabFrac * tEng / Config.CLUTCH_MAX_TORQUE.getAsDouble(), 0.0, 1.0) * aboveIdle;
+                : Mth.clamp(grabFrac * tEng / (Config.CLUTCH_MAX_TORQUE.getAsDouble() * engineScale), 0.0, 1.0) * aboveIdle;
 
         double overspeed = disengaged ? 0.0
                 : Mth.clamp((this.rpm - launchTarget - CLUTCH_FLARE_BAND) / CLUTCH_DUMP_BAND, 0.0, 1.0);
@@ -138,7 +139,7 @@ public final class DrivetrainSim {
             return record(tEng, ratio, 0.0, false);
         }
 
-        double tCap = Config.CLUTCH_MAX_TORQUE.getAsDouble() * this.clutchEngage;
+        double tCap = (Config.CLUTCH_MAX_TORQUE.getAsDouble() * engineScale) * this.clutchEngage;
         double kc = Config.CLUTCH_LOCK_STIFFNESS.getAsDouble();
 
         double omegaStick = (omega + dt / inertia * (tEng + kc * omegaGb)) / (1.0 + dt * kc / inertia);

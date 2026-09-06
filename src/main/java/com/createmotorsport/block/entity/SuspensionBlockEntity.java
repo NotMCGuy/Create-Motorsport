@@ -3,6 +3,7 @@ package com.createmotorsport.block.entity;
 import com.createmotorsport.Config;
 import com.createmotorsport.CreateMotorsport;
 import com.createmotorsport.block.SuspensionBlock;
+import com.createmotorsport.physics.MassScale;
 import com.createmotorsport.physics.TireModel;
 import com.createmotorsport.physics.TireSpec;
 import com.createmotorsport.physics.spec.DamperSpec;
@@ -81,6 +82,7 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements BlockEnti
     private static final int ASSIST_PROBES = 4;
     private static final double ASSIST_RELEASE_RATIO = 3.0;
     private double sprungMassPerWheel = 1.0;
+    private double cachedCarMass = MassScale.REFERENCE_CAR_MASS;
     private int cachedWheelCount = 4;
     private double cachedCarSpeed;
     private long wheelCountStamp = Long.MIN_VALUE;
@@ -874,7 +876,7 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements BlockEnti
             }
             cachedWheelCount = Math.max(1, count);
         }
-        double unsprung = cachedWheelCount * Math.max(0.1, Config.WHEEL_MASS.getAsDouble());
+        double unsprung = cachedWheelCount * wheelMass();
         double sprung = Math.max(1.0, massData.getMass() - unsprung);
         return sprung / cachedWheelCount;
     }
@@ -889,6 +891,7 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements BlockEnti
         if (massData.isInvalid()) {
             return;
         }
+        this.cachedCarMass = massData.getMass();
         this.sprungMassPerWheel = sprungMassPerWheel(subLevel, massData);
         Vector3d carVel = new Vector3d(subLevel.latestLinearVelocity);
         this.cachedCarSpeed = Math.sqrt(carVel.x * carVel.x + carVel.z * carVel.z);
@@ -911,7 +914,7 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements BlockEnti
             return;
         }
         double antiSlip = (driftDiffMode ? Config.DIFFERENTIAL_ANTISLIP_DRIFT : Config.DIFFERENTIAL_ANTISLIP_TORQUE)
-                .getAsDouble();
+                .getAsDouble() * MassScale.measured(cachedCarMass);
         if (antiSlip <= 0.0) {
             return;
         }
@@ -934,9 +937,15 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements BlockEnti
         return wheelInertia(radius);
     }
 
+    // Wheel mass needs to just scale with the car mass for now, since people are going to want to build very
+    // different weights and not know how/where to change this
+    private double wheelMass() {
+        return Math.max(0.1, Config.WHEEL_MASS.getAsDouble() * MassScale.measured(cachedCarMass));
+    }
+
     // I = m*r^2
-    private static double wheelInertia(double radius) {
-        return Math.max(0.5, Config.WHEEL_MASS.getAsDouble() * radius * radius);
+    private double wheelInertia(double radius) {
+        return Math.max(0.5, wheelMass() * radius * radius);
     }
 
     // Advances the wheel between the suspension spring and the tyre spring, returns the force the suspension puts into the body
@@ -947,7 +956,7 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements BlockEnti
         double springC = TireModel.springDamping(rateMass, setting.naturalFreqHz(),
                 setting.dampingRatio(), rebound);
         double tireK = springK * Config.TIRE_STIFFNESS_RATIO.getAsDouble();
-        double unsprungMass = Math.max(0.1, Config.WHEEL_MASS.getAsDouble());
+        double unsprungMass = wheelMass();
         double tireC = 2.0 * Config.TIRE_VERTICAL_DAMPING.getAsDouble()
                 * Math.sqrt(tireK * unsprungMass);
 
@@ -1019,7 +1028,8 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements BlockEnti
                 : 1.0;
 
         double wheelInertia = wheelInertia(radius);
-        double brakeTorque = brake01 * Config.BRAKE_STRENGTH.getAsDouble() * radius;
+        double brakeTorque = brake01 * Config.BRAKE_STRENGTH.getAsDouble()
+                * MassScale.measured(cachedCarMass) * radius;
 
         if (!grounded) {
             wheel.springLength = Mth.clamp(Mth.lerp(0.4, wheel.springLength, restLength() + MAX_DROOP_RENDER),

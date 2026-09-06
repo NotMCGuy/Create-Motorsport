@@ -3,9 +3,8 @@ package com.createmotorsport.physics;
 import net.minecraft.util.Mth;
 
 /**
- * Immutable definition of an engine + gearbox tier with values stated in real SI units
- * (Nm, RPM); DRIVETRAIN_TORQUE_SCALE in the common config, converts crank torque
- * into Sable's world scale, so users will see realistic car numbers, not Create/Sable's numbers
+ * Immutable definition of an engine tier with values stated in real SI units
+ * (Nm, RPM); drivetrainTorqueScale is derived from vehicle mass and a premeasured reference
  */
 public record EngineSpec(
         double idleRpm,
@@ -13,13 +12,19 @@ public record EngineSpec(
         double peakTorque,
         double shiftUpRpm,
         double shiftDownRpm,
-        double drivelineEfficiency
+        double drivelineEfficiency,
+        double designVehicleMassBlocks
 ) {
 
-    // still working on tuning this
     public static final EngineSpec RACING_V8_HYBRID = new EngineSpec(
-            5000, 18000, 320, 16000, 11000, 0.93
+            5000, 18000, 320, 16000, 11000, 0.93, MassScale.REFERENCE_CAR_MASS
     );
+
+    private static final double REFERENCE_TORQUE_SCALE = 0.1207;
+
+    public double drivetrainTorqueScale() {
+        return REFERENCE_TORQUE_SCALE * MassScale.design(designVehicleMassBlocks);
+    }
 
 
     // Crank torque in (Nm) at full throttle for a 2011 F1 2.4L V8
