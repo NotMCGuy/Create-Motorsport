@@ -87,16 +87,20 @@ public class CreateMotorsport {
     private static final float RACING_TIRE_RADIUS = 12.0f / 16.0f;   // Motorsports racing tire
     private static final float TRUCK_TIRE_RADIUS = 20.0f / 16.0f;    // offroad's large_tire
 
-    public static final DeferredItem<Item> RACING_TIRE_1 = registerTire("racing_tire_1", 20, RACING_TIRE_RADIUS);
-    public static final DeferredItem<Item> RACING_TIRE_2 = registerTire("racing_tire_2", 36, RACING_TIRE_RADIUS);
-    public static final DeferredItem<Item> RACING_TIRE_3 = registerTire("racing_tire_3", 65, RACING_TIRE_RADIUS);
-    public static final DeferredItem<Item> RACING_TIRE_4 = registerTire("racing_tire_4", 117, RACING_TIRE_RADIUS);
-    public static final DeferredItem<Item> RACING_TIRE_5 = registerTire("racing_tire_5", 210, RACING_TIRE_RADIUS);
-    public static final DeferredItem<Item> TRUCK_TIRE = registerTire("truck_tire", 1000, TRUCK_TIRE_RADIUS);
+    private static final net.minecraft.world.phys.Vec3 UPRIGHT = net.minecraft.world.phys.Vec3.ZERO;
+    private static final net.minecraft.world.phys.Vec3 FLAT = new net.minecraft.world.phys.Vec3(90.0, 0.0, 0.0);
+
+    public static final DeferredItem<Item> RACING_TIRE_1 = registerTire("racing_tire_1", 20, RACING_TIRE_RADIUS, UPRIGHT);
+    public static final DeferredItem<Item> RACING_TIRE_2 = registerTire("racing_tire_2", 36, RACING_TIRE_RADIUS, UPRIGHT);
+    public static final DeferredItem<Item> RACING_TIRE_3 = registerTire("racing_tire_3", 65, RACING_TIRE_RADIUS, UPRIGHT);
+    public static final DeferredItem<Item> RACING_TIRE_4 = registerTire("racing_tire_4", 117, RACING_TIRE_RADIUS, UPRIGHT);
+    public static final DeferredItem<Item> RACING_TIRE_5 = registerTire("racing_tire_5", 210, RACING_TIRE_RADIUS, UPRIGHT);
+    public static final DeferredItem<Item> TRUCK_TIRE = registerTire("truck_tire", 1000, TRUCK_TIRE_RADIUS, FLAT);
 
     public static final DeferredItem<Item> AIR_INTAKE = ITEMS.registerSimpleItem(
             "air_intake",
             new Item.Properties()
+
     );
     public static final DeferredItem<Item> EXHAUST_MANIFOLD = ITEMS.registerSimpleItem(
             "exhaust_manifold",
@@ -118,7 +122,6 @@ public class CreateMotorsport {
             "engine_block",
             ENGINE_BLOCK
     );
-
     public static final DeferredBlock<EngineBlock> TRUCK_ENGINE_BLOCK = BLOCKS.register(
             "truck_engine_block",
             () -> new EngineBlock(BlockBehaviour.Properties.of()
@@ -272,13 +275,14 @@ public class CreateMotorsport {
                 com.createmotorsport.network.SkidmarkPacket::handle);
     }
 
-    
-    private static DeferredItem<Item> registerTire(String name, double midpointKg, float radius) {
+
+    private static DeferredItem<Item> registerTire(String name, double midpointKg, float radius,
+                                                   net.minecraft.world.phys.Vec3 rotation) {
         float designLoad = (float) (midpointKg * 9.81 / 4.0);
         return ITEMS.register(name, () -> new Item(new Item.Properties()
                 .stacksTo(16)
                 .component(OffroadDataComponents.TIRE, new TireLike(radius,
-                        net.minecraft.world.phys.Vec3.ZERO, net.minecraft.world.phys.Vec3.ZERO, (ResourceLocation) null))
+                        rotation, net.minecraft.world.phys.Vec3.ZERO, (ResourceLocation) null))
                 .component(TIRE_DESIGN_LOAD, designLoad)));
     }
 
