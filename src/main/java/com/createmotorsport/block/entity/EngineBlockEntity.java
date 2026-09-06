@@ -75,7 +75,7 @@ public class EngineBlockEntity extends SmartBlockEntity implements dev.ryanhcode
     private static final int BURN_TICKS = 100;
     private static final int SOUND_INTERVAL = 8;
 
-    private final DrivetrainSim drivetrain = new DrivetrainSim(EngineSpec.RACING_V8_HYBRID);
+    private final DrivetrainSim drivetrain;
 
     private int burnTicks;
     private int soundCooldown;
@@ -150,6 +150,8 @@ public class EngineBlockEntity extends SmartBlockEntity implements dev.ryanhcode
 
     public EngineBlockEntity(BlockPos pos, BlockState state) {
         super(CreateMotorsport.ENGINE_BLOCK_ENTITY.get(), pos, state);
+        this.drivetrain = new DrivetrainSim(state.is(CreateMotorsport.TRUCK_ENGINE_BLOCK.get())
+                ? EngineSpec.TRUCK_DIESEL : EngineSpec.RACING_V8_HYBRID);
         for (int slot = 0; slot < SLOT_COUNT; slot++) {
             inventory.setItem(slot, items.get(slot));
         }

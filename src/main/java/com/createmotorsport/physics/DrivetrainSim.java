@@ -157,7 +157,7 @@ public final class DrivetrainSim {
 
         this.rpm = clampOmega(omegaNew, maxOmega) * RAD_TO_RPM;
 
-        double wheelTorque = tClutch * ratio * Config.DRIVELINE_EFFICIENCY.getAsDouble();
+        double wheelTorque = tClutch * ratio * this.spec.drivelineEfficiency();
         return record(tEng, ratio, wheelTorque, locked);
     }
 
@@ -167,8 +167,7 @@ public final class DrivetrainSim {
 
 
     private double idleHoldThrottle() {
-        double scale = Config.ENGINE_PEAK_TORQUE.getAsDouble() / this.spec.peakTorque();
-        double idleTorque = this.spec.torqueAt(this.spec.idleRpm()) * scale;
+        double idleTorque = this.spec.torqueAt(this.spec.idleRpm());
         if (idleTorque <= 1.0e-6) {
             return 0.1;
         }
@@ -178,16 +177,15 @@ public final class DrivetrainSim {
 
     private double netEngineTorque(double effThrottle, double omega) {
         double rpmNow = Math.abs(omega) * RAD_TO_RPM;
-        double scale = Config.ENGINE_PEAK_TORQUE.getAsDouble() / this.spec.peakTorque();
         double combustion = rpmNow >= this.spec.redlineRpm()
                 ? 0.0
-                : effThrottle * this.spec.torqueAt(rpmNow) * scale;
+                : effThrottle * this.spec.torqueAt(rpmNow);
         double sign = omega >= 0.0 ? 1.0 : -1.0;
         return combustion - sign * frictionTorque(rpmNow, effThrottle);
     }
 
     private double frictionTorque(double rpm, double effThrottle) {
-        double base = Config.ENGINE_BRAKE_FRACTION.getAsDouble() * Config.ENGINE_PEAK_TORQUE.getAsDouble();
+        double base = this.spec.engineBrakeFraction() * this.spec.peakTorque();
         double n = Mth.clamp(Math.abs(rpm) / this.spec.redlineRpm(), 0.0, 1.2);
         double mechanical = base * (0.25 + 0.45 * n);
         double pumping = base * (0.35 + 1.40 * n * n) * (1.0 - Mth.clamp(effThrottle, 0.0, 1.0));
@@ -221,7 +219,7 @@ public final class DrivetrainSim {
     // Signed overall ratio from crank -> wheel for gear index; 0 for neutral, negative for reverse
     // Comes from the config now
     private double overallRatio(int gearIndex) {
-        double finalDrive = Config.FINAL_DRIVE.getAsDouble();
+        double finalDrive = this.spec.finalDrive();
         if (gearIndex == GEAR_REVERSE) {
             return -Config.REVERSE_RATIO.getAsDouble() * finalDrive;
         }

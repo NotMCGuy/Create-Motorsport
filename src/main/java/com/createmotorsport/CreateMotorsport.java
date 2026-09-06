@@ -83,13 +83,17 @@ public class CreateMotorsport {
             new Item.Properties()
     );
 
-    // 5 different design loads of tires, using the offroad small-tire model (radius 0.75)
-    // I got these weights from a table I made of 'optimal engine specs to vehicle mass', so these should line up with 5 tiers of engine is the goal
-    public static final DeferredItem<Item> RACING_TIRE_1 = registerTire("racing_tire_1", 20);
-    public static final DeferredItem<Item> RACING_TIRE_2 = registerTire("racing_tire_2", 36);
-    public static final DeferredItem<Item> RACING_TIRE_3 = registerTire("racing_tire_3", 65);
-    public static final DeferredItem<Item> RACING_TIRE_4 = registerTire("racing_tire_4", 117);
-    public static final DeferredItem<Item> RACING_TIRE_5 = registerTire("racing_tire_5", 210);
+
+    private static final float RACING_TIRE_RADIUS = 12.0f / 16.0f;   // Motorsports racing tire
+    private static final float TRUCK_TIRE_RADIUS = 20.0f / 16.0f;    // offroad's large_tire
+
+    public static final DeferredItem<Item> RACING_TIRE_1 = registerTire("racing_tire_1", 20, RACING_TIRE_RADIUS);
+    public static final DeferredItem<Item> RACING_TIRE_2 = registerTire("racing_tire_2", 36, RACING_TIRE_RADIUS);
+    public static final DeferredItem<Item> RACING_TIRE_3 = registerTire("racing_tire_3", 65, RACING_TIRE_RADIUS);
+    public static final DeferredItem<Item> RACING_TIRE_4 = registerTire("racing_tire_4", 117, RACING_TIRE_RADIUS);
+    public static final DeferredItem<Item> RACING_TIRE_5 = registerTire("racing_tire_5", 210, RACING_TIRE_RADIUS);
+    public static final DeferredItem<Item> TRUCK_TIRE = registerTire("truck_tire", 1000, TRUCK_TIRE_RADIUS);
+
     public static final DeferredItem<Item> AIR_INTAKE = ITEMS.registerSimpleItem(
             "air_intake",
             new Item.Properties()
@@ -114,6 +118,19 @@ public class CreateMotorsport {
             "engine_block",
             ENGINE_BLOCK
     );
+
+    public static final DeferredBlock<EngineBlock> TRUCK_ENGINE_BLOCK = BLOCKS.register(
+            "truck_engine_block",
+            () -> new EngineBlock(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.METAL)
+                    .strength(3.5F, 6.0F)
+                    .noOcclusion()
+                    .requiresCorrectToolForDrops())
+    );
+    public static final DeferredItem<BlockItem> TRUCK_ENGINE_BLOCK_ITEM = ITEMS.registerSimpleBlockItem(
+            "truck_engine_block",
+            TRUCK_ENGINE_BLOCK
+    );
     public static final DeferredBlock<SuspensionBlock> SUSPENSION = BLOCKS.register(
             "suspension",
             () -> new SuspensionBlock(BlockBehaviour.Properties.of()
@@ -129,7 +146,7 @@ public class CreateMotorsport {
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<EngineBlockEntity>> ENGINE_BLOCK_ENTITY =
             BLOCK_ENTITY_TYPES.register("engine_block", () -> BlockEntityType.Builder.of(
                     EngineBlockEntity::new,
-                    ENGINE_BLOCK.get()
+                    ENGINE_BLOCK.get(), TRUCK_ENGINE_BLOCK.get()
             ).build(null));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<SuspensionBlockEntity>> SUSPENSION_BLOCK_ENTITY =
             BLOCK_ENTITY_TYPES.register("suspension", () -> BlockEntityType.Builder.of(
@@ -195,6 +212,7 @@ public class CreateMotorsport {
                     .icon(() -> ENGINE_BLOCK_ITEM.get().getDefaultInstance())
                     .displayItems((parameters, output) -> {
                         output.accept(ENGINE_BLOCK_ITEM.get());
+                        output.accept(TRUCK_ENGINE_BLOCK_ITEM.get());
                         output.accept(SUSPENSION_ITEM.get());
                         output.accept(STEERING_WHEEL_ITEM.get());
                         output.accept(DOWN_FLAP_ITEM.get());
@@ -207,6 +225,7 @@ public class CreateMotorsport {
                         output.accept(RACING_TIRE_3.get());
                         output.accept(RACING_TIRE_4.get());
                         output.accept(RACING_TIRE_5.get());
+                        output.accept(TRUCK_TIRE.get());
                     })
                     .build());
 
@@ -253,13 +272,12 @@ public class CreateMotorsport {
                 com.createmotorsport.network.SkidmarkPacket::handle);
     }
 
-
-    // register 'design load' tires
-    private static DeferredItem<Item> registerTire(String name, double midpointKg) {
+    
+    private static DeferredItem<Item> registerTire(String name, double midpointKg, float radius) {
         float designLoad = (float) (midpointKg * 9.81 / 4.0);
         return ITEMS.register(name, () -> new Item(new Item.Properties()
                 .stacksTo(16)
-                .component(OffroadDataComponents.TIRE, new TireLike(12.0f / 16.0f,
+                .component(OffroadDataComponents.TIRE, new TireLike(radius,
                         net.minecraft.world.phys.Vec3.ZERO, net.minecraft.world.phys.Vec3.ZERO, (ResourceLocation) null))
                 .component(TIRE_DESIGN_LOAD, designLoad)));
     }

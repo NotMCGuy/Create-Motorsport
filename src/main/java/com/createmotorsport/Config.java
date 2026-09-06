@@ -20,24 +20,11 @@ public class Config {
     // ======================================================================
     static { BUILDER.push("engine"); }
 
-    public static final ModConfigSpec.DoubleValue ENGINE_PEAK_TORQUE = BUILDER
-            .comment("Peak crank torque of the engine in real newton-metres (Nm).",
-                    "320 is a realistic number for a 2011 era V8 F1 engine.",
-                    "Turn it up if you want to buff the engine, but keep in mind",
-                    "that at some point you are also limited by grip.")
-            .defineInRange("enginePeakTorque", 320.0, 50.0, 2000.0);
-
     public static final ModConfigSpec.ConfigValue<String> GEAR_RATIOS = BUILDER
             .comment("Forward gear ratios, highest (1st gear) to lowest (top gear), comma-separated.",
                     "Higher ratio = more torque but lower speed per gear",
-                    "Multiplied by finalDrive to get the final crank to wheel ratio.")
+                    "Multiplied by the engine's own final drive to get the crank to wheel ratio.")
             .define("gearRatios", "3.2,2.6,2.0,1.6,1.3,1.0,0.85");
-
-    public static final ModConfigSpec.DoubleValue FINAL_DRIVE = BUILDER
-            .comment("Final-drive ratio, multiplied onto every gear (and reverse).",
-                    "Raise it to shorten all the gearing at once (more acceleration, lower top speed);",
-                    "Default 14.0")
-            .defineInRange("finalDrive", 14.0, 0.1, 60.0);
 
     public static final ModConfigSpec.DoubleValue REVERSE_RATIO = BUILDER
             .comment("Reverse gear ratio, default 3.2")
@@ -48,17 +35,6 @@ public class Config {
                     "Keeping this as a backup way to affect torque",
                     "Default 1.0")
             .defineInRange("drivetrainTrim", 1.0, 0.01, 10.0);
-
-    public static final ModConfigSpec.DoubleValue DRIVELINE_EFFICIENCY = BUILDER
-            .comment("Driveline efficiency %",
-                    "Real cars are 0.85-0.95",
-                    "Default 0.93")
-            .defineInRange("drivelineEfficiency", 0.93, 0.5, 1.0);
-
-    public static final ModConfigSpec.DoubleValue ENGINE_BRAKE_FRACTION = BUILDER
-            .comment("Passive Engine Drag as percent of peak torque",
-                    "Default 0.15")
-            .defineInRange("engineBrakeFraction", 0.15, 0.0, 0.3);
 
     public static final ModConfigSpec.DoubleValue ENGINE_INERTIA = BUILDER
             .comment("Rotating inertia of the engine + flywheel (kg*m^2)",
@@ -83,7 +59,6 @@ public class Config {
             .comment("The RPM which the auto-clutch holds the engine at during a standing start, like an F1 launch",
                     "based on F1 launch controls. Default 9000")
             .defineInRange("launchRpm", 9000.0, 1000.0, 18000.0);
-
 
     static { BUILDER.pop(); }
 
@@ -179,7 +154,6 @@ public class Config {
     public static final ModConfigSpec.DoubleValue TIRE_VERTICAL_DAMPING = BUILDER
             .comment("")
             .defineInRange("tireVerticalDamping", 0.06, 0.0, 1.0);
-
 
     // suspension
 
@@ -452,7 +426,6 @@ public class Config {
             .comment("")
             .defineInRange("tireMass", 2.0, 0.2, 100);
 
-
     public static final ModConfigSpec.DoubleValue STEERING_MAX_DEGREES = BUILDER
             .comment("Offroad cars use 32 degrees so I started with that, ",
                     "but F1 cars are more like ~20-22 degrees supposedly,",
@@ -663,7 +636,6 @@ public class Config {
     static { BUILDER.pop(); }
 
     static final ModConfigSpec SPEC = BUILDER.build();
-
 
     // for the csv logging, dump the entire config as "section.name,\"value\"" lines, to help identify issues in bug reports
     public static List<String> dumpForLog() {

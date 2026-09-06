@@ -1,6 +1,7 @@
 {
   "itemGroup.createmotorsport": "Create: Motorsport",
   "block.createmotorsport.engine_block": "Engine Block",
+  "block.createmotorsport.truck_engine_block": "Truck Engine Block",
   "block.createmotorsport.suspension": "Suspension",
   "block.createmotorsport.steering_wheel": "Steering Wheel",
   "block.createmotorsport.down_flap": "Down Flap",
@@ -13,6 +14,7 @@
   "item.createmotorsport.racing_tire_3": "Racing Tire III (load ~65 kpn)",
   "item.createmotorsport.racing_tire_4": "Racing Tire IV (load ~117 kpn)",
   "item.createmotorsport.racing_tire_5": "Racing Tire V (load ~210 kpn)",
+  "item.createmotorsport.truck_tire": "Truck Tire (load ~1000 kpn)",
   "container.createmotorsport.engine": "Engine Block",
   "container.createmotorsport.suspension": "Suspension Steering",
   "container.createmotorsport.steering_wheel": "Steering Wheel",
@@ -33,7 +35,7 @@
   "createmotorsport.configuration.section.createmotorsport.common.toml": "Create: Motorsport Configs",
   "createmotorsport.configuration.section.createmotorsport.common.toml.title": "Create: Motorsport Configs",
   "createmotorsport.configuration.enableDebugLogging": "Enable Debug Logging",
-  "createmotorsport.configuration.drivetrainTorqueScale": "Drivetrain Torque Scale",
+  "createmotorsport.configuration.drivetrainTrim": "Drivetrain Trim",
 
   "create.tooltip.flapState": "Flap State: %1$s/15"
 }
