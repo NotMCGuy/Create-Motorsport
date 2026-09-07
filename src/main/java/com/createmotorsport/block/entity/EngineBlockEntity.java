@@ -76,7 +76,8 @@ public class EngineBlockEntity extends SmartBlockEntity implements dev.ryanhcode
     private static final int SOUND_INTERVAL = 8;
 
     private final DrivetrainSim drivetrain;
-
+    private final EngineSpec baseSpec;
+    private double designMassOverride;
     private int burnTicks;
     private int soundCooldown;
     private float throttle;
@@ -150,8 +151,9 @@ public class EngineBlockEntity extends SmartBlockEntity implements dev.ryanhcode
 
     public EngineBlockEntity(BlockPos pos, BlockState state) {
         super(CreateMotorsport.ENGINE_BLOCK_ENTITY.get(), pos, state);
-        this.drivetrain = new DrivetrainSim(state.is(CreateMotorsport.TRUCK_ENGINE_BLOCK.get())
-                ? EngineSpec.TRUCK_DIESEL : EngineSpec.RACING_V8_HYBRID);
+        this.baseSpec = state.is(CreateMotorsport.TRUCK_ENGINE_BLOCK.get())
+                ? EngineSpec.TRUCK_DIESEL : EngineSpec.RACING_V8_HYBRID;
+        this.drivetrain = new DrivetrainSim(baseSpec);
         for (int slot = 0; slot < SLOT_COUNT; slot++) {
             inventory.setItem(slot, items.get(slot));
         }
@@ -305,6 +307,26 @@ public class EngineBlockEntity extends SmartBlockEntity implements dev.ryanhcode
         }
         // muting engine for now
         // playEngineSound(running);
+    }
+
+    public double getDesignMass() {
+        return designMassOverride > 0.0 ? designMassOverride : baseSpec.designVehicleMassBlocks();
+    }
+
+    public void setDesignMassOverride(double blocks) {
+        double clamped = blocks <= 0.0 ? 0.0 : Mth.clamp(blocks, 1.0, 100000.0);
+        if (clamped == designMassOverride) {
+            return;
+        }
+        designMassOverride = clamped;
+        applyDesignMass();
+        setChanged();
+        sendData();
+    }
+
+    private void applyDesignMass() {
+        drivetrain.setSpec(designMassOverride > 0.0
+                ? baseSpec.withDesignVehicleMass(designMassOverride) : baseSpec);
     }
 
     public int getRotationDirection() {
@@ -762,6 +784,7 @@ public class EngineBlockEntity extends SmartBlockEntity implements dev.ryanhcode
         tag.putInt("PowerMode", powerMode);
         tag.putBoolean("TractionControl", tractionControl);
         tag.putInt("RotationDirection", rotationDirection);
+        tag.putDouble("DesignMassOverride", designMassOverride);
         drivetrain.save(tag);
         ContainerHelper.saveAllItems(tag, items, registries);
     }
@@ -774,6 +797,8 @@ public class EngineBlockEntity extends SmartBlockEntity implements dev.ryanhcode
         powerMode = tag.contains("PowerMode") ? Math.max(1, Math.min(MAX_POWER_MODE, tag.getInt("PowerMode"))) : MAX_POWER_MODE;
         tractionControl = tag.getBoolean("TractionControl");
         rotationDirection = tag.getInt("RotationDirection") < 0 ? -1 : 1;
+        designMassOverride = tag.getDouble("DesignMassOverride");
+        applyDesignMass();
         drivetrain.load(tag);
         ContainerHelper.loadAllItems(tag, items, registries);
         for (int slot = 0; slot < SLOT_COUNT; slot++) {

@@ -69,6 +69,12 @@ public record EngineSpec(
                 * (REFERENCE_REAL_MASS_KG / Math.max(1.0, realVehicleMassKg));
     }
 
+    // user override for mass, and eventually other things, goes through here
+    public EngineSpec withDesignVehicleMass(double blocks) {
+        return new EngineSpec(idleRpm, redlineRpm, shiftUpRpm, shiftDownRpm, drivelineEfficiency,
+                engineBrakeFraction, finalDrive, realVehicleMassKg, blocks, torqueCurve);
+    }
+
     public double peakTorque() {
         double peak = 0.0;
         for (TorquePoint p : torqueCurve) {

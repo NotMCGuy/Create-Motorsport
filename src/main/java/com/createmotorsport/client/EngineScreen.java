@@ -3,6 +3,8 @@ package com.createmotorsport.client;
 import com.createmotorsport.block.entity.EngineBlockEntity;
 import com.createmotorsport.block.entity.EngineBlockEntity.ControlChannel;
 import com.createmotorsport.menu.EngineMenu;
+import com.createmotorsport.client.widget.NumberField;
+import com.createmotorsport.network.SetEngineDesignMassPacket;
 import com.createmotorsport.network.ToggleEngineDirectionPacket;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.Minecraft;
@@ -33,12 +35,59 @@ public class EngineScreen extends AbstractContainerScreen<EngineMenu> {
     private static final int DIR_FORWARD = 0xFF35506A;
     private static final int DIR_REVERSE = 0xFF6A3535;
 
+    // Design mass text box
+    private static final int MASS_X = 178;
+    private static final int MASS_W = 54;
+    private static final int MASS_H = 14;
+    private NumberField massField;
+
     public EngineScreen(EngineMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
-        this.imageWidth = 176;
+        this.imageWidth = 244;
         this.imageHeight = EngineMenu.HOTBAR_Y + 18 + 6;
         this.inventoryLabelY = EngineMenu.INV_Y - 12;
         this.inventoryLabelX = EngineMenu.INV_X;
+    }
+
+    @Override
+    protected void init() {
+        super.init();
+        massField = new NumberField(this.font, leftPos + MASS_X, topPos + EngineMenu.COMPONENT_Y - 1,
+                MASS_W, MASS_H, Component.literal("Design mass"), 1.0, 100000.0, this::sendDesignMass);
+        massField.showValue(getDesignMass());
+        addRenderableWidget(massField);
+    }
+
+    @Override
+    protected void containerTick() {
+        super.containerTick();
+        if (massField != null && !massField.isFocused()) {
+            massField.showValue(getDesignMass());
+        }
+    }
+
+    private void sendDesignMass(double blocks) {
+        BlockPos pos = menu.getEnginePos();
+        if (pos != null) {
+            PacketDistributor.sendToServer(new SetEngineDesignMassPacket(pos, blocks));
+        }
+    }
+
+    private double getDesignMass() {
+        BlockPos pos = menu.getEnginePos();
+        if (pos != null && Minecraft.getInstance().level != null
+                && Minecraft.getInstance().level.getBlockEntity(pos) instanceof EngineBlockEntity engine) {
+            return engine.getDesignMass();
+        }
+        return 0.0;
+    }
+
+    @Override
+    public boolean keyPressed(int key, int scan, int mods) {
+        if (massField != null && massField.isFocused() && key != 256) {
+            return massField.keyPressed(key, scan, mods) || massField.canConsumeInput();
+        }
+        return super.keyPressed(key, scan, mods);
     }
 
     @Override
@@ -64,6 +113,9 @@ public class EngineScreen extends AbstractContainerScreen<EngineMenu> {
         drawSlot(g, l + EngineMenu.EXHAUST_X, t + EngineMenu.COMPONENT_Y, 0);
         drawSlot(g, l + EngineMenu.INTAKE_X, t + EngineMenu.COMPONENT_Y, 0);
         g.drawString(font, "Components", l + 12, t + EngineMenu.COMPONENT_Y + 4, 0xFFFFFFFF, false);
+
+        g.drawString(font, "Design mass", l + MASS_X, t + EngineMenu.COMPONENT_Y - 12, 0xFFAAAAAA, false);
+        g.drawString(font, "blocks", l + MASS_X, t + EngineMenu.COMPONENT_Y + 16, 0xFF777777, false);
 
         // Channel rows
         for (ControlChannel channel : EngineBlockEntity.CHANNELS) {

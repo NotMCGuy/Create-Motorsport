@@ -47,7 +47,6 @@ import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
@@ -77,6 +76,11 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements BlockEnti
     private static final double FOOTPRINT_FRACTION = 0.95;
     private static final int MAX_FOOTPRINT_SAMPLES = 8;
 
+    // Semi-implicit euler holds only to omega*dt < 2, so we need to have this cap
+    // above which a corner just carries its own hardpoint through the unsprung loop instead of freezing
+    // See stepUnsprung
+    private static final double MAX_BODY_MODE_OMEGA_DT = 1.8;
+
     private double lastCastLift;
     private double lastAssistLift;
     private static final int ASSIST_PROBES = 4;
@@ -85,6 +89,8 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements BlockEnti
     private double cachedCarMass = MassScale.REFERENCE_CAR_MASS;
     private int cachedWheelCount = 4;
     private double cachedCarSpeed;
+    private double bodyModeOmegaDt;
+    private boolean warnedFastBodyMode;
     private long wheelCountStamp = Long.MIN_VALUE;
     public static final double MAX_TRAVEL = REST_LENGTH - BUMP_STOP_GAP;
     public static final double MAX_DROOP_RENDER = 0.15;
@@ -862,6 +868,25 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements BlockEnti
     // Physics substep
     // ================
 
+    // more telemetry
+    public double getCachedCarMass() {
+        return cachedCarMass;
+    }
+
+    public double getScaledWheelMass() {
+        return wheelMass();
+    }
+
+    public double getSprungMassPerWheel() {
+        return sprungMassPerWheel;
+    }
+
+    // omega*dt of the corner's body mode. Over 2 the integrator cannot hold it, over BODY_SUBSTEP_LIMIT
+    // this axle is substepping the hardpoint to compensate
+    public double getBodyModeOmegaDt() {
+        return bodyModeOmegaDt;
+    }
+
     // gotta use the right mass here, was using InvNormalMass before, which is wrong
     private double sprungMassPerWheel(ServerSubLevel subLevel, MassData massData) {
         long now = level.getGameTime();
@@ -951,9 +976,21 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements BlockEnti
     // Advances the wheel between the suspension spring and the tyre spring, returns the force the suspension puts into the body
     private double stepUnsprung(WheelState wheel, double rateMass, double rigidLength,
                                 double hardpointVel, double responseMass, double dt) {
-        double springK = TireModel.springRate(rateMass, setting.naturalFreqHz());
         boolean rebound = hardpointVel > 0.0;
-        double springC = TireModel.springDamping(rateMass, setting.naturalFreqHz(),
+        double springK = TireModel.springRate(rateMass, setting.naturalFreqHz());
+
+        // Roll stiffness is 4*k*b^2 against Ixx; a given corners roll mode runs at sqrt(springK/responseMass)
+        // semi implicit euler works here only to omega*dt < 2 based on my tests, alternates/vibrates real bad past that.
+        // This can happen if the car is built like a pencil with no weight on either side of a 1 block chassis.
+        // The solution for now is measuring that value and scaling frequency down when needed
+        double omegaDtRaw = responseMass > 1.0e-9 ? Math.sqrt(springK / responseMass) * dt : 0.0;
+        bodyModeOmegaDt = omegaDtRaw;
+        double freqHz = setting.naturalFreqHz();
+        if (omegaDtRaw > MAX_BODY_MODE_OMEGA_DT) {
+            freqHz *= MAX_BODY_MODE_OMEGA_DT / omegaDtRaw;
+            springK = TireModel.springRate(rateMass, freqHz);
+        }
+        double springC = TireModel.springDamping(rateMass, freqHz,
                 setting.dampingRatio(), rebound);
         double tireK = springK * Config.TIRE_STIFFNESS_RATIO.getAsDouble();
         double unsprungMass = wheelMass();
@@ -991,7 +1028,8 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements BlockEnti
         double strutVel = wheel.unsprungVel - hardpointVel;
         double bodyC = TireModel.effectiveDamping(springC, strutVel, setting.damper(), dt, responseMass);
         wheel.telemDampFraction = springC > 0.0 ? bodyC / springC : 1.0;
-        return Math.max(0.0, springK * newCompression + bodyC * strutVel);
+
+        return springK * newCompression + bodyC * strutVel;
     }
 
     private boolean stepWheel(WheelSide side, ServerSubLevel subLevel, Pose3d pose, MassData massData,
@@ -1032,6 +1070,8 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements BlockEnti
                 * MassScale.measured(cachedCarMass) * radius;
 
         if (!grounded) {
+            double airborneVel = Sable.HELPER.getVelocity(level, subLevel, hardpointJoml, new Vector3d()).y;
+            wheel.unsprungVel = Mth.lerp(0.4, wheel.unsprungVel, airborneVel);
             wheel.springLength = Mth.clamp(Mth.lerp(0.4, wheel.springLength, restLength() + MAX_DROOP_RENDER),
                     restLength() - MAX_TRAVEL, restLength() + MAX_DROOP_RENDER);
             wheel.omega = TireModel.integrateSpin(wheel.omega, radius, wheelInertia, driveTorquePerWheel,
@@ -1122,9 +1162,12 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements BlockEnti
         }
 
         wheel.telemVelNormal = localVelocity.dot(hitNormal); // hitNormal is already in body space here, so the velocity has to be rotated the same way before projecting
-
-        springForce *= Mth.clamp(1.0 / Math.max(0.5, hitNormal.y), 1.0, 2.0);
-        springForce = Math.min(springForce, Config.MAX_CORNERING_G.getAsDouble() * rateMass * 9.81);
+        
+        if (springForce > 0.0) {
+            springForce *= Mth.clamp(1.0 / Math.max(0.5, hitNormal.y), 1.0, 2.0);
+        }
+        double forceCap = Config.MAX_CORNERING_G.getAsDouble() * rateMass * 9.81;
+        springForce = Mth.clamp(springForce, -forceCap, forceCap);
 
         Vector3d springImpulse = new Vector3d(hitNormal).mul(springForce * dt);
         forceTotal.applyImpulseAtPoint(massData, hardpointJoml, springImpulse);

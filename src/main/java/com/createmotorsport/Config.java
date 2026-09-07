@@ -219,6 +219,11 @@ public class Config {
             .comment("Should be kept right under tmeasySlipAtPeakLong")
             .defineInRange("tcTargetSlip", 0.14, 0.02, 1.0);
 
+    public static final ModConfigSpec.DoubleValue RACE_MIN_LAP_TIME = BUILDER
+            .comment("Min lap time is necessary to give time for cars to cross the grid for",
+                    "the first time without triggering a new lap")
+            .defineInRange("raceMinLapTime", 20.0, 0.5, 600.0);
+
     public static final ModConfigSpec.DoubleValue TC_PROPORTIONAL = BUILDER
             .comment("")
             .defineInRange("tcProportional", 2.5, 0.0, 20.0);
@@ -423,7 +428,8 @@ public class Config {
             .defineInRange("absMinSpeed", 1.5, 0.0, 10.0);
 
     public static final ModConfigSpec.DoubleValue WHEEL_MASS = BUILDER
-            .comment("")
+            .comment("This scales with the cars measured mass, so no need to change it here",
+                    "Default 2.0")
             .defineInRange("tireMass", 2.0, 0.2, 100);
 
     public static final ModConfigSpec.DoubleValue STEERING_MAX_DEGREES = BUILDER

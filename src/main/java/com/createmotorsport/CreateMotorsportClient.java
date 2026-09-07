@@ -37,9 +37,12 @@ public class CreateMotorsportClient {
         NeoForge.EVENT_BUS.addListener(MotorsportCommands::register);
         NeoForge.EVENT_BUS.addListener(com.createmotorsport.client.MotorsportHud::onRenderGui);
         NeoForge.EVENT_BUS.addListener(com.createmotorsport.client.SkidmarkManager::onRenderLevel);
+        NeoForge.EVENT_BUS.addListener(com.createmotorsport.client.LapGateLinkPreview::onClientTick);
+        NeoForge.EVENT_BUS.addListener(com.createmotorsport.client.GhostManager::onRenderLevel);
         NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.event.level.LevelEvent.Unload e) -> {
             if (e.getLevel().isClientSide()) {
                 com.createmotorsport.client.SkidmarkManager.clear();
+                com.createmotorsport.client.GhostManager.clear();
             }
         });
     }
@@ -48,6 +51,7 @@ public class CreateMotorsportClient {
         event.register(CreateMotorsport.ENGINE_MENU.get(), EngineScreen::new);
         event.register(CreateMotorsport.SUSPENSION_MENU.get(), SuspensionScreen::new);
         event.register(CreateMotorsport.STEERING_WHEEL_MENU.get(), SteeringWheelScreen::new);
+        event.register(CreateMotorsport.LAP_GATE_MENU.get(), com.createmotorsport.client.LapGateScreen::new);
     }
 
     private void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {

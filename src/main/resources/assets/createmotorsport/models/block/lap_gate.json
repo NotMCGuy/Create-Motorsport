@@ -1,0 +1,21 @@
+{
+  "parent": "block/block",
+  "textures": {
+    "post": "minecraft:block/polished_blackstone",
+    "particle": "minecraft:block/polished_blackstone"
+  },
+  "elements": [
+    {
+      "from": [5, 0, 5],
+      "to": [11, 16, 11],
+      "faces": {
+        "north": { "uv": [0, 0, 6, 16], "texture": "#post" },
+        "east":  { "uv": [0, 0, 6, 16], "texture": "#post" },
+        "south": { "uv": [0, 0, 6, 16], "texture": "#post" },
+        "west":  { "uv": [0, 0, 6, 16], "texture": "#post" },
+        "up":    { "uv": [0, 0, 6, 6], "texture": "#post" },
+        "down":  { "uv": [0, 0, 6, 6], "texture": "#post" }
+      }
+    }
+  ]
+}

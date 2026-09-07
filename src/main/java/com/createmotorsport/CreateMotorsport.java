@@ -6,6 +6,7 @@ import com.createmotorsport.block.SuspensionBlock;
 import com.createmotorsport.block.DownFlapBlock;
 import com.createmotorsport.block.entity.DownFlapBlockEntity;
 import com.createmotorsport.block.entity.EngineBlockEntity;
+import com.createmotorsport.block.entity.LapGateBlockEntity;
 import com.createmotorsport.block.entity.SteeringWheelBlockEntity;
 import com.createmotorsport.block.entity.SuspensionBlockEntity;
 import com.createmotorsport.item.SuspensionWrenchItem;
@@ -83,24 +84,27 @@ public class CreateMotorsport {
             new Item.Properties()
     );
 
-
     private static final float RACING_TIRE_RADIUS = 12.0f / 16.0f;   // Motorsports racing tire
     private static final float TRUCK_TIRE_RADIUS = 20.0f / 16.0f;    // offroad's large_tire
 
     private static final net.minecraft.world.phys.Vec3 UPRIGHT = net.minecraft.world.phys.Vec3.ZERO;
-    private static final net.minecraft.world.phys.Vec3 FLAT = new net.minecraft.world.phys.Vec3(90.0, 0.0, 0.0);
+    private static final net.minecraft.world.phys.Vec3 STAND_UP = new net.minecraft.world.phys.Vec3(90.0, 0.0, 0.0);
 
+    public static final DeferredItem<Item> RACING_TIRE = registerTire("racing_tire", 65, RACING_TIRE_RADIUS, UPRIGHT);
+
+    // keeping these registered for backward compatibility
     public static final DeferredItem<Item> RACING_TIRE_1 = registerTire("racing_tire_1", 20, RACING_TIRE_RADIUS, UPRIGHT);
     public static final DeferredItem<Item> RACING_TIRE_2 = registerTire("racing_tire_2", 36, RACING_TIRE_RADIUS, UPRIGHT);
     public static final DeferredItem<Item> RACING_TIRE_3 = registerTire("racing_tire_3", 65, RACING_TIRE_RADIUS, UPRIGHT);
     public static final DeferredItem<Item> RACING_TIRE_4 = registerTire("racing_tire_4", 117, RACING_TIRE_RADIUS, UPRIGHT);
     public static final DeferredItem<Item> RACING_TIRE_5 = registerTire("racing_tire_5", 210, RACING_TIRE_RADIUS, UPRIGHT);
-    public static final DeferredItem<Item> TRUCK_TIRE = registerTire("truck_tire", 1000, TRUCK_TIRE_RADIUS, FLAT);
+
+    // Truck tire
+    public static final DeferredItem<Item> TRUCK_TIRE = registerTire("truck_tire", 1000, TRUCK_TIRE_RADIUS, STAND_UP);
 
     public static final DeferredItem<Item> AIR_INTAKE = ITEMS.registerSimpleItem(
             "air_intake",
             new Item.Properties()
-
     );
     public static final DeferredItem<Item> EXHAUST_MANIFOLD = ITEMS.registerSimpleItem(
             "exhaust_manifold",
@@ -150,6 +154,29 @@ public class CreateMotorsport {
             BLOCK_ENTITY_TYPES.register("engine_block", () -> BlockEntityType.Builder.of(
                     EngineBlockEntity::new,
                     ENGINE_BLOCK.get(), TRUCK_ENGINE_BLOCK.get()
+            ).build(null));
+
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Long>> GATE_FIRST_POST =
+            DATA_COMPONENTS.register("gate_first_post", () -> DataComponentType.<Long>builder()
+                    .persistent(Codec.LONG)
+                    .networkSynchronized(ByteBufCodecs.VAR_LONG)
+                    .build());
+
+    public static final DeferredBlock<com.createmotorsport.block.LapGateBlock> LAP_GATE = BLOCKS.register(
+            "lap_gate",
+            () -> new com.createmotorsport.block.LapGateBlock(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.COLOR_BLACK)
+                    .strength(2.0F, 6.0F)
+                    .noOcclusion())
+    );
+    public static final DeferredItem<com.createmotorsport.item.LapGateBlockItem> LAP_GATE_ITEM = ITEMS.register(
+            "lap_gate",
+            () -> new com.createmotorsport.item.LapGateBlockItem(LAP_GATE.get(), new Item.Properties())
+    );
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<LapGateBlockEntity>> LAP_GATE_BLOCK_ENTITY =
+            BLOCK_ENTITY_TYPES.register("lap_gate", () -> BlockEntityType.Builder.of(
+                    LapGateBlockEntity::new,
+                    LAP_GATE.get()
             ).build(null));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<SuspensionBlockEntity>> SUSPENSION_BLOCK_ENTITY =
             BLOCK_ENTITY_TYPES.register("suspension", () -> BlockEntityType.Builder.of(
@@ -203,6 +230,10 @@ public class CreateMotorsport {
             "steering_wheel",
             () -> IMenuTypeExtension.create((id, inv, buf) -> new SteeringWheelMenu(id, inv, buf.readBlockPos()))
     );
+    public static final DeferredHolder<MenuType<?>, MenuType<com.createmotorsport.menu.LapGateMenu>> LAP_GATE_MENU =
+            MENUS.register("lap_gate",
+                    () -> IMenuTypeExtension.create((id, inv, buf) ->
+                            new com.createmotorsport.menu.LapGateMenu(id, inv, buf.readBlockPos())));
     public static final DeferredHolder<SoundEvent, SoundEvent> ENGINE_IDLE = registerSound("engine_idle");
     public static final DeferredHolder<SoundEvent, SoundEvent> ENGINE_LOW = registerSound("engine_low");
     public static final DeferredHolder<SoundEvent, SoundEvent> ENGINE_MID = registerSound("engine_mid");
@@ -222,12 +253,9 @@ public class CreateMotorsport {
                         output.accept(AIR_INTAKE.get());
                         output.accept(EXHAUST_MANIFOLD.get());
                         output.accept(SUSPENSION_WRENCH.get());
+                        output.accept(LAP_GATE_ITEM.get());
                         output.accept(RACING_COMPONENT.get());
-                        output.accept(RACING_TIRE_1.get());
-                        output.accept(RACING_TIRE_2.get());
-                        output.accept(RACING_TIRE_3.get());
-                        output.accept(RACING_TIRE_4.get());
-                        output.accept(RACING_TIRE_5.get());
+                        output.accept(RACING_TIRE.get());
                         output.accept(TRUCK_TIRE.get());
                     })
                     .build());
@@ -262,6 +290,21 @@ public class CreateMotorsport {
         PayloadRegistrar registrar = event.registrar("1");
         registrar.playToServer(SteeringInputPacket.TYPE, SteeringInputPacket.CODEC, SteeringInputPacket::handle);
         registrar.playToServer(SetSteeringKeyPacket.TYPE, SetSteeringKeyPacket.CODEC, SetSteeringKeyPacket::handle);
+        registrar.playToServer(com.createmotorsport.network.SetEngineDesignMassPacket.TYPE,
+                com.createmotorsport.network.SetEngineDesignMassPacket.CODEC,
+                com.createmotorsport.network.SetEngineDesignMassPacket::handle);
+        registrar.playToServer(com.createmotorsport.network.SetTireDesignLoadPacket.TYPE,
+                com.createmotorsport.network.SetTireDesignLoadPacket.CODEC,
+                com.createmotorsport.network.SetTireDesignLoadPacket::handle);
+        registrar.playToServer(com.createmotorsport.network.RaceControlPacket.TYPE,
+                com.createmotorsport.network.RaceControlPacket.CODEC,
+                com.createmotorsport.network.RaceControlPacket::handle);
+        registrar.playToServer(com.createmotorsport.network.SetEntrantPacket.TYPE,
+                com.createmotorsport.network.SetEntrantPacket.CODEC,
+                com.createmotorsport.network.SetEntrantPacket::handle);
+        registrar.playToClient(com.createmotorsport.network.GhostSyncPacket.TYPE,
+                com.createmotorsport.network.GhostSyncPacket.CODEC,
+                com.createmotorsport.network.GhostSyncPacket::handle);
         registrar.playToServer(SetDrivingPacket.TYPE, SetDrivingPacket.CODEC, SetDrivingPacket::handle);
         registrar.playToServer(StartTelemetryLogPacket.TYPE, StartTelemetryLogPacket.CODEC, StartTelemetryLogPacket::handle);
         registrar.playToServer(SetDriveModePacket.TYPE, SetDriveModePacket.CODEC, SetDriveModePacket::handle);
@@ -279,7 +322,7 @@ public class CreateMotorsport {
     private static DeferredItem<Item> registerTire(String name, double midpointKg, float radius,
                                                    net.minecraft.world.phys.Vec3 rotation) {
         float designLoad = (float) (midpointKg * 9.81 / 4.0);
-        return ITEMS.register(name, () -> new Item(new Item.Properties()
+        return ITEMS.register(name, () -> new com.createmotorsport.item.TireItem(new Item.Properties()
                 .stacksTo(16)
                 .component(OffroadDataComponents.TIRE, new TireLike(radius,
                         rotation, net.minecraft.world.phys.Vec3.ZERO, (ResourceLocation) null))

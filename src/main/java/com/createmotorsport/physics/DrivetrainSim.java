@@ -25,7 +25,7 @@ public final class DrivetrainSim {
     private static final double CLUTCH_IDLE_CREEP = 0.10;
     private static final double CLUTCH_DUMP_BAND = 4000.0;
 
-    private final EngineSpec spec;
+    private EngineSpec spec;
 
     private double rpm;
     private int gear = GEAR_NEUTRAL;
@@ -37,6 +37,11 @@ public final class DrivetrainSim {
     private double lastRatio;
     private double lastWheelTorque;
     private boolean lastClutchLocked;
+
+
+    public void setSpec(EngineSpec spec) {
+        this.spec = spec;
+    }
 
     public DrivetrainSim(EngineSpec spec) {
         this.spec = spec;

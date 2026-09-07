@@ -492,6 +492,12 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity {
             sendLine(TelemetryLinePacket.KIND_ROW, "config_option,value");
             CarActors logged = gatherCar();
             if (logged != null) {
+                if (!logged.suspensions().isEmpty()) {
+                    SuspensionBlockEntity any = logged.suspensions().get(0);
+                    sendLine(TelemetryLinePacket.KIND_ROW, "car.mass," + any.getCachedCarMass());
+                    sendLine(TelemetryLinePacket.KIND_ROW, "car.wheelMassScaled," + any.getScaledWheelMass());
+                    sendLine(TelemetryLinePacket.KIND_ROW, "car.sprungMassPerWheel," + any.getSprungMassPerWheel());
+                }
                 for (int a = 0; a < logged.suspensions().size(); a++) {
                     SuspensionBlockEntity axle = logged.suspensions().get(a);
                     sendLine(TelemetryLinePacket.KIND_ROW,
@@ -501,6 +507,8 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity {
                             + (ap.getX() + 0.5) + " " + (ap.getY() + 0.5) + " " + (ap.getZ() + 0.5) + "\"");
                     sendLine(TelemetryLinePacket.KIND_ROW, "axle" + a + ".facing,\""
                             + axle.getFacing() + (axle.isFrontAxle() ? " front" : " rear") + "\"");
+                    sendLine(TelemetryLinePacket.KIND_ROW,
+                            "axle" + a + ".bodyModeOmegaDt," + axle.getBodyModeOmegaDt());
                 }
             }
             for (String configLine : com.createmotorsport.Config.dumpForLog()) {
