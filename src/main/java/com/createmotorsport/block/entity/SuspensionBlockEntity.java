@@ -838,7 +838,12 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements BlockEnti
         if (speedKmh <= fullLockKmh) {
             return 1.0;
         }
-        double aeroKmh = Config.STEER_ASSIST_AERO_SPEED.getAsDouble();
+
+        // Speed where downforce equals weight
+        double aeroPerWheel = Config.AERO_DOWNFORCE.getAsDouble();
+        double aeroKmh = aeroPerWheel > 0.0
+                ? Math.sqrt(cachedCarMass * 9.81 / (Math.max(1, cachedWheelCount) * aeroPerWheel)) * 3.6
+                : 0.0;
         if (aeroKmh <= 0.0) {
             double ratio = fullLockKmh / speedKmh;
             return ratio * ratio;
@@ -2023,6 +2028,8 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements BlockEnti
             tag.putFloat("RightOmega", (float) rightWheel.omega);
             tag.putFloat("LeftSpring", (float) leftWheel.springLength);
             tag.putFloat("RightSpring", (float) rightWheel.springLength);
+            tag.putFloat("CarMass", (float) cachedCarMass);
+            tag.putInt("WheelCount", cachedWheelCount);
         }
     }
 
@@ -2057,6 +2064,8 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements BlockEnti
             rightWheel.omega = tag.getFloat("RightOmega");
             leftWheel.springLength = tag.getFloat("LeftSpring");
             rightWheel.springLength = tag.getFloat("RightSpring");
+            cachedCarMass = tag.getFloat("CarMass");
+            cachedWheelCount = Math.max(1, tag.getInt("WheelCount"));
         }
     }
 }

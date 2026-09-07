@@ -22,6 +22,7 @@ public record RaceControlPacket(BlockPos pos, int action, int value) implements 
     public static final int ACTION_RESCAN = 5;
     public static final int ACTION_TOGGLE_GHOST = 6;
     public static final int ACTION_CLEAR_GHOST = 7;
+    public static final int ACTION_TOGGLE_DIRECTION = 8;
 
     public static final Type<RaceControlPacket> TYPE =
             new Type<>(ResourceLocation.fromNamespaceAndPath(CreateMotorsport.MODID, "race_control"));
@@ -56,6 +57,7 @@ public record RaceControlPacket(BlockPos pos, int action, int value) implements 
                 case ACTION_RESCAN -> gate.scanForCars();
                 case ACTION_TOGGLE_GHOST -> gate.setGhostEnabled(!gate.isGhostEnabled());
                 case ACTION_CLEAR_GHOST -> gate.clearGhost();
+                case ACTION_TOGGLE_DIRECTION -> gate.setReversed(!gate.isReversed());
                 default -> {
                 }
             }

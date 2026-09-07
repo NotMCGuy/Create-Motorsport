@@ -37,6 +37,7 @@ public class LapGateScreen extends AbstractContainerScreen<LapGateMenu> {
     private static final int SET_ROW_1 = 22;
     private static final int SET_ROW_2 = 60;
     private static final int SET_ROW_3 = 100;
+    private static final int SET_ROW_4 = 140;
     private static final int CTRL_ON_TEXT = -3;
 
 
@@ -49,6 +50,7 @@ public class LapGateScreen extends AbstractContainerScreen<LapGateMenu> {
     private final List<Integer> builtGrids = new ArrayList<>();
     private final List<EditBox> allBoxes = new ArrayList<>();
     private FlatButton telemetryButton;
+    private FlatButton directionButton;
     private FlatButton ghostButton;
     private FlatButton startButton;
 
@@ -69,6 +71,7 @@ public class LapGateScreen extends AbstractContainerScreen<LapGateMenu> {
         builtGrids.clear();
         allBoxes.clear();
         telemetryButton = null;
+        directionButton = null;
         ghostButton = null;
         startButton = null;
 
@@ -157,6 +160,11 @@ public class LapGateScreen extends AbstractContainerScreen<LapGateMenu> {
                 FlatButton.NEUTRAL, b -> send(RaceControlPacket.ACTION_SET_MARKER, parse(markerBox, 0))));
 
         int r2 = y + SET_ROW_2 + CTRL_ON_TEXT;
+        int r4 = y + SET_ROW_4 + CTRL_ON_TEXT;
+        directionButton = new FlatButton(x + 96, r4, 84, 14, directionLabel(gate), FlatButton.NEUTRAL,
+                b -> send(RaceControlPacket.ACTION_TOGGLE_DIRECTION, 0));
+        addRenderableWidget(directionButton);
+
         ghostButton = new FlatButton(x + 96, r2, 56, 14, ghostLabel(gate), FlatButton.NEUTRAL,
                 b -> send(RaceControlPacket.ACTION_TOGGLE_GHOST, 0));
         addRenderableWidget(ghostButton);
@@ -205,6 +213,10 @@ public class LapGateScreen extends AbstractContainerScreen<LapGateMenu> {
         return Component.literal(gate != null && gate.isLogFullTelemetry() ? "On" : "Off");
     }
 
+    private static Component directionLabel(LapGateBlockEntity gate) {
+        return Component.literal(gate != null && gate.isReversed() ? "B to A" : "A to B");
+    }
+
     private static Component ghostLabel(LapGateBlockEntity gate) {
         return Component.literal(gate != null && gate.isGhostEnabled() ? "On" : "Off");
     }
@@ -216,6 +228,9 @@ public class LapGateScreen extends AbstractContainerScreen<LapGateMenu> {
         if (telemetryButton != null) {
             telemetryButton.setMessage(telemetryLabel(gate));
             telemetryButton.muted(gate == null || !gate.isLogFullTelemetry());
+        }
+        if (directionButton != null) {
+            directionButton.setMessage(directionLabel(gate));
         }
         if (ghostButton != null) {
             ghostButton.setMessage(ghostLabel(gate));
@@ -338,6 +353,10 @@ public class LapGateScreen extends AbstractContainerScreen<LapGateMenu> {
         g.drawString(font, "Full telemetry", PAD + 4, y + SET_ROW_3, TEXT, false);
         g.drawString(font, "Writes every car's physics to the CSV result file", PAD + 4, y + SET_ROW_3 + 12,
                 LABEL, false);
+
+        g.drawString(font, "Direction", PAD + 4, y + SET_ROW_4, TEXT, false);
+        g.drawString(font, "Sets the direction of travel for a crossing", PAD + 4, y + SET_ROW_4 + 12,
+                LABEL, false);
     }
 
     private void drawStatusPill(GuiGraphics g, LapGateBlockEntity gate) {
@@ -371,9 +390,8 @@ public class LapGateScreen extends AbstractContainerScreen<LapGateMenu> {
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         for (EditBox box : allBoxes) {
-            if (box.isFocused()) {
-                return box.keyPressed(keyCode, scanCode, modifiers)
-                        || super.keyPressed(keyCode, scanCode, modifiers);
+            if (box.isFocused() && keyCode != 256) {
+                return box.keyPressed(keyCode, scanCode, modifiers) || box.canConsumeInput();
             }
         }
         return super.keyPressed(keyCode, scanCode, modifiers);

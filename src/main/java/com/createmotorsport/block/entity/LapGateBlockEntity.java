@@ -39,6 +39,7 @@ public class LapGateBlockEntity extends SmartBlockEntity {
         public int nextMarker; // which marker index we expect to cross next
         public long lastCrossTick;
         public long lapStartTick;
+        public long firstCrossTick = -1L;
         public boolean finished;
 
         public final List<float[]> recording = new ArrayList<>(); // flat x,y,z samples of the lap being driven, for the ghost
@@ -56,6 +57,7 @@ public class LapGateBlockEntity extends SmartBlockEntity {
     // Gate Identity -------------------------------------------------------------------------------
     private BlockPos partner;
     private int marker = MARKER_START_FINISH;
+    private boolean reversed; // for direction of travel setting
 
     // Rate State ----------------------------------------------------
     // control marker only
@@ -80,6 +82,7 @@ public class LapGateBlockEntity extends SmartBlockEntity {
     private float[] ghostSamples = new float[0];
     private int syncedGhostSampleCount; // samples arent synced, so client-side mirror of ghostSamples.length
     private long ghostLapTicks;
+    private long ghostLeadInTicks;
     private String ghostName = "";
     private boolean ghostEnabled = true;
     public static final int GHOST_MAX_SAMPLES = 18_000; // 30 minute lap at 10 hz should be enough, bound is safer
@@ -286,6 +289,7 @@ public class LapGateBlockEntity extends SmartBlockEntity {
             e.splits.clear();
             e.lastCrossTick = 0L;
             e.lapStartTick = 0L;
+            e.firstCrossTick = -1L;
             e.recording.clear();
             e.lastSide = new double[gateCount];
             e.lastCrossAt = new long[gateCount];
@@ -448,7 +452,7 @@ public class LapGateBlockEntity extends SmartBlockEntity {
             state = RaceState.RUNNING;
             raceStartGameTime = level.getGameTime();
             broadcast("§a[Race] §lGO!");
-            broadcastGhost(raceStartGameTime, true);
+            broadcastGhost(raceStartGameTime + ghostLeadInTicks, true);
             setChanged();
             sendData();
         }
@@ -487,10 +491,21 @@ public class LapGateBlockEntity extends SmartBlockEntity {
         return ghostName;
     }
 
+    public boolean isReversed() {
+        return reversed;
+    }
+
+    public void setReversed(boolean value) {
+        reversed = value;
+        setChanged();
+        sendData();
+    }
+
     public void clearGhost() {
         ghostSamples = new float[0];
         syncedGhostSampleCount = 0;
         ghostLapTicks = 0;
+        ghostLeadInTicks = 0L;
         ghostName = "";
         setChanged();
         sendData();
@@ -523,9 +538,10 @@ public class LapGateBlockEntity extends SmartBlockEntity {
         }
         ghostSamples = flat;
         ghostLapTicks = lapTicks;
+        ghostLeadInTicks = Math.max(0L, e.firstCrossTick);
         ghostName = e.name;
         broadcast("§d[Race] §fBest lap by " + e.name + " §7(" + formatTime(lapTicks) + "), new ghost saved");
-        broadcastGhost(raceStartGameTime, true);
+        broadcastGhost(raceStartGameTime + ghostLeadInTicks, true);
         setChanged();
         sendData();
     }
@@ -606,6 +622,9 @@ public class LapGateBlockEntity extends SmartBlockEntity {
         if (Double.isNaN(previous) || previous == 0.0 || Math.signum(side) == Math.signum(previous)) {
             return false;
         }
+        if ((previous < 0.0) == reversed) {
+            return false;
+        }
 
         // Make sure car passed actually between the two blocks, and at gate height
         double dx = b.x - a.x;
@@ -640,6 +659,9 @@ public class LapGateBlockEntity extends SmartBlockEntity {
 
         if (lapCompleted) {
             considerGhost(e, lapTime);
+        }
+        if (e.firstCrossTick < 0L) {
+            e.firstCrossTick = now;
         }
         e.lapStartTick = now;
         e.recording.clear();
@@ -825,6 +847,7 @@ public class LapGateBlockEntity extends SmartBlockEntity {
             }
             entry.putInt("NextMarker", e.nextMarker);
             entry.putLong("LapStart", e.lapStartTick);
+            entry.putLong("FirstCross", e.firstCrossTick);
             entry.putLong("LastCross", e.lastCrossTick);
             long[] splits = new long[e.splits.size()];
             for (int si = 0; si < splits.length; si++) {
@@ -836,6 +859,8 @@ public class LapGateBlockEntity extends SmartBlockEntity {
         tag.put("Entrants", list);
         tag.putBoolean("GhostEnabled", ghostEnabled);
         tag.putLong("GhostLapTicks", ghostLapTicks);
+        tag.putLong("GhostLeadIn", ghostLeadInTicks);
+        tag.putBoolean("Reversed", reversed);
         tag.putString("GhostName", ghostName);
         tag.putInt("GhostSampleCount", ghostSampleCount());
         if (clientPacket) {
@@ -881,6 +906,7 @@ public class LapGateBlockEntity extends SmartBlockEntity {
             e.finished = entry.getBoolean("Finished");
             e.nextMarker = Math.max(0, entry.getInt("NextMarker"));
             e.lapStartTick = entry.getLong("LapStart");
+            e.firstCrossTick = entry.contains("FirstCross") ? entry.getLong("FirstCross") : -1L;
             e.lastCrossTick = entry.getLong("LastCross");
             for (long split : entry.getLongArray("Splits")) {
                 e.splits.add(split);
@@ -889,6 +915,8 @@ public class LapGateBlockEntity extends SmartBlockEntity {
         }
         ghostEnabled = !tag.contains("GhostEnabled") || tag.getBoolean("GhostEnabled");
         ghostLapTicks = tag.getLong("GhostLapTicks");
+        ghostLeadInTicks = tag.getLong("GhostLeadIn");
+        reversed = tag.getBoolean("Reversed");
         ghostName = tag.getString("GhostName");
         syncedGhostSampleCount = tag.getInt("GhostSampleCount");
         if (clientPacket) {
