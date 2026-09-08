@@ -71,6 +71,24 @@ public class CreateMotorsport {
     public static final DeferredRegister<DataComponentType<?>> DATA_COMPONENTS =
             DeferredRegister.create(Registries.DATA_COMPONENT_TYPE, MODID);
 
+    public static final DeferredBlock<com.createmotorsport.block.FuelTankBlock> FUEL_TANK = BLOCKS.register(
+            "fuel_tank", () -> new com.createmotorsport.block.FuelTankBlock(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.METAL).strength(3.5F, 6.0F).noOcclusion()));
+    public static final DeferredItem<BlockItem> FUEL_TANK_ITEM = ITEMS.registerSimpleBlockItem("fuel_tank", FUEL_TANK);
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<com.createmotorsport.block.entity.FuelTankBlockEntity>> FUEL_TANK_ENTITY =
+            BLOCK_ENTITY_TYPES.register("fuel_tank", () -> BlockEntityType.Builder.of(
+                    com.createmotorsport.block.entity.FuelTankBlockEntity::new, FUEL_TANK.get()).build(null));
+
+    public static final DeferredBlock<com.createmotorsport.block.FuelPumpBlock> FUEL_PUMP = BLOCKS.register(
+            "fuel_pump", () -> new com.createmotorsport.block.FuelPumpBlock(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.METAL).strength(3.5F, 6.0F).noOcclusion()));
+    public static final DeferredItem<BlockItem> FUEL_PUMP_ITEM = ITEMS.registerSimpleBlockItem("fuel_pump", FUEL_PUMP);
+    public static final DeferredItem<com.createmotorsport.item.FuelNozzleItem> FUEL_NOZZLE = ITEMS.register(
+            "fuel_nozzle", () -> new com.createmotorsport.item.FuelNozzleItem(new Item.Properties().stacksTo(1)));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<com.createmotorsport.block.entity.FuelPumpBlockEntity>> FUEL_PUMP_ENTITY =
+            BLOCK_ENTITY_TYPES.register("fuel_pump", () -> BlockEntityType.Builder.of(
+                    com.createmotorsport.block.entity.FuelPumpBlockEntity::new, FUEL_PUMP.get()).build(null));
+
     // tire's "design load", Value = midpoint_weight_kg * 9.81 / 4 wheels
     public static final DataComponentType<Float> TIRE_DESIGN_LOAD = DataComponentType.<Float>builder()
             .persistent(Codec.FLOAT)
@@ -245,6 +263,17 @@ public class CreateMotorsport {
                     .withTabsBefore(CreativeModeTabs.REDSTONE_BLOCKS)
                     .icon(() -> ENGINE_BLOCK_ITEM.get().getDefaultInstance())
                     .displayItems((parameters, output) -> {
+                        output.accept(FUEL_PUMP_ITEM.get());
+                        output.accept(FUEL_TANK_ITEM.get());
+                        output.accept(com.createmotorsport.trailer.TrailerRegistry.FIFTH_WHEEL.get());
+                        output.accept(com.createmotorsport.trailer.TrailerRegistry.LARGE_FIFTH_WHEEL.get());
+                        output.accept(com.createmotorsport.trailer.TrailerRegistry.KINGPIN.get());
+                        output.accept(com.createmotorsport.trailer.TrailerRegistry.WIDE_KINGPIN.get());
+                        output.accept(com.createmotorsport.trailer.TrailerRegistry.TOW_BALL.get());
+                        output.accept(com.createmotorsport.trailer.TrailerRegistry.COUPLING_HEAD.get());
+                        output.accept(com.createmotorsport.trailer.TrailerRegistry.LANDING_LEGS.get());
+                        output.accept(com.createmotorsport.trailer.TrailerRegistry.CONTROL_PANEL.get());
+                        output.accept(com.createmotorsport.trailer.TrailerRegistry.LINKER.get());
                         output.accept(ENGINE_BLOCK_ITEM.get());
                         output.accept(TRUCK_ENGINE_BLOCK_ITEM.get());
                         output.accept(SUSPENSION_ITEM.get());
@@ -261,9 +290,20 @@ public class CreateMotorsport {
                     .build());
 
     public CreateMotorsport(IEventBus modEventBus, ModContainer modContainer) {
+        com.createmotorsport.trailer.TrailerRegistry.init();
+        modContainer.registerConfig(ModConfig.Type.SERVER, com.createmotorsport.trailer.TrailerConfig.SPEC, "createmotorsport-trailers.toml");
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::registerPayloads);
 
+        modEventBus.addListener((net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent event) ->
+                event.registerBlockEntity(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK,
+                        FUEL_PUMP_ENTITY.get(), (pump, side) -> pump.fluidAccess));
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(com.createmotorsport.item.FuelNozzleItem::cleanup);
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(com.createmotorsport.item.FuelNozzleItem::logout);
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(com.createmotorsport.trailer.TrailerTestRig::register);
+        modEventBus.addListener((net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent event) ->
+                event.registerBlockEntity(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK,
+                        FUEL_TANK_ENTITY.get(), (tank, side) -> tank.tank));
         BLOCKS.register(modEventBus);
         ITEMS.register(modEventBus);
         DATA_COMPONENTS.register(modEventBus);

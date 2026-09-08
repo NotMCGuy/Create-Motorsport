@@ -1,0 +1,20 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "createmotorsport:block/fuel_tank",
+      "y": 0
+    },
+    "facing=east": {
+      "model": "createmotorsport:block/fuel_tank",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "createmotorsport:block/fuel_tank",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "createmotorsport:block/fuel_tank",
+      "y": 270
+    }
+  }
+}

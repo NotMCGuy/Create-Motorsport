@@ -27,7 +27,6 @@ import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidUtil;
@@ -71,7 +70,7 @@ public class EngineBlockEntity extends SmartBlockEntity implements dev.ryanhcode
         return SLOT_CHANNELS_START + channel.ordinal() * 2 + 1;
     }
 
-    private static final int LAVA_PER_BURN = 100;
+    private static final int FUEL_PER_BURN = 100;
     private static final int BURN_TICKS = 100;
     private static final int SOUND_INTERVAL = 8;
 
@@ -359,7 +358,7 @@ public class EngineBlockEntity extends SmartBlockEntity implements dev.ryanhcode
     }
 
     private void updateFuel() {
-        if (burnTicks <= 1 && tryDrainLava()) {
+        if (burnTicks <= 1 && tryDrainFuel()) {
             burnTicks = BURN_TICKS;
             return;
         }
@@ -386,20 +385,20 @@ public class EngineBlockEntity extends SmartBlockEntity implements dev.ryanhcode
         return Mth.clamp(signalFor(ControlChannel.THROTTLE) / 15.0F, 0.0F, 1.0F);
     }
 
-    private boolean tryDrainLava() {
-        FluidStack lava = new FluidStack(Fluids.LAVA, LAVA_PER_BURN);
+    private boolean tryDrainFuel() {
         for (Direction direction : Direction.values()) {
             IFluidHandler handler = FluidUtil.getFluidHandler(level, worldPosition.relative(direction),
                     direction.getOpposite()).orElse(null);
-            if (handler == null) {
-                continue;
+            if (handler == null) continue;
+            for (int i = 0; i < handler.getTanks(); i++) {
+                FluidStack fuel = handler.getFluidInTank(i).copyWithAmount(FUEL_PER_BURN);
+                if (!com.createmotorsport.fuel.FuelRules.accepts(fuel)) continue;
+                FluidStack simulated = handler.drain(fuel, IFluidHandler.FluidAction.SIMULATE);
+                if (simulated.getAmount() != FUEL_PER_BURN || !FluidStack.isSameFluidSameComponents(fuel, simulated)) continue;
+                FluidStack drained = handler.drain(fuel, IFluidHandler.FluidAction.EXECUTE);
+                if (drained.getAmount() == FUEL_PER_BURN && FluidStack.isSameFluidSameComponents(fuel, drained)) return true;
+                if (!drained.isEmpty()) handler.fill(drained, IFluidHandler.FluidAction.EXECUTE);
             }
-            FluidStack simulated = handler.drain(lava, IFluidHandler.FluidAction.SIMULATE);
-            if (simulated.getAmount() < LAVA_PER_BURN || simulated.getFluid() != Fluids.LAVA) {
-                continue;
-            }
-            handler.drain(lava, IFluidHandler.FluidAction.EXECUTE);
-            return true;
         }
         return false;
     }

@@ -1,0 +1,230 @@
+{
+  "credit": "Made with Blockbench",
+  "texture_size": [
+    64,
+    64
+  ],
+  "textures": {
+    "0": "createmotorsport:block/fuel_tank",
+    "particle": "createmotorsport:block/fuel_tank"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            4,
+            4
+          ],
+          "texture": "#0"
+        },
+        "east": {
+          "uv": [
+            0,
+            4.25,
+            4,
+            8.25
+          ],
+          "texture": "#0"
+        },
+        "south": {
+          "uv": [
+            4.25,
+            0,
+            8.25,
+            4
+          ],
+          "texture": "#0"
+        },
+        "west": {
+          "uv": [
+            4.25,
+            4.25,
+            8.25,
+            8.25
+          ],
+          "texture": "#0"
+        },
+        "up": {
+          "uv": [
+            4,
+            12.5,
+            0,
+            8.5
+          ],
+          "texture": "#0"
+        },
+        "down": {
+          "uv": [
+            12.5,
+            0,
+            8.5,
+            4
+          ],
+          "texture": "#0"
+        }
+      }
+    },
+    {
+      "from": [
+        15.9,
+        8,
+        4
+      ],
+      "to": [
+        16.9,
+        16,
+        12
+      ],
+      "rotation": {
+        "angle": 0,
+        "axis": "y",
+        "origin": [
+          15.9,
+          0,
+          0
+        ]
+      },
+      "faces": {
+        "north": {
+          "uv": [
+            6.25,
+            9,
+            6.5,
+            11
+          ],
+          "texture": "#0"
+        },
+        "east": {
+          "uv": [
+            1,
+            4.25,
+            3,
+            6.25
+          ],
+          "texture": "#0"
+        },
+        "south": {
+          "uv": [
+            6.5,
+            9,
+            6.75,
+            11
+          ],
+          "texture": "#0"
+        },
+        "west": {
+          "uv": [
+            5.25,
+            4.25,
+            7.25,
+            6.25
+          ],
+          "texture": "#0"
+        },
+        "up": {
+          "uv": [
+            6.25,
+            8.5,
+            4.25,
+            8.75
+          ],
+          "rotation": 90,
+          "texture": "#0"
+        },
+        "down": {
+          "uv": [
+            4.25,
+            8.75,
+            6.25,
+            9
+          ],
+          "rotation": 90,
+          "texture": "#0"
+        }
+      }
+    },
+    {
+      "name": "cube inverted",
+      "from": [
+        16,
+        16,
+        16
+      ],
+      "to": [
+        0,
+        0,
+        0
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4.25,
+            4,
+            8.25,
+            0
+          ],
+          "texture": "#0"
+        },
+        "east": {
+          "uv": [
+            4.25,
+            8.25,
+            8.25,
+            4.25
+          ],
+          "texture": "#0"
+        },
+        "south": {
+          "uv": [
+            0,
+            4,
+            4,
+            0
+          ],
+          "texture": "#0"
+        },
+        "west": {
+          "uv": [
+            0,
+            8.25,
+            4,
+            4.25
+          ],
+          "texture": "#0"
+        },
+        "up": {
+          "uv": [
+            8.5,
+            0,
+            12.5,
+            4
+          ],
+          "texture": "#0"
+        },
+        "down": {
+          "uv": [
+            0,
+            12.5,
+            4,
+            8.5
+          ],
+          "texture": "#0"
+        }
+      }
+    }
+  ],
+  "render_type": "minecraft:cutout"
+}

@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "III",
+    " A ",
+    " C "
+  ],
+  "key": {
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "A": {
+      "item": "create:andesite_alloy"
+    },
+    "C": {
+      "item": "create:shaft"
+    }
+  },
+  "result": {
+    "id": "createmotorsport:kingpin",
+    "count": 1
+  }
+}
