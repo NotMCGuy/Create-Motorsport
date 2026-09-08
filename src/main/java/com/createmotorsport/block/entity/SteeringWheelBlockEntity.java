@@ -531,10 +531,10 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity {
 
     private static final String[] WHEEL_COLS = {
             "grounded", "load_N", "slip_ratio", "slip_angle_deg", "vlon_ms", "vlat_ms", "Fx_N", "Fy_N",
-            "omega", "wheelspeed_ms", "spring_m", "compress_m", "mu", "steer_deg", "brake_Nm",
+            "omega", "wheelspeed_ms", "spring_m", "compress_m", "eff_mu", "steer_deg", "brake_Nm",
             "grip_mult", "drive_Nm", "tire_temp_C","rigid_m", "defl_m", "unsprung_v", "eff_mass_kg",
             "hardpoint_v", "spring_N", "hpv_world", "hpv_body", "hpv_diff", "hpv_normal", "cast_lift",
-            "damp_frac", "assist_m", "grip_use"
+            "damp_frac", "assist_m", "grip_use", "peak_N", "slip_comb", "slip_peak", "curve_N"
     };
 
     public String raceTelemetryHeader() {
@@ -635,7 +635,8 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity {
                 SuspensionBlockEntity.WheelTelemetry t = s.getTelemetry(side);
                 sb.append(String.format(l,
                         ",%d,%.1f,%.4f,%.3f,%.3f,%.3f,%.1f,%.1f,%.2f,%.3f,%.4f,%.4f,%.3f,%.2f,%.1f,%.3f,%.2f,%.1f"
-                                + ",%.4f,%.5f,%.4f,%.2f,%.4f,%.1f,%.4f,%.4f,%.4f,%.4f,%.5f,%.4f,%.5f,%.4f",
+                                + ",%.4f,%.5f,%.4f,%.2f,%.4f,%.1f,%.4f,%.4f,%.4f,%.4f,%.5f,%.4f,%.5f,%.4f"
+                                + ",%.1f,%.5f,%.5f,%.1f",
                         t.grounded() ? 1 : 0, t.loadN(), t.slipRatio(), t.slipAngleDeg(),
                         t.vLonMs(), t.vLatMs(), t.longForceN(), t.latForceN(), t.omega(),
                         t.wheelSpeedMs(), t.springLenM(), t.compressionM(), t.surfaceMu(),
@@ -643,7 +644,8 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity {
                         t.rigidLenM(), t.tireDeflM(), t.unsprungVMs(), t.effMassKg(),
                         t.hardpointVMs(), t.springForceN(),
                         t.velWorld(), t.velBody(), t.velDiff(), t.velNormal(), t.castLift(),
-                        t.dampFraction(), t.assistLift(), t.gripUse()));
+                        t.dampFraction(), t.assistLift(), t.gripUse(),
+                        t.peakForceN(), t.slipCombined(), t.slipAtPeak(), t.curveForceN()));
             }
         }
         return sb.toString();

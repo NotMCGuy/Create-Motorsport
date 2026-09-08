@@ -451,6 +451,10 @@ public class Config {
             .comment("A clever offroading assist I'm trying: cap the slope of the ground under the raycast, basically.")
             .define("offroadingAssist", true);
 
+    public static final ModConfigSpec.DoubleValue STEER_ASSIST_AERO_SPEED = BUILDER
+            .comment("")
+            .defineInRange("steerAssistAeroSpeed", 153.0, 0.0, 1000.0);
+
     public static final ModConfigSpec.BooleanValue SEMI_AUTO_SHIFT = BUILDER
             .comment("false = full manual: you must hold the clutch channel to change gear",
                     "true = paddle shifters like F1 actually uses")

@@ -214,6 +214,11 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements BlockEnti
         double telemVLon;
         double telemVLat;
         double telemLongForce;
+        double telemPeakForce;
+        double telemSlipCombined;
+        double telemSlipAtPeak;
+        double telemCurveForce;
+        boolean telemModelSlip;
         double telemLatForce;
         double telemWheelSpeed;
         double telemCompression;
@@ -270,7 +275,9 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements BlockEnti
                                  double effMassKg, double hardpointVMs, double springForceN,
                                  double velWorld, double velBody, double velDiff, double velNormal,
                                  double castLift, double dampFraction, double assistLift,
-                                 double gripUse, double gripLon, double gripLat) {
+                                 double gripUse, double gripLon, double gripLat,
+                                 double peakForceN, double slipCombined, double slipAtPeak,
+                                 double curveForceN) {
     }
 
     public WheelTelemetry getTelemetry(WheelSide side) {
@@ -283,7 +290,8 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements BlockEnti
                 w.telemHardpointVel, w.telemSpringForce,
                 w.telemVelWorld, w.telemVelBody, w.telemVelDiff, w.telemVelNormal, w.telemCastLift,
                 w.telemDampFraction, w.telemAssistLift, w.telemGripUse,
-                w.telemGripLon, w.telemGripLat);
+                w.telemGripLon, w.telemGripLat,
+                w.telemPeakForce, w.telemSlipCombined, w.telemSlipAtPeak, w.telemCurveForce);
     }
 
 
@@ -839,11 +847,7 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements BlockEnti
             return 1.0;
         }
 
-        // Speed where downforce equals weight
-        double aeroPerWheel = Config.AERO_DOWNFORCE.getAsDouble();
-        double aeroKmh = aeroPerWheel > 0.0
-                ? Math.sqrt(cachedCarMass * 9.81 / (Math.max(1, cachedWheelCount) * aeroPerWheel)) * 3.6
-                : 0.0;
+        double aeroKmh = Config.STEER_ASSIST_AERO_SPEED.getAsDouble();
         if (aeroKmh <= 0.0) {
             double ratio = fullLockKmh / speedKmh;
             return ratio * ratio;
@@ -1086,6 +1090,10 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements BlockEnti
             wheel.telemLatForce = 0.0;
             wheel.telemSlipRatio = 0.0;
             wheel.telemSlipAngleRad = 0.0;
+            wheel.telemPeakForce = 0.0;
+            wheel.telemSlipCombined = 0.0;
+            wheel.telemSlipAtPeak = 0.0;
+            wheel.telemCurveForce = 0.0;
             wheel.telemGripUse = 0.0;
             wheel.latUse = 0.0;
             wheel.telemGripLon = 0.0;
@@ -1391,6 +1399,13 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements BlockEnti
             // this part is from Chrono's ChTMeasyTire 'Advanced' & 'tmxy_combined'
             TireModel.tmeasyCombined(tm, sc, df0, sm, fm, ss, fs);
             double f = tm[0];
+            wheel.telemPeakForce = peakForce;
+            wheel.telemSlipCombined = sc;
+            wheel.telemSlipAtPeak = sm;
+            wheel.telemCurveForce = f;
+            wheel.telemSlipRatio = sx;
+            wheel.telemSlipAngleRad = Math.atan(sy);
+            wheel.telemModelSlip = true;
             double forwardForce = sc > 1.0e-9 ? f * cphi : 0.0;
             double lateralForce = sc > 1.0e-9 ? f * sphi : 0.0;
 
@@ -1484,8 +1499,11 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements BlockEnti
         wheel.telemLoad = normalForce;
         wheel.telemVLon = vLon;
         wheel.telemVLat = vLat;
-        wheel.telemSlipRatio = (wheel.omega * radius - vLon) / Math.max(Math.abs(vLon), 2.0);
-        wheel.telemSlipAngleRad = Math.atan2(vLat, Math.max(Math.abs(vLon), 0.05));
+        if (!wheel.telemModelSlip) {
+            wheel.telemSlipRatio = (wheel.omega * radius - vLon) / Math.max(Math.abs(vLon), 2.0);
+            wheel.telemSlipAngleRad = Math.atan2(vLat, Math.max(Math.abs(vLon), 0.05));
+        }
+        wheel.telemModelSlip = false;
         wheel.telemLongForce = forwardImpulse / dt;
         wheel.telemLatForce = sideImpulse / dt;
         wheel.telemWheelSpeed = wheel.omega * radius;
@@ -2028,8 +2046,6 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements BlockEnti
             tag.putFloat("RightOmega", (float) rightWheel.omega);
             tag.putFloat("LeftSpring", (float) leftWheel.springLength);
             tag.putFloat("RightSpring", (float) rightWheel.springLength);
-            tag.putFloat("CarMass", (float) cachedCarMass);
-            tag.putInt("WheelCount", cachedWheelCount);
         }
     }
 
@@ -2064,8 +2080,6 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements BlockEnti
             rightWheel.omega = tag.getFloat("RightOmega");
             leftWheel.springLength = tag.getFloat("LeftSpring");
             rightWheel.springLength = tag.getFloat("RightSpring");
-            cachedCarMass = tag.getFloat("CarMass");
-            cachedWheelCount = Math.max(1, tag.getInt("WheelCount"));
         }
     }
 }
