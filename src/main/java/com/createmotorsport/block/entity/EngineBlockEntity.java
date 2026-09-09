@@ -120,11 +120,14 @@ public class EngineBlockEntity extends SmartBlockEntity implements dev.ryanhcode
     private static final double TCL_SIDE_SLIP = 4.0;     // m/s of sideways slide before the anti-oversteer cut
     private static final double TCL_SIDE_RANGE = 8.0;    // m/s past that over which the cut ramps to the floor
     private static final double TCL_SIDE_FLOOR = 0.5;    // most the lateral cut can trim throttle to
+    private static final double TC_RELEASE_GAIN = 4.0; // multiplies tcRecoverRate at full slip headroom
 
     private int powerMode = MAX_POWER_MODE; // 1 to 8;  torque caps at mode / MAX
     private boolean tractionControl;
     private double telemTcSlipTarget;
+    private double telemTcSlipRatio;
     private double telemTcFactor = 1.0;
+    private double telemTcCapacity = 1.0;
     private double tcIntegral;
     private double tcFactor = 1.0; // last throttle multiplier
     private double boostReserve = 1.0;      // 0 to 1
@@ -477,7 +480,9 @@ public class EngineBlockEntity extends SmartBlockEntity implements dev.ryanhcode
             tcIntegral = 0.0;
             tcFactor = 1.0;
             telemTcSlipTarget = Config.TC_TARGET_SLIP.getAsDouble();
+            telemTcSlipRatio = 0.0;
             telemTcFactor = 1.0;
+            telemTcCapacity = 1.0;
             return 1.0;
         }
         Vec3 vel = Sable.HELPER.getVelocity(level, Vec3.atCenterOf(worldPosition));
@@ -486,6 +491,7 @@ public class EngineBlockEntity extends SmartBlockEntity implements dev.ryanhcode
         double ground = Math.abs(vel.x * fwd.x + vel.z * fwd.z);
         double wheelSurface = Math.abs(peakOmega) * repRadius;
         double slipRatio = (wheelSurface - ground) / Math.max(ground, TC_SPEED_FLOOR);
+        telemTcSlipRatio = slipRatio;
         double latUse = Mth.clamp(peakLatUse, 0.0, 1.0);
         double slipTarget = Config.TC_TARGET_SLIP.getAsDouble() * Math.sqrt(Math.max(0.0, 1.0 - latUse * latUse));
         telemTcSlipTarget = slipTarget;
@@ -501,19 +507,23 @@ public class EngineBlockEntity extends SmartBlockEntity implements dev.ryanhcode
                 + Config.TC_INTEGRAL.getAsDouble() * tcIntegral;
         double target = Mth.clamp(1.0 - cut, Config.TC_MIN_THROTTLE.getAsDouble(), 1.0);
 
+        double headroom = slipTarget > 1.0e-6 ? Mth.clamp(-error / slipTarget, 0.0, 1.0) : 0.0;
         if (target < tcFactor) {
             tcFactor = target;
         } else {
-            tcFactor = Math.min(target, tcFactor + Config.TC_RECOVER_RATE.getAsDouble());
+            tcFactor = Math.min(target,
+                    tcFactor + Config.TC_RECOVER_RATE.getAsDouble() * (1.0 + TC_RELEASE_GAIN * headroom));
         }
 
-        if (tractionForce > 0.0 && demandTorque > 1.0e-6) {
-            double capacityTorque = tractionForce * repRadius;
-            tcFactor = Math.min(tcFactor, Mth.clamp(capacityTorque / demandTorque, 0.0, 1.0));
-        }
         telemTcFactor = tcFactor;
 
-        double factor = tcFactor;
+        double capacityCap = 1.0;
+        if (tractionForce > 0.0 && demandTorque > 1.0e-6) {
+            capacityCap = Mth.clamp(tractionForce * repRadius / demandTorque, 0.0, 1.0);
+        }
+        telemTcCapacity = capacityCap;
+
+        double factor = Math.min(tcFactor, capacityCap);
         double sideSlip = Math.abs(vel.x * fwd.z - vel.z * fwd.x);
         if (sideSlip > TCL_SIDE_SLIP) {
             factor *= Mth.clamp(1.0 - (sideSlip - TCL_SIDE_SLIP) / TCL_SIDE_RANGE, TCL_SIDE_FLOOR, 1.0);
@@ -550,6 +560,22 @@ public class EngineBlockEntity extends SmartBlockEntity implements dev.ryanhcode
 
     public boolean isBoosting() {
         return boosting;
+    }
+
+    public double getTcSlipFactor() {
+        return telemTcFactor;
+    }
+
+    public double getTcCapacityFactor() {
+        return telemTcCapacity;
+    }
+
+    public double getTcSlipRatio() {
+        return telemTcSlipRatio;
+    }
+
+    public double getTcSlipTarget() {
+        return telemTcSlipTarget;
     }
 
     public double getPowerFactor() {

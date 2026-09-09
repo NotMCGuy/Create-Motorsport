@@ -266,13 +266,14 @@ public final class TireModel {
     public static double solveUnsprung(double unsprungMass, double dt,
                                        double unsprungVel, double hardpointVel,
                                        double springRate, double springDamp, double compression,
-                                       double tireRate, double tireDamp, double tireDeflect) {
+                                       double tireRate, double tireDamp, double tireDeflect,
+                                       double gravity) {
         double denom = unsprungMass / dt + tireRate * dt + tireDamp + springRate * dt + springDamp;
         double rhs = unsprungMass * unsprungVel / dt
                 + tireRate * tireDeflect
                 - springRate * compression
                 + (springRate * dt + springDamp) * hardpointVel
-                - unsprungMass * 9.81;
+                - unsprungMass * gravity;
         return rhs / denom;
     }
 

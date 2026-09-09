@@ -1,6 +1,8 @@
 package com.createmotorsport.network;
 
 import com.createmotorsport.CreateMotorsport;
+import com.createmotorsport.physics.Gravity;
+
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -39,7 +41,7 @@ public record SetTireDesignLoadPacket(boolean mainHand, double midpointKg) imple
                 return;
             }
             double kg = Math.max(1.0, Math.min(100000.0, packet.midpointKg()));
-            stack.set(CreateMotorsport.TIRE_DESIGN_LOAD, (float) (kg * 9.81 / 4.0));
+            stack.set(CreateMotorsport.TIRE_DESIGN_LOAD, (float) (kg * Gravity.DEFAULT / 4.0));
         });
     }
 }

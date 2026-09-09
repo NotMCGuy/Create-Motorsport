@@ -237,7 +237,6 @@ public class Config {
             .defineInRange("tcMinThrottle", 0.02, 0.0, 1.0);
 
     public static final ModConfigSpec.DoubleValue TC_RECOVER_RATE = BUILDER
-            .comment("")
             .defineInRange("tcRecoverRate", 0.08, 0.005, 1.0);
 
     public static final ModConfigSpec.IntValue TIRE_MODEL = BUILDER
@@ -451,8 +450,12 @@ public class Config {
             .comment("A clever offroading assist I'm trying: cap the slope of the ground under the raycast, basically.")
             .define("offroadingAssist", true);
 
+    public static final ModConfigSpec.BooleanValue OFFROADING_ASSIST_EXTRA = BUILDER
+            .comment("Extra offroading assist, may have performance impacts",
+                    "Default false")
+            .define("offroadingAssistExtra", false);
+
     public static final ModConfigSpec.DoubleValue STEER_ASSIST_AERO_SPEED = BUILDER
-            .comment("")
             .defineInRange("steerAssistAeroSpeed", 153.0, 0.0, 1000.0);
 
     public static final ModConfigSpec.BooleanValue SEMI_AUTO_SHIFT = BUILDER

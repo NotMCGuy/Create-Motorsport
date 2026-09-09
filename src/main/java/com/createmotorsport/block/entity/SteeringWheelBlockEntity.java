@@ -3,14 +3,25 @@ package com.createmotorsport.block.entity;
 import com.createmotorsport.Config;
 import com.createmotorsport.CreateMotorsport;
 import com.createmotorsport.network.TelemetryLinePacket;
+import com.createmotorsport.physics.Gravity;
 import com.simibubi.create.Create;
 import com.simibubi.create.content.redstone.link.IRedstoneLinkable;
 import com.simibubi.create.content.redstone.link.RedstoneLinkNetworkHandler;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+
 import dev.ryanhcode.sable.Sable;
 import dev.ryanhcode.sable.sublevel.ServerSubLevel;
 import dev.ryanhcode.sable.sublevel.SubLevel;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.WeakHashMap;
+
 import net.createmod.catnip.data.Couple;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -24,14 +35,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.WeakHashMap;
 
 public class SteeringWheelBlockEntity extends SmartBlockEntity {
     // menu ordering of the various keybinds
@@ -490,6 +493,7 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity {
             // appends the full config to every csv so its easier to identify issues with bug reports
             sendLine(TelemetryLinePacket.KIND_ROW, "");
             sendLine(TelemetryLinePacket.KIND_ROW, "config_option,value");
+            sendLine(TelemetryLinePacket.KIND_ROW, "world.gravity," + Gravity.of(level));
             CarActors logged = gatherCar();
             if (logged != null) {
                 if (!logged.suspensions().isEmpty()) {
@@ -534,7 +538,8 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity {
             "omega", "wheelspeed_ms", "spring_m", "compress_m", "eff_mu", "steer_deg", "brake_Nm",
             "grip_mult", "drive_Nm", "tire_temp_C","rigid_m", "defl_m", "unsprung_v", "eff_mass_kg",
             "hardpoint_v", "spring_N", "hpv_world", "hpv_body", "hpv_diff", "hpv_normal", "cast_lift",
-            "damp_frac", "assist_m", "grip_use", "peak_N", "slip_comb", "slip_peak", "curve_N"
+            "damp_frac", "assist_m", "grip_use", "peak_N", "slip_comb", "slip_peak", "curve_N",
+            "hp_y", "rigid_raw", "assist_tgt", "assist_rise", "assist_probe", "assist_why"
     };
 
     public String raceTelemetryHeader() {
@@ -571,7 +576,8 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity {
         StringBuilder sb = new StringBuilder(
                 "t_s,tick,speed_ms,speed_kmh,mass_kg,gear,rpm,throttle,clutch_locked,"
                         + "engine_torque_Nm,gear_ratio,wheel_torque_Nm,wheel_torque_applied,avg_wheel_omega,driven_wheels,"
-                        + "power_mode,tc_on,boost_reserve,torque_factor,pos_x,pos_y,pos_z,vel_x,vel_y,vel_z,"
+                        + "power_mode,tc_on,boost_reserve,torque_factor,tc_slip_f,tc_cap_f,tc_slip_target,tc_slip,"
+                        + "pos_x,pos_y,pos_z,vel_x,vel_y,vel_z,"
                         + "bodypos_x,bodypos_y,bodypos_z,quat_x,quat_y,quat_z,quat_w,"
                         + "com_x,com_y,com_z");
         for (int a = 0; a < car.suspensions().size(); a++) {
@@ -619,11 +625,16 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity {
         boolean tcOn = engine != null && engine.isTractionControlOn();
         double boostReserve = engine != null ? engine.getBoostReserve() : 0.0;
         double torqueFactor = engine != null ? engine.getPowerFactor() : 0.0;
+        double tcSlipF = engine != null ? engine.getTcSlipFactor() : 1.0;
+        double tcCapF = engine != null ? engine.getTcCapacityFactor() : 1.0;
+        double tcTarget = engine != null ? engine.getTcSlipTarget() : 0.0;
+        double tcSlip = engine != null ? engine.getTcSlipRatio() : 0.0;
 
-        sb.append(String.format(l, "%.2f,%d,%.3f,%.2f,%.1f,%s,%d,%.3f,%d,%.2f,%.3f,%.2f,%.2f,%.3f,%d,%d,%d,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.4f,%.4f,%.4f,%.6f,%.6f,%.6f,%.6f,%.4f,%.4f,%.4f",
+        sb.append(String.format(l, "%.2f,%d,%.3f,%.2f,%.1f,%s,%d,%.3f,%d,%.2f,%.3f,%.2f,%.2f,%.3f,%d,%d,%d,%.3f,%.3f,%.4f,%.4f,%.4f,%.4f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.4f,%.4f,%.4f,%.6f,%.6f,%.6f,%.6f,%.4f,%.4f,%.4f",
                 tS, level.getGameTime(), speed, speed * 3.6, mass, gear, rpm, throttle,
                 clutchLocked ? 1 : 0, engineTorque, gearRatio, wheelTorque, wheelTorqueApplied,
                 avgOmega, drivenWheels, powerMode, tcOn ? 1 : 0, boostReserve, torqueFactor,
+                tcSlipF, tcCapF, tcTarget, tcSlip,
                 worldPos.x, worldPos.y, worldPos.z, velocity.x, velocity.y, velocity.z,
                 bodyPos.x(), bodyPos.y(), bodyPos.z(), quat.x(), quat.y(), quat.z(), quat.w(),
                 com.x(), com.y(), com.z()));
@@ -636,7 +647,8 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity {
                 sb.append(String.format(l,
                         ",%d,%.1f,%.4f,%.3f,%.3f,%.3f,%.1f,%.1f,%.2f,%.3f,%.4f,%.4f,%.3f,%.2f,%.1f,%.3f,%.2f,%.1f"
                                 + ",%.4f,%.5f,%.4f,%.2f,%.4f,%.1f,%.4f,%.4f,%.4f,%.4f,%.5f,%.4f,%.5f,%.4f"
-                                + ",%.1f,%.5f,%.5f,%.1f",
+                                + ",%.1f,%.5f,%.5f,%.1f"
+                                + ",%.4f,%.5f,%.5f,%.5f,%.3f,%d",
                         t.grounded() ? 1 : 0, t.loadN(), t.slipRatio(), t.slipAngleDeg(),
                         t.vLonMs(), t.vLatMs(), t.longForceN(), t.latForceN(), t.omega(),
                         t.wheelSpeedMs(), t.springLenM(), t.compressionM(), t.surfaceMu(),
@@ -645,7 +657,9 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity {
                         t.hardpointVMs(), t.springForceN(),
                         t.velWorld(), t.velBody(), t.velDiff(), t.velNormal(), t.castLift(),
                         t.dampFraction(), t.assistLift(), t.gripUse(),
-                        t.peakForceN(), t.slipCombined(), t.slipAtPeak(), t.curveForceN()));
+                        t.peakForceN(), t.slipCombined(), t.slipAtPeak(), t.curveForceN(),
+                        t.hardpointY(), t.rigidRawM(), t.assistTargetM(), t.assistRiseM(),
+                        t.assistProbeM(), t.assistWhy()));
             }
         }
         return sb.toString();

@@ -1,9 +1,9 @@
 package com.createmotorsport;
 
+import com.createmotorsport.block.DownFlapBlock;
 import com.createmotorsport.block.EngineBlock;
 import com.createmotorsport.block.SteeringWheelBlock;
 import com.createmotorsport.block.SuspensionBlock;
-import com.createmotorsport.block.DownFlapBlock;
 import com.createmotorsport.block.entity.DownFlapBlockEntity;
 import com.createmotorsport.block.entity.EngineBlockEntity;
 import com.createmotorsport.block.entity.LapGateBlockEntity;
@@ -18,18 +18,18 @@ import com.createmotorsport.network.SetDriveModePacket;
 import com.createmotorsport.network.SetDrivingPacket;
 import com.createmotorsport.network.SetSteeringKeyPacket;
 import com.createmotorsport.network.StartTelemetryLogPacket;
-import com.createmotorsport.network.ToggleAxleEndPacket;
-import com.createmotorsport.network.ToggleEngineDirectionPacket;
 import com.createmotorsport.network.SteeringInputPacket;
 import com.createmotorsport.network.TelemetryLinePacket;
+import com.createmotorsport.network.ToggleAxleEndPacket;
+import com.createmotorsport.network.ToggleEngineDirectionPacket;
+import com.createmotorsport.physics.Gravity;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
+
 import dev.ryanhcode.offroad.content.components.TireLike;
 import dev.ryanhcode.offroad.index.OffroadDataComponents;
 import dev.ryanhcode.sable.platform.SableEventPlatform;
-import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
-import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
-import net.neoforged.neoforge.network.registration.PayloadRegistrar;
+
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -49,10 +49,14 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
+
 import org.slf4j.Logger;
 
 @Mod(CreateMotorsport.MODID)
@@ -71,7 +75,7 @@ public class CreateMotorsport {
     public static final DeferredRegister<DataComponentType<?>> DATA_COMPONENTS =
             DeferredRegister.create(Registries.DATA_COMPONENT_TYPE, MODID);
 
-    // tire's "design load", Value = midpoint_weight_kg * 9.81 / 4 wheels
+    // tire's "design load", Value = midpoint_weight_kg * Gravity.DEFAULT / 4 wheels
     public static final DataComponentType<Float> TIRE_DESIGN_LOAD = DataComponentType.<Float>builder()
             .persistent(Codec.FLOAT)
             .networkSynchronized(ByteBufCodecs.FLOAT)
@@ -321,7 +325,7 @@ public class CreateMotorsport {
 
     private static DeferredItem<Item> registerTire(String name, double midpointKg, float radius,
                                                    net.minecraft.world.phys.Vec3 rotation) {
-        float designLoad = (float) (midpointKg * 9.81 / 4.0);
+        float designLoad = (float) (midpointKg * Gravity.DEFAULT / 4.0);
         return ITEMS.register(name, () -> new com.createmotorsport.item.TireItem(new Item.Properties()
                 .stacksTo(16)
                 .component(OffroadDataComponents.TIRE, new TireLike(radius,

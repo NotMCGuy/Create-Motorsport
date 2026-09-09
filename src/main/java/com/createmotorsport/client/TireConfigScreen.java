@@ -3,6 +3,8 @@ package com.createmotorsport.client;
 import com.createmotorsport.CreateMotorsport;
 import com.createmotorsport.client.widget.NumberField;
 import com.createmotorsport.network.SetTireDesignLoadPacket;
+import com.createmotorsport.physics.Gravity;
+
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -36,7 +38,7 @@ public class TireConfigScreen extends Screen {
     // The menu asks the user for a whole car mass, but the component holds a corner's design load in newtons
     private double midpointKg() {
         Float load = stack.get(CreateMotorsport.TIRE_DESIGN_LOAD);
-        return load == null ? 0.0 : load * 4.0 / 9.81;
+        return load == null ? 0.0 : load * 4.0 / Gravity.DEFAULT;
     }
 
     @Override
