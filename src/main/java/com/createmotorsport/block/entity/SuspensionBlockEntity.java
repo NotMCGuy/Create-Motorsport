@@ -868,7 +868,8 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements BlockEnti
         if (fullLockKmh <= 0.0 || level == null) {
             return 1.0;
         }
-        double speedKmh = Sable.HELPER.getVelocity(level, Vec3.atCenterOf(worldPosition)).length() * 3.6;
+        Vec3 vel = Sable.HELPER.getVelocity(level, Vec3.atCenterOf(worldPosition));
+        double speedKmh = Math.sqrt(vel.x * vel.x + vel.z * vel.z) * 3.6;
         if (speedKmh <= fullLockKmh) {
             return 1.0;
         }

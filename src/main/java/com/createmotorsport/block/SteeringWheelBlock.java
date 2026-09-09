@@ -64,12 +64,25 @@ public class SteeringWheelBlock extends HorizontalDirectionalBlock implements En
             return InteractionResult.PASS;
         }
 
-        // right click to open menu
+        // Right click to drive, sneak+right click to open menu
+        if (player.isSecondaryUseActive()) {
+            if (!level.isClientSide) {
+                player.openMenu(new SimpleMenuProvider(
+                        (id, inv, p) -> new SteeringWheelMenu(id, inv, wheel),
+                        MENU_TITLE
+                ), pos);
+            }
+            return InteractionResult.sidedSuccess(level.isClientSide);
+        }
+
         if (!level.isClientSide) {
-            player.openMenu(new SimpleMenuProvider(
-                    (id, inv, p) -> new SteeringWheelMenu(id, inv, wheel),
-                    MENU_TITLE
-            ), pos);
+            if (wheel.isUser(player)) {
+                wheel.setDriving(player, false);
+            } else if (wheel.hasUser()) {
+                player.displayClientMessage(Component.translatable("createmotorsport.steering_wheel.occupied"), true);
+            } else {
+                wheel.setDriving(player, true);
+            }
         }
         return InteractionResult.sidedSuccess(level.isClientSide);
     }

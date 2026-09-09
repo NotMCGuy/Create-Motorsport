@@ -262,6 +262,10 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity {
             return;
         }
         if (driving) {
+            // guard against another user
+            if (user != null && !user.equals(player.getUUID())) {
+                return;
+            }
             user = player.getUUID();
             notifyUpdate();
         } else if (isUser(player)) {

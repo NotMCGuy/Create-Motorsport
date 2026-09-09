@@ -23,6 +23,8 @@
   "container.createmotorsport.steering_wheel": "Steering Wheel",
   "container.createmotorsport.down_flap": "Down Flap",
 
+  "createmotorsport.steering_wheel.occupied": "Someone else is driving",
+
   "key.categories.createmotorsport": "Create: Motorsport",
   "key.createmotorsport.throttle": "Throttle",
   "key.createmotorsport.brake": "Brake",
