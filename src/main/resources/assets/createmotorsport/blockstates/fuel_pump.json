@@ -1,0 +1,36 @@
+{
+  "variants": {
+    "facing=north,half=lower": {
+      "model": "createmotorsport:block/fuel_pump",
+      "y": 0
+    },
+    "facing=north,half=upper": {
+      "model": "createmotorsport:block/fuel_pump_upper",
+      "y": 0
+    },
+    "facing=east,half=lower": {
+      "model": "createmotorsport:block/fuel_pump",
+      "y": 90
+    },
+    "facing=east,half=upper": {
+      "model": "createmotorsport:block/fuel_pump_upper",
+      "y": 90
+    },
+    "facing=south,half=lower": {
+      "model": "createmotorsport:block/fuel_pump",
+      "y": 180
+    },
+    "facing=south,half=upper": {
+      "model": "createmotorsport:block/fuel_pump_upper",
+      "y": 180
+    },
+    "facing=west,half=lower": {
+      "model": "createmotorsport:block/fuel_pump",
+      "y": 270
+    },
+    "facing=west,half=upper": {
+      "model": "createmotorsport:block/fuel_pump_upper",
+      "y": 270
+    }
+  }
+}

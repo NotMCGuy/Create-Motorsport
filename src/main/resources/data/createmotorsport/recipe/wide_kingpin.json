@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "IKI"
+  ],
+  "key": {
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "K": {
+      "item": "createmotorsport:kingpin"
+    }
+  },
+  "result": {
+    "id": "createmotorsport:wide_kingpin",
+    "count": 1
+  }
+}

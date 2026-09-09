@@ -64,6 +64,7 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 neoForge {
     // Specify the version of NeoForge to use.
     version = project.neo_version
+    unitTest { enable() }
 
     parchment {
         mappingsVersion = project.parchment_mappings_version
@@ -131,6 +132,7 @@ neoForge {
             sourceSet(sourceSets.main)
         }
     }
+    unitTest.testedMod = mods."${mod_id}"
 }
 
 // Sets up a dependency configuration called 'localRuntime'.
@@ -142,6 +144,10 @@ configurations {
 }
 
 dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testRuntimeOnly("maven.modrinth:${sable_modrinth_id}:${sable_modrinth_version}")
+    testRuntimeOnly("dev.ryanhcode.sable-companion:sable-companion-common-${minecraft_version}:${sable_companion_version}")
     implementation("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") {
         transitive = false
     }
@@ -155,6 +161,14 @@ dependencies {
     compileOnly("dev.ryanhcode.sable-companion:sable-companion-common-${minecraft_version}:${sable_companion_version}")
     localRuntime("maven.modrinth:${aeronautics_modrinth_id}:${aeronautics_modrinth_version}")
     compileOnly(files(
+            "libs/offroad-neoforge-${minecraft_version}-${libs_compile_version}.jar",
+            "libs/simulated-neoforge-${minecraft_version}-${libs_compile_version}.jar"
+    ))
+    localRuntime(files(
+            "libs/offroad-neoforge-${minecraft_version}-${libs_compile_version}.jar",
+            "libs/simulated-neoforge-${minecraft_version}-${libs_compile_version}.jar"
+    ))
+    testRuntimeOnly(files(
             "libs/offroad-neoforge-${minecraft_version}-${libs_compile_version}.jar",
             "libs/simulated-neoforge-${minecraft_version}-${libs_compile_version}.jar"
     ))
@@ -181,6 +195,12 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 }
+
+tasks.named('test', Test) {
+    useJUnitPlatform()
+}
+
+sourceSets.test.compileClasspath += sourceSets.main.compileClasspath
 
 // This block of code expands all declared replace properties in the specified resource targets.
 // A missing property will result in an error. Properties are expanded using ${} Groovy notation.

@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "III",
+    "AFA",
+    "III"
+  ],
+  "key": {
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "A": {
+      "item": "create:andesite_alloy"
+    },
+    "F": {
+      "item": "createmotorsport:fifth_wheel"
+    }
+  },
+  "result": {
+    "id": "createmotorsport:large_fifth_wheel",
+    "count": 1
+  }
+}

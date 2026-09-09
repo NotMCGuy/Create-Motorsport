@@ -1,0 +1,20 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "createmotorsport:block/trailer/wide_kingpin",
+      "y": 0
+    },
+    "facing=east": {
+      "model": "createmotorsport:block/trailer/wide_kingpin",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "createmotorsport:block/trailer/wide_kingpin",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "createmotorsport:block/trailer/wide_kingpin",
+      "y": 270
+    }
+  }
+}

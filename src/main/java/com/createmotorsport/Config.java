@@ -8,6 +8,15 @@ import java.util.List;
 public class Config {
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
 
+    public static final ModConfigSpec.IntValue FUEL_TANK_CAPACITY = BUILDER
+            .defineInRange("fuelTankCapacityMb", 16000, 1000, 1000000);
+    public static final ModConfigSpec.IntValue PUMP_CAPACITY = BUILDER
+            .defineInRange("fuelPumpCapacityMb", 16000, 1000, 1000000);
+    public static final ModConfigSpec.DoubleValue PUMP_RANGE = BUILDER
+            .defineInRange("fuelPumpHoseRange", 12.0, 2.0, 64.0);
+    public static final ModConfigSpec.IntValue PUMP_TRANSFER = BUILDER
+            .defineInRange("fuelPumpTransferMb", 250, 1, 16000);
+
     // Fallback forward gear ratios if the config string can't be parsed
     private static final double[] DEFAULT_GEAR_RATIOS = {3.20, 2.49, 2.00, 1.67, 1.44, 1.26, 1.00};
 
@@ -142,7 +151,6 @@ public class Config {
             .defineInRange("maxCorneringG", 12.0, 1.0, 20.0);
 
     public static final ModConfigSpec.BooleanValue TIRE_COMPLIANCE = BUILDER
-            .comment("")
             .define("tireCompliance", true);
 
     public static final ModConfigSpec.DoubleValue TIRE_STIFFNESS_RATIO = BUILDER
@@ -152,41 +160,32 @@ public class Config {
             .defineInRange("tireStiffnessRatio", 1.3, 0.5, 40.0);
 
     public static final ModConfigSpec.DoubleValue TIRE_VERTICAL_DAMPING = BUILDER
-            .comment("")
             .defineInRange("tireVerticalDamping", 0.06, 0.0, 1.0);
 
     // suspension
 
     public static final ModConfigSpec.DoubleValue SUSPENSION_SOFT_HZ = BUILDER
-            .comment("")
             .defineInRange("suspensionSoftHz", 1.6, 0.5, 10.0);
 
     public static final ModConfigSpec.DoubleValue SUSPENSION_SOFT_DAMPING = BUILDER
-            .comment("")
             .defineInRange("suspensionSoftDamping", 0.35, 0.05, 2.0);
 
     public static final ModConfigSpec.DoubleValue SUSPENSION_MEDIUM_HZ = BUILDER
-            .comment("")
             .defineInRange("suspensionMediumHz", 2.2, 0.5, 10.0);
 
     public static final ModConfigSpec.DoubleValue SUSPENSION_MEDIUM_DAMPING = BUILDER
-            .comment("")
             .defineInRange("suspensionMediumDamping", 0.55, 0.05, 2.0);
 
     public static final ModConfigSpec.DoubleValue SUSPENSION_FIRM_HZ = BUILDER
-            .comment("")
             .defineInRange("suspensionFirmHz", 3.0, 0.5, 10.0);
 
     public static final ModConfigSpec.DoubleValue SUSPENSION_FIRM_DAMPING = BUILDER
-            .comment("")
             .defineInRange("suspensionFirmDamping", 0.70, 0.05, 2.0);
 
     public static final ModConfigSpec.DoubleValue SUSPENSION_RACE_HZ = BUILDER
-            .comment("")
             .defineInRange("suspensionRaceHz", 3.8, 0.5, 10.0);
 
     public static final ModConfigSpec.DoubleValue SUSPENSION_RACE_DAMPING = BUILDER
-            .comment("")
             .defineInRange("suspensionRaceDamping", 0.70, 0.05, 2.0);
 
     public static final ModConfigSpec.DoubleValue ROLL_INFLUENCE = BUILDER
@@ -225,11 +224,9 @@ public class Config {
             .defineInRange("raceMinLapTime", 20.0, 0.5, 600.0);
 
     public static final ModConfigSpec.DoubleValue TC_PROPORTIONAL = BUILDER
-            .comment("")
             .defineInRange("tcProportional", 2.5, 0.0, 20.0);
 
     public static final ModConfigSpec.DoubleValue TC_INTEGRAL = BUILDER
-            .comment("")
             .defineInRange("tcIntegral", 6.0, 0.0, 40.0);
 
     public static final ModConfigSpec.DoubleValue TC_MIN_THROTTLE = BUILDER
@@ -484,7 +481,6 @@ public class Config {
             .defineInRange("steerInputSensitivity", 1.0, 0.25, 4.0);
 
     public static final ModConfigSpec.DoubleValue PEDAL_INPUT_SENSITIVITY = BUILDER
-            .comment("")
             .defineInRange("pedalInputSensitivity", 1.0, 0.25, 4.0);
 
     public static final ModConfigSpec.DoubleValue ADVANCED_INPUT_GAMMA = BUILDER
@@ -599,11 +595,9 @@ public class Config {
             .define("tireSmokeGroundDust", true);
 
     public static final ModConfigSpec.BooleanValue SKIDMARKS = BUILDER
-            .comment("")
             .define("skidmarks", true);
 
     public static final ModConfigSpec.DoubleValue SKIDMARK_LIFETIME = BUILDER
-            .comment("")
             .defineInRange("skidmarkLifetime", 40.0, 2.0, 600.0);
 
     public static final ModConfigSpec.IntValue SKIDMARK_MAX = BUILDER
@@ -612,11 +606,9 @@ public class Config {
             .defineInRange("skidmarkMax", 4096, 256, 32768);
 
     public static final ModConfigSpec.DoubleValue SKIDMARK_OPACITY = BUILDER
-            .comment("")
             .defineInRange("skidmarkOpacity", 0.65, 0.05, 1.0);
 
     public static final ModConfigSpec.DoubleValue SKIDMARK_WIDTH = BUILDER
-            .comment("")
             .defineInRange("skidmarkWidth", 0.55, 0.1, 1.5);
 
     public static final ModConfigSpec.DoubleValue SKIDMARK_TRAIL_TIME = BUILDER

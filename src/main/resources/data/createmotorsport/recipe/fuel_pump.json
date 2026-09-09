@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "IPI",
+    "ITI",
+    "BBB"
+  ],
+  "key": {
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "P": {
+      "item": "create:fluid_pipe"
+    },
+    "T": {
+      "item": "create:fluid_tank"
+    },
+    "B": {
+      "item": "create:andesite_alloy"
+    }
+  },
+  "result": {
+    "id": "createmotorsport:fuel_pump",
+    "count": 1
+  }
+}
