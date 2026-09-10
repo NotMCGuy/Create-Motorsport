@@ -30,6 +30,9 @@ public class SteeringWheelBlock extends HorizontalDirectionalBlock implements En
     public static final MapCodec<SteeringWheelBlock> CODEC = simpleCodec(SteeringWheelBlock::new);
     private static final Component MENU_TITLE = Component.translatable("container.createmotorsport.steering_wheel");
 
+    public static java.util.function.Consumer<BlockPos> clientDriveToggle = pos -> {
+    };
+
     public SteeringWheelBlock(BlockBehaviour.Properties properties) {
         super(properties);
         registerDefaultState(defaultBlockState().setValue(FACING, Direction.NORTH));
@@ -75,14 +78,10 @@ public class SteeringWheelBlock extends HorizontalDirectionalBlock implements En
             return InteractionResult.sidedSuccess(level.isClientSide);
         }
 
-        if (!level.isClientSide) {
-            if (wheel.isUser(player)) {
-                wheel.setDriving(player, false);
-            } else if (wheel.hasUser()) {
-                player.displayClientMessage(Component.translatable("createmotorsport.steering_wheel.occupied"), true);
-            } else {
-                wheel.setDriving(player, true);
-            }
+        if (level.isClientSide) {
+            clientDriveToggle.accept(pos);
+        } else if (wheel.hasUser() && !wheel.isUser(player)) {
+            player.displayClientMessage(Component.translatable("createmotorsport.steering_wheel.occupied"), true);
         }
         return InteractionResult.sidedSuccess(level.isClientSide);
     }

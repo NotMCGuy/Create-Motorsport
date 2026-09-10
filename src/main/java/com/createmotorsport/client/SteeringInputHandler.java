@@ -51,7 +51,25 @@ public final class SteeringInputHandler {
     }
 
 
-    // Client: start capture for wheel at (pos), called by menu button
+    public static void toggleDriving(BlockPos pos) {
+        if (activePos != null) {
+            boolean sameWheel = activePos.equals(pos);
+            stop();
+            if (sameWheel) {
+                return;
+            }
+        }
+        Minecraft mc = Minecraft.getInstance();
+
+        if (mc.level != null && mc.player != null
+                && mc.level.getBlockEntity(pos) instanceof SteeringWheelBlockEntity wheel
+                && wheel.hasUser() && !wheel.isUser(mc.player)) {
+            return;
+        }
+        startDriving(pos);
+    }
+
+    // Client: start capture for wheel at (pos), called by menu button and toggleDriving
     public static void startDriving(BlockPos pos) {
         activePos = pos.immutable();
         HELD_KEYS.clear();

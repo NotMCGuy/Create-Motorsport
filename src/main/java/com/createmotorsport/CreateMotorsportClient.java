@@ -1,5 +1,6 @@
 package com.createmotorsport;
 
+import com.createmotorsport.block.SteeringWheelBlock;
 import com.createmotorsport.client.DownFlapRenderer;
 import com.createmotorsport.client.EngineScreen;
 import com.createmotorsport.client.MotorsportCommands;
@@ -29,6 +30,8 @@ public class CreateMotorsportClient {
         modEventBus.addListener(this::registerRenderers);
         modEventBus.addListener(MotorsportKeybinds::register);
         container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
+
+        SteeringWheelBlock.clientDriveToggle = SteeringInputHandler::toggleDriving;
 
         // Steering wheel live input intercepts keys and streams the driver's controls
         NeoForge.EVENT_BUS.addListener(SteeringInputHandler::onKeyInput);
