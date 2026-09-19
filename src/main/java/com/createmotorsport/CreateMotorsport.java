@@ -256,11 +256,34 @@ public class CreateMotorsport {
     public static final DeferredHolder<SoundEvent, SoundEvent> ENGINE_LOW = registerSound("engine_low");
     public static final DeferredHolder<SoundEvent, SoundEvent> ENGINE_MID = registerSound("engine_mid");
     public static final DeferredHolder<SoundEvent, SoundEvent> ENGINE_FAST = registerSound("engine_fast");
-
+    
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> MOTORSPORT_TAB =
             CREATIVE_MODE_TABS.register("motorsport", () -> CreativeModeTab.builder()
                     .title(Component.translatable("itemGroup.createmotorsport"))
-                    .withTabsBefore(CreativeModeTabs.REDSTONE_BLOCKS)
+                    .withTabsBefore(CreativeModeTabs.INGREDIENTS)
+                    .icon(() -> ENGINE_BLOCK_ITEM.get().getDefaultInstance())
+                    .displayItems((parameters, output) -> {
+                        output.accept(FUEL_PUMP_ITEM.get());
+                        output.accept(FUEL_TANK_ITEM.get());
+                        output.accept(ENGINE_BLOCK_ITEM.get());
+                        output.accept(TRUCK_ENGINE_BLOCK_ITEM.get());
+                        output.accept(SUSPENSION_ITEM.get());
+                        output.accept(STEERING_WHEEL_ITEM.get());
+                        output.accept(DOWN_FLAP_ITEM.get());
+                        output.accept(AIR_INTAKE.get());
+                        output.accept(EXHAUST_MANIFOLD.get());
+                        output.accept(SUSPENSION_WRENCH.get());
+                        output.accept(LAP_GATE_ITEM.get());
+                        output.accept(RACING_COMPONENT.get());
+                        output.accept(RACING_TIRE.get());
+                    })
+                    .build());
+                    
+    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TRUCK_MOTORSPORT_TAB =
+            CREATIVE_MODE_TABS.register("truck", () -> CreativeModeTab.builder()
+                    .title(Component.translatable("itemGroup.createmotorsport.truck"))
+                    .withTabsBefore(CreativeModeTabs.INGREDIENTS)
+                    .withTabsAfter(MOTORSPORT_TAB.getKey())
                     .icon(() -> ENGINE_BLOCK_ITEM.get().getDefaultInstance())
                     .displayItems((parameters, output) -> {
                         output.accept(FUEL_PUMP_ITEM.get());
@@ -274,17 +297,7 @@ public class CreateMotorsport {
                         output.accept(com.createmotorsport.trailer.TrailerRegistry.LANDING_LEGS.get());
                         output.accept(com.createmotorsport.trailer.TrailerRegistry.CONTROL_PANEL.get());
                         output.accept(com.createmotorsport.trailer.TrailerRegistry.LINKER.get());
-                        output.accept(ENGINE_BLOCK_ITEM.get());
                         output.accept(TRUCK_ENGINE_BLOCK_ITEM.get());
-                        output.accept(SUSPENSION_ITEM.get());
-                        output.accept(STEERING_WHEEL_ITEM.get());
-                        output.accept(DOWN_FLAP_ITEM.get());
-                        output.accept(AIR_INTAKE.get());
-                        output.accept(EXHAUST_MANIFOLD.get());
-                        output.accept(SUSPENSION_WRENCH.get());
-                        output.accept(LAP_GATE_ITEM.get());
-                        output.accept(RACING_COMPONENT.get());
-                        output.accept(RACING_TIRE.get());
                         output.accept(TRUCK_TIRE.get());
                     })
                     .build());
