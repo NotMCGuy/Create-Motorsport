@@ -2,6 +2,7 @@ package com.createmotorsport.block.entity;
 
 import com.createmotorsport.Config;
 import com.createmotorsport.CreateMotorsport;
+import com.createmotorsport.block.DownFlapBlock;
 import com.createmotorsport.physics.control.Cruise;
 import com.createmotorsport.physics.terrain.TerrainAssist;
 import com.createmotorsport.physics.vehicle.CarState;
@@ -83,7 +84,8 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity implements dev.ry
         HUD_TOGGLE("HUD Toggle"),
         STEER_ASSIST("Steer Assist"),
         CRUISE("Cruise"),
-        IGNITION("Ignition");
+        IGNITION("Ignition"),
+        DOWN_FLAP("Down Flap");
 
         private final String displayName;
 
@@ -175,9 +177,15 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity implements dev.ry
     private double clientWheelAngle;
     private double lastClientWheelAngle;
 
+    // DownFlap
+    private boolean downFlapToggle = false;
+
     // ==========================================
     // CONSTRUCTION / LIFECYCLE
     // ==========================================
+    // If on -> drag activated
+
+
 
     public SteeringWheelBlockEntity(BlockPos pos, BlockState state) {
         super(CreateMotorsport.STEERING_WHEEL_BLOCK_ENTITY.get(), pos, state);
@@ -398,10 +406,12 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity implements dev.ry
         boolean ignition = (inputMask & (1 << SteeringControl.IGNITION.ordinal())) != 0;
 
         int diffBit = 1 << SteeringControl.DIFF_MODE.ordinal();
+        int downFlapBit = 1 << SteeringControl.DOWN_FLAP.ordinal();
         int assistBit = 1 << SteeringControl.STEER_ASSIST.ordinal();
         int cruiseBit = 1 << SteeringControl.CRUISE.ordinal();
         int tcBit = 1 << SteeringControl.TRACTION_CONTROL.ordinal();
         boolean diffEdge = (inputMask & diffBit) != 0 && (prevMomentaryMask & diffBit) == 0;
+        boolean downFlapEdge = (inputMask & downFlapBit) != 0 && (prevMomentaryMask & downFlapBit) == 0;
         boolean assistEdge = (inputMask & assistBit) != 0 && (prevMomentaryMask & assistBit) == 0;
         boolean cruiseEdge = (inputMask & cruiseBit) != 0 && (prevMomentaryMask & cruiseBit) == 0;
         boolean tcEdge = (inputMask & tcBit) != 0 && (prevMomentaryMask & tcBit) == 0;
@@ -434,6 +444,14 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity implements dev.ry
         car.state().setControls(new CarState.Controls(throttle01, clutch, shiftUp, shiftDown,
                 overtake, modeUp, modeDown, steerSignal, brakeSignal, ignition), level.getGameTime());
 
+        // Get all pillar downflaps
+        List<DownFlapBlockEntity> downflaps = new ArrayList<>();
+        for (var actor : subLevel.getPlot().getBlockEntityActors()) {
+            if (actor instanceof DownFlapBlockEntity d && d.getBlockState().getValue(DownFlapBlock.PILLAR)) {
+                downflaps.add(d);
+            }
+        }
+
         if (Config.ENABLE_DEBUG_LOGGING.getAsBoolean() && level.getGameTime() % 20 == 0) {
             CreateMotorsport.LOGGER.info(
                     "[Wheel {}] driving mask={} engines={} suspensions={} steer={} brake={} throttle={}",
@@ -441,24 +459,34 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity implements dev.ry
                     String.format("%.2f", steerSignal), String.format("%.2f", brakeSignal),
                     String.format("%.2f", throttle01));
         }
-    }
 
-    // ==========================================
-    // KEY BINDINGS / REDSTONE LINKS
-    // ==========================================
-
-    public int getKeyCode(int controlIndex) {
-        return controlIndex >= 0 && controlIndex < keyCodes.length ? keyCodes[controlIndex] : -1;
-    }
-
-    // from SetSteeringKeyPacket, -1 clears
-    public void setKeyCode(int controlIndex, int keyCode) {
-        if (level == null || level.isClientSide || controlIndex < 0 || controlIndex >= keyCodes.length) {
-            return;
+        if (!downflaps.isEmpty()) {
+            if (downFlapEdge) {
+                downFlapToggle = !downFlapToggle;
+                for (DownFlapBlockEntity d : downflaps) {
+                    DownFlapBlock block = (DownFlapBlock) d.getBlockState().getBlock();
+                    block.steeringBack(d.getBlockState(), d.getLevel(), d.getBlockPos(), downFlapToggle);
+                }
+            }
         }
-        keyCodes[controlIndex] = keyCode;
-        setChanged();
-        notifyUpdate();
+    }
+
+// ==========================================
+// KEY BINDINGS / REDSTONE LINKS
+// ==========================================
+
+public int getKeyCode(int controlIndex) {
+    return controlIndex >= 0 && controlIndex < keyCodes.length ? keyCodes[controlIndex] : -1;
+}
+
+// from SetSteeringKeyPacket, -1 clears
+public void setKeyCode(int controlIndex, int keyCode) {
+    if (level == null || level.isClientSide || controlIndex < 0 || controlIndex >= keyCodes.length) {
+        return;
+    }
+    keyCodes[controlIndex] = keyCode;
+    setChanged();
+    notifyUpdate();
     }
 
     // the 'ghost' item frequency in a link slot
