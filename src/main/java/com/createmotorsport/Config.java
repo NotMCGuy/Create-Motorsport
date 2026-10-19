@@ -119,11 +119,6 @@ public class Config {
             .comment("Use thermal modeling for tires? Default is false for now")
             .define("tireThermalModel", false);
 
-    public static final ModConfigSpec.DoubleValue TIRE_OPT_TEMP = BUILDER
-            .comment("Thermal model only; optimal tire temperature in Celsius for grip",
-                    "Default 90")
-            .defineInRange("tireOptTemp", 70.0, 20.0, 150.0);
-
     public static final ModConfigSpec.DoubleValue TIRE_AMBIENT_TEMP = BUILDER
             .comment("Thermal model only; ambient temperature in Celsius",
                     "Default 30")
