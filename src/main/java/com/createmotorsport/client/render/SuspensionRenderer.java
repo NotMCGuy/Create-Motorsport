@@ -28,15 +28,15 @@ public class SuspensionRenderer extends GeoBlockRenderer<SuspensionBlockEntity> 
 
     private static final float DROP_HEIGHT = 0.5F;
 
-    private static final float WHEEL_LIFT = 7.0F / 16.0F;
-
 
     private static final float HUB_X = 8.0F / 16F;
     private static final float HUB_Y = 1.0F / 16F;
 
+    // forward is -x, left is +z. Suspension art doesnt move with the fore/aft offset
     private static Vector3f hub(SuspensionBlockEntity be, WheelSide side) {
         float half = (float) be.trackHalfWidth();
-        return new Vector3f(HUB_X, HUB_Y, side == WheelSide.LEFT ? HUB_X + half : HUB_X - half);
+        float ahead = (float) be.wheelOffset();
+        return new Vector3f(HUB_X - ahead, HUB_Y, side == WheelSide.LEFT ? HUB_X + half : HUB_X - half);
     }
 
     public SuspensionRenderer() {
@@ -79,18 +79,17 @@ public class SuspensionRenderer extends GeoBlockRenderer<SuspensionBlockEntity> 
             return;
         }
 
-        float raiseOffset = SuspensionModel.raise(be, side, partialTicks) * WHEEL_LIFT; // + as the suspension compresses
+        float raiseOffset = (float) (SuspensionModel.hubRaise(be, side, partialTicks) * SuspensionModel.HUB_TRAVEL);
         float deploy = be.getLerpedDeploy(side, partialTicks);
         float dropOffset = (1.0F - deploy) * DROP_HEIGHT; // starts high, eases to 0
         float spin = be.getLerpedAngle(side, partialTicks);
         float steer = be.getLerpedSteer(side, partialTicks);
-        float breakaway = (float) be.breakawayDrop(); // for tire breakaway from suspension with the lift heigh
 
         // flip one tire so its not inside out
         boolean flip = side == WheelSide.LEFT;
 
         ms.pushPose();
-        ms.translate(hub.x, hub.y + raiseOffset + dropOffset - breakaway, hub.z);
+        ms.translate(hub.x, hub.y + raiseOffset + dropOffset, hub.z);
         ms.mulPose(Axis.YP.rotation(steer * STEER_SIGN)); // steering yaw
         if (flip) {
             ms.mulPose(Axis.YP.rotation((float) Math.PI));

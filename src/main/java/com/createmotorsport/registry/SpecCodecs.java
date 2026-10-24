@@ -126,10 +126,12 @@ public final class SpecCodecs {
                     .forGetter(SuspensionArt::animation)
     ).apply(i, SuspensionArt::new));
 
-    private record SuspensionExtras(double maxRideHeight, SuspensionArt art) {
+    private record SuspensionExtras(double wheelOffset, double maxRideHeight, SuspensionArt art) {
     }
 
     private static final MapCodec<SuspensionExtras> SUSPENSION_EXTRAS = RecordCodecBuilder.mapCodec(i -> i.group(
+            field(Codec.doubleRange(-SuspensionSpec.MAX_WHEEL_OFFSET, SuspensionSpec.MAX_WHEEL_OFFSET), "wheel_offset",
+                    SuspensionSpec.DEFAULT_WHEEL_OFFSET).forGetter(SuspensionExtras::wheelOffset),
             field(Codec.DOUBLE, "max_ride_height", SuspensionSpec.DEFAULT_MAX_RIDE_HEIGHT)
                     .forGetter(SuspensionExtras::maxRideHeight),
             nested(SUSPENSION_ART, "art", SuspensionArt.DEFAULT).forGetter(SuspensionExtras::art)
@@ -157,14 +159,14 @@ public final class SpecCodecs {
                     .forGetter(SuspensionSpec::steerFullLockSpeed),
             field(Codec.DOUBLE, "roll_influence", SuspensionSpec.DEFAULT_ROLL_INFLUENCE)
                     .forGetter(SuspensionSpec::rollInfluence),
-            SUSPENSION_EXTRAS.forGetter(s -> new SuspensionExtras(s.maxRideHeight(), s.art())),
+            SUSPENSION_EXTRAS.forGetter(s -> new SuspensionExtras(s.wheelOffset(), s.maxRideHeight(), s.art())),
             nested(BRAKE, "brakes", BrakeSpec.DEFAULT).forGetter(SuspensionSpec::brakes),
             nested(DAMPER, "damper", DamperSpec.F1_DIGRESSIVE).forGetter(SuspensionSpec::damper),
             nested(TERRAIN_ASSIST, "terrain_assist", TerrainAssistSpec.DEFAULT)
                     .forGetter(SuspensionSpec::terrainAssist)
     ).apply(i, (type, driven, freq, zeta, ride, track, maxSteer, ackermann, camber, camberK, lockSpeed,
                 roll, extras, brakes, damper, assist) -> new SuspensionSpec(type, driven, freq, zeta, ride, track,
-            maxSteer, ackermann, camber, camberK, lockSpeed, roll, extras.maxRideHeight(),
+            extras.wheelOffset(), maxSteer, ackermann, camber, camberK, lockSpeed, roll, extras.maxRideHeight(),
             extras.art(), brakes, damper, assist)));
 
     public static final Codec<DriveInputSpec> DRIVE_INPUT = RecordCodecBuilder.create(i -> i.group(

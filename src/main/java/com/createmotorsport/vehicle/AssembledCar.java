@@ -27,6 +27,7 @@ import dev.ryanhcode.sable.sublevel.SubLevel;
 
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3d;
@@ -270,8 +271,8 @@ public final class AssembledCar {
         CarGeometry.Axis axis = axis(fitted);
         List<CarSpec.Axle> specAxles = new ArrayList<>();
         for (SuspensionBlockEntity axle : fitted) {
-            double along = axis == null ? Double.NaN
-                    : axis.along(axle.getBlockPos().getX() + 0.5, axle.getBlockPos().getZ() + 0.5);
+            Vec3 centre = axle.axleCentre();
+            double along = axis == null ? Double.NaN : axis.along(centre.x, centre.z);
             specAxles.add(new CarSpec.Axle(axle.getBlockPos().asLong(), axle.isFrontAxle(), axle.isDriven(), tires(axle), along));
         }
         CarSpec spec = new CarSpec(List.copyOf(specAxles));
@@ -442,7 +443,8 @@ public final class AssembledCar {
     private static CarGeometry.Axis axis(List<SuspensionBlockEntity> axles) {
         CarGeometry.Builder geometry = new CarGeometry.Builder();
         for (SuspensionBlockEntity axle : axles) {
-            geometry.add(axle.getBlockPos().getX() + 0.5, axle.getBlockPos().getZ() + 0.5, axle.isFrontAxle());
+            Vec3 centre = axle.axleCentre();
+            geometry.add(centre.x, centre.z, axle.isFrontAxle());
         }
         return geometry.build();
     }

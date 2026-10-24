@@ -466,7 +466,7 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements com.creat
     }
 
     // ==========================================
-    // RIDE HEIGHT / TRACK
+    // RIDE HEIGHT / TRACK / WHEEL OFFSET
     // ==========================================
 
     public boolean isLiftOverridden() {
@@ -477,12 +477,27 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements com.creat
         return SpecOverrides.isSet(setupSlot.overrides(), "track_width");
     }
 
+    public boolean isWheelOffsetOverridden() {
+        return SpecOverrides.isSet(setupSlot.overrides(), "wheel_offset");
+    }
+
     public double trackWidth() {
         return this.trackWidthPx / 16.0;
     }
 
     public double trackHalfWidth() {
         return this.trackWidthPx / 32.0;
+    }
+
+    // fore/aft adjustment requested by someone for building purposes. Wont line up with the axle unless you replace the art with something offset the same way
+    public double wheelOffset() {
+        return Mth.clamp(setup.wheelOffset(), -SuspensionSpec.MAX_WHEEL_OFFSET, SuspensionSpec.MAX_WHEEL_OFFSET);
+    }
+
+    public Vec3 axleCentre() {
+        Direction facing = getFacing();
+        double offset = wheelOffset();
+        return Vec3.atCenterOf(worldPosition).add(facing.getStepX() * offset, 0.0, facing.getStepZ() * offset);
     }
 
     public double liftHeight() {
@@ -496,16 +511,6 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements com.creat
     // in steps, 24 for every shipped setup
     private int maxLiftSteps() {
         return Math.max(0, (int) Math.round(setup.maxRideHeight() / LIFT_STEP_HEIGHT));
-    }
-
-    // the rest is breakawayDrop
-    public double animatedLiftHeight() {
-        return Math.min(liftSteps, LIFT_STEPS) * LIFT_STEP_HEIGHT;
-    }
-
-    // Lift beyond the animation
-    public double breakawayDrop() {
-        return liftHeight() - animatedLiftHeight();
     }
 
     private double restLength() {
@@ -791,7 +796,7 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements com.creat
         double radius = tire.radius();
         Direction facing = getFacing();
         Direction sideDir = getSideDirection(side);
-        Vec3 hardpoint = Vec3.atCenterOf(worldPosition)
+        Vec3 hardpoint = axleCentre()
                 .add(sideDir.getStepX() * trackHalfWidth(), 0.0, sideDir.getStepZ() * trackHalfWidth());
         Vector3d hardpointJoml = JOMLConversion.toJOML(hardpoint);
 
@@ -893,7 +898,7 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements com.creat
     // The roll mode's mass at one corner, in kg
     // Not responseMass. The issue is pencil shaped cars diverging real badly in roll mode
     private double rollResponseMass(MassData massData, Vector3d hardpointJoml, double invCorner) {
-        Vector3d axleCentre = JOMLConversion.toJOML(Vec3.atCenterOf(worldPosition));
+        Vector3d axleCentre = JOMLConversion.toJOML(axleCentre());
         double invMid = massData.getInverseNormalMass(axleCentre, OrientedBoundingBox3d.UP);
         return Corner.rollResponseMass(invCorner, invMid, cachedWheelCount);
     }

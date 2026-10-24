@@ -16,18 +16,16 @@ import java.util.function.Function;
 
 public class SuspensionModel extends GeoModel<SuspensionBlockEntity> {
 
-    public static final double RENDER_REST_RAISE = 0.8;
+    public static final double RENDER_REST_RAISE = 0.8; // art's pose at REST_LENGTH, 0 is full droop, 1 is full bump
+    public static final double HUB_TRAVEL = 7.0 / 16.0; // blocks that the hub moves per unit of pose
+
+    public static double hubRaise(SuspensionBlockEntity be, WheelSide side, float partialTicks) {
+        double droop = be.getLerpedSpringLength(side, partialTicks) - SuspensionBlockEntity.REST_LENGTH;
+        return RENDER_REST_RAISE - droop / HUB_TRAVEL;
+    }
 
     public static float raise(SuspensionBlockEntity be, WheelSide side, float partialTicks) {
-        double animSpring = be.getLerpedSpringLength(side, partialTicks) - be.breakawayDrop();
-        double droopSpan = SuspensionBlockEntity.MAX_DROOP_RENDER + be.animatedLiftHeight();
-        double rest = SuspensionBlockEntity.REST_LENGTH;
-        if (animSpring >= rest) {
-            double t = Mth.clamp((animSpring - rest) / droopSpan, 0.0, 1.0);
-            return (float) (RENDER_REST_RAISE * (1.0 - t));
-        }
-        double t = Mth.clamp((rest - animSpring) / SuspensionBlockEntity.MAX_TRAVEL, 0.0, 1.0);
-        return (float) (RENDER_REST_RAISE + (1.0 - RENDER_REST_RAISE) * t);
+        return (float) Mth.clamp(hubRaise(be, side, partialTicks), 0.0, 1.0);
     }
 
 

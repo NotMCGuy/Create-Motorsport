@@ -36,7 +36,7 @@ public final class SpecFields {
     private static final Set<String> SKIPPED = Set.of("art");
 
     private static final Map<String, String> UNITS = Map.ofEntries(
-            Map.entry("ride_height", "blocks"), Map.entry("track_width", "blocks"),
+            Map.entry("ride_height", "blocks"), Map.entry("track_width", "blocks"), Map.entry("wheel_offset", "blocks"),
             Map.entry("max_ride_height", "blocks"), Map.entry("width", "blocks"), Map.entry("radius", "blocks"),
             Map.entry("steer_full_lock_speed", "km/h"),
             Map.entry("design_vehicle_mass_blocks", "in-world"), Map.entry("real_vehicle_mass_kg", "real kg"),

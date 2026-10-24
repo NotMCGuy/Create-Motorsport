@@ -81,6 +81,7 @@ public final class SpecDump {
 
             geometry(manifest, prefix + ".ride_height", axle.liftHeight(), axle.isLiftOverridden());
             geometry(manifest, prefix + ".track_width", axle.trackWidth(), axle.isTrackOverridden());
+            geometry(manifest, prefix + ".wheel_offset", axle.wheelOffset(), axle.isWheelOffsetOverridden());
 
             manifest.add(prefix + ".max_steer_deg," + axle.maxSteerDegrees());
             manifest.add(prefix + ".ackermann," + axle.getSetup().ackermann());

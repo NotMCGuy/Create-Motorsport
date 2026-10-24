@@ -2,6 +2,7 @@ package com.createmotorsport.client.screen.tune;
 
 import com.createmotorsport.client.widget.ConfirmDialog;
 import com.createmotorsport.client.widget.FlatButton;
+import com.createmotorsport.client.widget.HoverTip;
 import com.createmotorsport.client.widget.Theme;
 import com.createmotorsport.network.TunePacket;
 import com.createmotorsport.physics.spec.TireSpec;
@@ -15,6 +16,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.resources.language.I18n;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
@@ -333,7 +335,38 @@ public class TuneScreen extends Screen {
     public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
         int mx = dialog.isOpen() ? -1 : mouseX, my = dialog.isOpen() ? -1 : mouseY;
         super.render(g, mx, my, partialTick);
+        Row hovered = dialog.isOpen() ? null : rowAt(mouseX, mouseY);
+        Component tip = hovered == null ? null : tip(hovered);
+        if (tip != null) {
+            HoverTip.draw(g, font, tip, mouseX, mouseY);
+        }
         dialog.render(g, mouseX, mouseY);
+    }
+
+    // tooltip is going to be the whole entire row for now including the number box but that might get annoying, we'll see
+    @Nullable
+    private Row rowAt(int mouseX, int mouseY) {
+        if (mouseX < left() + PAD || mouseX >= right() - PAD || mouseY < rowY(0)) {
+            return null;
+        }
+        int onPage = (mouseY - rowY(0)) / ROW_H;
+        int index = page * rowsPerPage() + onPage;
+        return onPage < rowsPerPage() && index < lines.size() && lines.get(index) instanceof Row row ? row : null;
+    }
+
+    // tune.createmotorsport.<section>.<path> in the lang file
+    @Nullable
+    private static Component tip(Row row) {
+        String base = "tune.createmotorsport." + row.section().key() + ".";
+        String path = row.field().path();
+        if (row.section().pack() instanceof TireSpec) {
+            String modelKey = base + ((TireSpec) applied(row.section())).model().id() + "." + path;
+            if (I18n.exists(modelKey)) {
+                return Component.translatable(modelKey);
+            }
+        }
+        String key = base + path;
+        return I18n.exists(key) ? Component.translatable(key) : null;
     }
 
     @Override
