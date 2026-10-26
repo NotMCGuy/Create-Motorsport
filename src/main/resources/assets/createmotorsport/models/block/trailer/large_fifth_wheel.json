@@ -2,9 +2,10 @@
   "textures": {
     "metal": "minecraft:block/iron_block",
     "dark": "minecraft:block/gray_concrete",
-    "brass": "minecraft:block/yellow_terracotta",
+    "brass": "minecraft:block/gold_block",
     "screen": "minecraft:block/black_concrete",
-    "particle": "minecraft:block/iron_block"
+    "particle": "#metal",
+    "casing": "minecraft:block/gray_concrete"
   },
   "elements": [
     {
@@ -20,22 +21,58 @@
       ],
       "faces": {
         "north": {
-          "texture": "#dark"
+          "texture": "#dark",
+          "uv": [
+            4.0,
+            6.5,
+            12.0,
+            9.5
+          ]
         },
         "south": {
-          "texture": "#dark"
+          "texture": "#dark",
+          "uv": [
+            4.0,
+            6.5,
+            12.0,
+            9.5
+          ]
         },
         "east": {
-          "texture": "#dark"
+          "texture": "#dark",
+          "uv": [
+            0.0,
+            7.1429,
+            16.0,
+            8.8571
+          ]
         },
         "west": {
-          "texture": "#dark"
+          "texture": "#dark",
+          "uv": [
+            0.0,
+            7.1429,
+            16.0,
+            8.8571
+          ]
         },
         "up": {
-          "texture": "#dark"
+          "texture": "#dark",
+          "uv": [
+            5.7143,
+            0.0,
+            10.2857,
+            16.0
+          ]
         },
         "down": {
-          "texture": "#dark"
+          "texture": "#dark",
+          "uv": [
+            5.7143,
+            0.0,
+            10.2857,
+            16.0
+          ]
         }
       }
     },
@@ -52,22 +89,58 @@
       ],
       "faces": {
         "north": {
-          "texture": "#dark"
+          "texture": "#dark",
+          "uv": [
+            4.0,
+            6.5,
+            12.0,
+            9.5
+          ]
         },
         "south": {
-          "texture": "#dark"
+          "texture": "#dark",
+          "uv": [
+            4.0,
+            6.5,
+            12.0,
+            9.5
+          ]
         },
         "east": {
-          "texture": "#dark"
+          "texture": "#dark",
+          "uv": [
+            0.0,
+            7.1429,
+            16.0,
+            8.8571
+          ]
         },
         "west": {
-          "texture": "#dark"
+          "texture": "#dark",
+          "uv": [
+            0.0,
+            7.1429,
+            16.0,
+            8.8571
+          ]
         },
         "up": {
-          "texture": "#dark"
+          "texture": "#dark",
+          "uv": [
+            5.7143,
+            0.0,
+            10.2857,
+            16.0
+          ]
         },
         "down": {
-          "texture": "#dark"
+          "texture": "#dark",
+          "uv": [
+            5.7143,
+            0.0,
+            10.2857,
+            16.0
+          ]
         }
       }
     },
@@ -84,29 +157,65 @@
       ],
       "faces": {
         "north": {
-          "texture": "#dark"
+          "texture": "#dark",
+          "uv": [
+            2.0,
+            6.5,
+            14.0,
+            9.5
+          ]
         },
         "south": {
-          "texture": "#dark"
+          "texture": "#dark",
+          "uv": [
+            2.0,
+            6.5,
+            14.0,
+            9.5
+          ]
         },
         "east": {
-          "texture": "#dark"
+          "texture": "#dark",
+          "uv": [
+            5.0,
+            6.5,
+            11.0,
+            9.5
+          ]
         },
         "west": {
-          "texture": "#dark"
+          "texture": "#dark",
+          "uv": [
+            5.0,
+            6.5,
+            11.0,
+            9.5
+          ]
         },
         "up": {
-          "texture": "#dark"
+          "texture": "#dark",
+          "uv": [
+            2.0,
+            5.0,
+            14.0,
+            11.0
+          ]
         },
         "down": {
-          "texture": "#dark"
+          "texture": "#dark",
+          "uv": [
+            2.0,
+            5.0,
+            14.0,
+            11.0
+          ]
         }
       }
     },
     {
       "from": [
         2,
-        3,
+        6,
         2
       ],
       "to": [
@@ -116,29 +225,65 @@
       ],
       "faces": {
         "north": {
-          "texture": "#metal"
+          "texture": "#metal",
+          "uv": [
+            4.0,
+            6.0,
+            12.0,
+            10.0
+          ]
         },
         "south": {
-          "texture": "#metal"
+          "texture": "#metal",
+          "uv": [
+            4.0,
+            6.0,
+            12.0,
+            10.0
+          ]
         },
         "east": {
-          "texture": "#metal"
+          "texture": "#metal",
+          "uv": [
+            0.0,
+            6.8571,
+            16.0,
+            9.1429
+          ]
         },
         "west": {
-          "texture": "#metal"
+          "texture": "#metal",
+          "uv": [
+            0.0,
+            6.8571,
+            16.0,
+            9.1429
+          ]
         },
         "up": {
-          "texture": "#metal"
+          "texture": "#metal",
+          "uv": [
+            5.7143,
+            0.0,
+            10.2857,
+            16.0
+          ]
         },
         "down": {
-          "texture": "#metal"
+          "texture": "#metal",
+          "uv": [
+            5.7143,
+            0.0,
+            10.2857,
+            16.0
+          ]
         }
       }
     },
     {
       "from": [
         22,
-        3,
+        6,
         2
       ],
       "to": [
@@ -148,29 +293,65 @@
       ],
       "faces": {
         "north": {
-          "texture": "#metal"
+          "texture": "#metal",
+          "uv": [
+            4.0,
+            6.0,
+            12.0,
+            10.0
+          ]
         },
         "south": {
-          "texture": "#metal"
+          "texture": "#metal",
+          "uv": [
+            4.0,
+            6.0,
+            12.0,
+            10.0
+          ]
         },
         "east": {
-          "texture": "#metal"
+          "texture": "#metal",
+          "uv": [
+            0.0,
+            6.8571,
+            16.0,
+            9.1429
+          ]
         },
         "west": {
-          "texture": "#metal"
+          "texture": "#metal",
+          "uv": [
+            0.0,
+            6.8571,
+            16.0,
+            9.1429
+          ]
         },
         "up": {
-          "texture": "#metal"
+          "texture": "#metal",
+          "uv": [
+            5.7143,
+            0.0,
+            10.2857,
+            16.0
+          ]
         },
         "down": {
-          "texture": "#metal"
+          "texture": "#metal",
+          "uv": [
+            5.7143,
+            0.0,
+            10.2857,
+            16.0
+          ]
         }
       }
     },
     {
       "from": [
         10,
-        3,
+        6,
         2
       ],
       "to": [
@@ -180,22 +361,58 @@
       ],
       "faces": {
         "north": {
-          "texture": "#metal"
+          "texture": "#metal",
+          "uv": [
+            2.0,
+            6.0,
+            14.0,
+            10.0
+          ]
         },
         "south": {
-          "texture": "#metal"
+          "texture": "#metal",
+          "uv": [
+            2.0,
+            6.0,
+            14.0,
+            10.0
+          ]
         },
         "east": {
-          "texture": "#metal"
+          "texture": "#metal",
+          "uv": [
+            5.0,
+            6.0,
+            11.0,
+            10.0
+          ]
         },
         "west": {
-          "texture": "#metal"
+          "texture": "#metal",
+          "uv": [
+            5.0,
+            6.0,
+            11.0,
+            10.0
+          ]
         },
         "up": {
-          "texture": "#metal"
+          "texture": "#metal",
+          "uv": [
+            2.0,
+            5.0,
+            14.0,
+            11.0
+          ]
         },
         "down": {
-          "texture": "#metal"
+          "texture": "#metal",
+          "uv": [
+            2.0,
+            5.0,
+            14.0,
+            11.0
+          ]
         }
       }
     },
@@ -207,27 +424,63 @@
       ],
       "to": [
         8,
-        11,
+        10.25,
         26
       ],
       "faces": {
         "north": {
-          "texture": "#brass"
+          "texture": "#metal",
+          "uv": [
+            6.0,
+            7.875,
+            10.0,
+            8.125
+          ]
         },
         "south": {
-          "texture": "#brass"
+          "texture": "#metal",
+          "uv": [
+            6.0,
+            7.875,
+            10.0,
+            8.125
+          ]
         },
         "east": {
-          "texture": "#brass"
+          "texture": "#metal",
+          "uv": [
+            0.0,
+            7.9091,
+            16.0,
+            8.0909
+          ]
         },
         "west": {
-          "texture": "#brass"
+          "texture": "#metal",
+          "uv": [
+            0.0,
+            7.9091,
+            16.0,
+            8.0909
+          ]
         },
         "up": {
-          "texture": "#brass"
+          "texture": "#metal",
+          "uv": [
+            6.5455,
+            0.0,
+            9.4545,
+            16.0
+          ]
         },
         "down": {
-          "texture": "#brass"
+          "texture": "#metal",
+          "uv": [
+            6.5455,
+            0.0,
+            9.4545,
+            16.0
+          ]
         }
       }
     },
@@ -239,27 +492,615 @@
       ],
       "to": [
         28,
-        11,
+        10.25,
         26
       ],
       "faces": {
         "north": {
-          "texture": "#brass"
+          "texture": "#metal",
+          "uv": [
+            6.0,
+            7.875,
+            10.0,
+            8.125
+          ]
         },
         "south": {
-          "texture": "#brass"
+          "texture": "#metal",
+          "uv": [
+            6.0,
+            7.875,
+            10.0,
+            8.125
+          ]
         },
         "east": {
-          "texture": "#brass"
+          "texture": "#metal",
+          "uv": [
+            0.0,
+            7.9091,
+            16.0,
+            8.0909
+          ]
         },
         "west": {
-          "texture": "#brass"
+          "texture": "#metal",
+          "uv": [
+            0.0,
+            7.9091,
+            16.0,
+            8.0909
+          ]
         },
         "up": {
-          "texture": "#brass"
+          "texture": "#metal",
+          "uv": [
+            6.5455,
+            0.0,
+            9.4545,
+            16.0
+          ]
         },
         "down": {
-          "texture": "#brass"
+          "texture": "#metal",
+          "uv": [
+            6.5455,
+            0.0,
+            9.4545,
+            16.0
+          ]
+        }
+      }
+    },
+    {
+      "name": "truck_detail_mount_bolt",
+      "from": [
+        6,
+        3,
+        6
+      ],
+      "to": [
+        8,
+        4,
+        8
+      ],
+      "faces": {
+        "north": {
+          "texture": "#brass",
+          "uv": [
+            7.0,
+            7.5,
+            9.0,
+            8.5
+          ]
+        },
+        "south": {
+          "texture": "#brass",
+          "uv": [
+            7.0,
+            7.5,
+            9.0,
+            8.5
+          ]
+        },
+        "east": {
+          "texture": "#brass",
+          "uv": [
+            7.0,
+            7.5,
+            9.0,
+            8.5
+          ]
+        },
+        "west": {
+          "texture": "#brass",
+          "uv": [
+            7.0,
+            7.5,
+            9.0,
+            8.5
+          ]
+        },
+        "up": {
+          "texture": "#brass",
+          "uv": [
+            7.0,
+            7.0,
+            9.0,
+            9.0
+          ]
+        },
+        "down": {
+          "texture": "#brass",
+          "uv": [
+            7.0,
+            7.0,
+            9.0,
+            9.0
+          ]
+        }
+      }
+    },
+    {
+      "name": "truck_detail_mount_bolt",
+      "from": [
+        6,
+        3,
+        24
+      ],
+      "to": [
+        8,
+        4,
+        26
+      ],
+      "faces": {
+        "north": {
+          "texture": "#brass",
+          "uv": [
+            7.0,
+            7.5,
+            9.0,
+            8.5
+          ]
+        },
+        "south": {
+          "texture": "#brass",
+          "uv": [
+            7.0,
+            7.5,
+            9.0,
+            8.5
+          ]
+        },
+        "east": {
+          "texture": "#brass",
+          "uv": [
+            7.0,
+            7.5,
+            9.0,
+            8.5
+          ]
+        },
+        "west": {
+          "texture": "#brass",
+          "uv": [
+            7.0,
+            7.5,
+            9.0,
+            8.5
+          ]
+        },
+        "up": {
+          "texture": "#brass",
+          "uv": [
+            7.0,
+            7.0,
+            9.0,
+            9.0
+          ]
+        },
+        "down": {
+          "texture": "#brass",
+          "uv": [
+            7.0,
+            7.0,
+            9.0,
+            9.0
+          ]
+        }
+      }
+    },
+    {
+      "name": "truck_detail_mount_bolt",
+      "from": [
+        24,
+        3,
+        6
+      ],
+      "to": [
+        26,
+        4,
+        8
+      ],
+      "faces": {
+        "north": {
+          "texture": "#brass",
+          "uv": [
+            7.0,
+            7.5,
+            9.0,
+            8.5
+          ]
+        },
+        "south": {
+          "texture": "#brass",
+          "uv": [
+            7.0,
+            7.5,
+            9.0,
+            8.5
+          ]
+        },
+        "east": {
+          "texture": "#brass",
+          "uv": [
+            7.0,
+            7.5,
+            9.0,
+            8.5
+          ]
+        },
+        "west": {
+          "texture": "#brass",
+          "uv": [
+            7.0,
+            7.5,
+            9.0,
+            8.5
+          ]
+        },
+        "up": {
+          "texture": "#brass",
+          "uv": [
+            7.0,
+            7.0,
+            9.0,
+            9.0
+          ]
+        },
+        "down": {
+          "texture": "#brass",
+          "uv": [
+            7.0,
+            7.0,
+            9.0,
+            9.0
+          ]
+        }
+      }
+    },
+    {
+      "name": "truck_detail_mount_bolt",
+      "from": [
+        24,
+        3,
+        24
+      ],
+      "to": [
+        26,
+        4,
+        26
+      ],
+      "faces": {
+        "north": {
+          "texture": "#brass",
+          "uv": [
+            7.0,
+            7.5,
+            9.0,
+            8.5
+          ]
+        },
+        "south": {
+          "texture": "#brass",
+          "uv": [
+            7.0,
+            7.5,
+            9.0,
+            8.5
+          ]
+        },
+        "east": {
+          "texture": "#brass",
+          "uv": [
+            7.0,
+            7.5,
+            9.0,
+            8.5
+          ]
+        },
+        "west": {
+          "texture": "#brass",
+          "uv": [
+            7.0,
+            7.5,
+            9.0,
+            8.5
+          ]
+        },
+        "up": {
+          "texture": "#brass",
+          "uv": [
+            7.0,
+            7.0,
+            9.0,
+            9.0
+          ]
+        },
+        "down": {
+          "texture": "#brass",
+          "uv": [
+            7.0,
+            7.0,
+            9.0,
+            9.0
+          ]
+        }
+      }
+    },
+    {
+      "name": "truck_detail_mount_rail",
+      "from": [
+        4,
+        1,
+        6
+      ],
+      "to": [
+        6,
+        4,
+        26
+      ],
+      "faces": {
+        "north": {
+          "texture": "#casing",
+          "uv": [
+            7.0,
+            6.5,
+            9.0,
+            9.5
+          ]
+        },
+        "south": {
+          "texture": "#casing",
+          "uv": [
+            7.0,
+            6.5,
+            9.0,
+            9.5
+          ]
+        },
+        "east": {
+          "texture": "#casing",
+          "uv": [
+            0.0,
+            6.8,
+            16.0,
+            9.2
+          ]
+        },
+        "west": {
+          "texture": "#casing",
+          "uv": [
+            0.0,
+            6.8,
+            16.0,
+            9.2
+          ]
+        },
+        "up": {
+          "texture": "#casing",
+          "uv": [
+            7.2,
+            0.0,
+            8.8,
+            16.0
+          ]
+        },
+        "down": {
+          "texture": "#casing",
+          "uv": [
+            7.2,
+            0.0,
+            8.8,
+            16.0
+          ]
+        }
+      }
+    },
+    {
+      "name": "truck_detail_mount_rail",
+      "from": [
+        26,
+        1,
+        6
+      ],
+      "to": [
+        28,
+        4,
+        26
+      ],
+      "faces": {
+        "north": {
+          "texture": "#casing",
+          "uv": [
+            7.0,
+            6.5,
+            9.0,
+            9.5
+          ]
+        },
+        "south": {
+          "texture": "#casing",
+          "uv": [
+            7.0,
+            6.5,
+            9.0,
+            9.5
+          ]
+        },
+        "east": {
+          "texture": "#casing",
+          "uv": [
+            0.0,
+            6.8,
+            16.0,
+            9.2
+          ]
+        },
+        "west": {
+          "texture": "#casing",
+          "uv": [
+            0.0,
+            6.8,
+            16.0,
+            9.2
+          ]
+        },
+        "up": {
+          "texture": "#casing",
+          "uv": [
+            7.2,
+            0.0,
+            8.8,
+            16.0
+          ]
+        },
+        "down": {
+          "texture": "#casing",
+          "uv": [
+            7.2,
+            0.0,
+            8.8,
+            16.0
+          ]
+        }
+      }
+    },
+    {
+      "name": "truck_detail_pivot_pedestal",
+      "from": [
+        4,
+        3,
+        10
+      ],
+      "to": [
+        8,
+        6,
+        22
+      ],
+      "faces": {
+        "north": {
+          "texture": "#dark",
+          "uv": [
+            6.0,
+            6.5,
+            10.0,
+            9.5
+          ]
+        },
+        "south": {
+          "texture": "#dark",
+          "uv": [
+            6.0,
+            6.5,
+            10.0,
+            9.5
+          ]
+        },
+        "east": {
+          "texture": "#dark",
+          "uv": [
+            2.0,
+            6.5,
+            14.0,
+            9.5
+          ]
+        },
+        "west": {
+          "texture": "#dark",
+          "uv": [
+            2.0,
+            6.5,
+            14.0,
+            9.5
+          ]
+        },
+        "up": {
+          "texture": "#dark",
+          "uv": [
+            6.0,
+            2.0,
+            10.0,
+            14.0
+          ]
+        },
+        "down": {
+          "texture": "#dark",
+          "uv": [
+            6.0,
+            2.0,
+            10.0,
+            14.0
+          ]
+        }
+      }
+    },
+    {
+      "name": "truck_detail_pivot_pedestal",
+      "from": [
+        24,
+        3,
+        10
+      ],
+      "to": [
+        28,
+        6,
+        22
+      ],
+      "faces": {
+        "north": {
+          "texture": "#dark",
+          "uv": [
+            6.0,
+            6.5,
+            10.0,
+            9.5
+          ]
+        },
+        "south": {
+          "texture": "#dark",
+          "uv": [
+            6.0,
+            6.5,
+            10.0,
+            9.5
+          ]
+        },
+        "east": {
+          "texture": "#dark",
+          "uv": [
+            2.0,
+            6.5,
+            14.0,
+            9.5
+          ]
+        },
+        "west": {
+          "texture": "#dark",
+          "uv": [
+            2.0,
+            6.5,
+            14.0,
+            9.5
+          ]
+        },
+        "up": {
+          "texture": "#dark",
+          "uv": [
+            6.0,
+            2.0,
+            10.0,
+            14.0
+          ]
+        },
+        "down": {
+          "texture": "#dark",
+          "uv": [
+            6.0,
+            2.0,
+            10.0,
+            14.0
+          ]
         }
       }
     }
@@ -299,5 +1140,7 @@
         0.5
       ]
     }
-  }
+  },
+  "ambientocclusion": true,
+  "parent": "minecraft:block/block"
 }

@@ -18,12 +18,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3d;
 
-// Tyre smoke and skidmarks, emitted from the server
 public final class                          WheelEffects {
 
-    // Tire smoke tuning
-    private static final double SMOKE_HEAT_COLD_C = 60.0; // no smoke boost at/below this temp
-    private static final double SMOKE_HEAT_HOT_C = 130.0; // full smoke boost at/above this
+    private static final double SMOKE_HEAT_COLD_C = 60.0;
+    private static final double SMOKE_HEAT_HOT_C = 130.0;
     private static final double SMOKE_DRIFT_SPEED = 0.09;
     private static final double SMOKE_CLOUD_LEAN = 1.6;
     private static final double SMOKE_CENTER_HEIGHT = 0.45;
@@ -44,17 +42,15 @@ public final class                          WheelEffects {
         public double smokeAccum;
         public BlockState smokeSurface;
 
-        // skidmark ribbon
         public double skidAxleX, skidAxleY, skidAxleZ;
         public boolean skidActive;
         public double skidPrevLX, skidPrevLY, skidPrevLZ;
         public double skidPrevRX, skidPrevRY, skidPrevRZ;
-        public boolean skidFreshContact;// set each grounded tick
-        public int skidHold; // ticks of trailing mark left
+        public boolean skidFreshContact;
+        public int skidHold;
         public double skidLastIntensity;
     }
 
-    // once per game tick
     public static void emit(ServerLevel serverLevel, BlockPos at, State left, State right) {
         emitTireSmoke(serverLevel, left);
         emitTireSmoke(serverLevel, right);
@@ -122,7 +118,6 @@ public final class                          WheelEffects {
         fx.skidFreshContact = false;
     }
 
-    // Skid marks only work on hard surfaces for now, so not dirt or sand or gravel
     private static boolean isHardSkidSurface(BlockState surface) {
         if (surface == null || surface.isAir()) {
             return false;
@@ -154,7 +149,6 @@ public final class                          WheelEffects {
         serverLevel.sendParticles(particle, cx, cy, cz, puffs, hSpread, vSpread, hSpread, SMOKE_DRIFT_MAX);
     }
 
-    // Will improve this later to be more data driven but for now this detects some surfaces to kick up dirt instead of smoke the tire
     private static ParticleOptions smokeParticleFor(BlockState surface) {
         if (surface != null && Config.TIRE_SMOKE_GROUND_DUST.get()
                 && (surface.is(BlockTags.DIRT) || surface.is(BlockTags.SAND) || surface.is(BlockTags.SNOW)
@@ -164,7 +158,6 @@ public final class                          WheelEffects {
         return ParticleTypes.CAMPFIRE_COSY_SMOKE;
     }
 
-    // Whether to smoke tires, for the server tick. Keeping it separate from force solver
     public static void record(Level level, State fx, CornerState wheel, Pose3d pose, Vector3d contactPoint,
                               Vector3d forward, Vector3d axle, double vLon, double vLat, double radius,
                               TerrainCast.Result cast) {
@@ -174,7 +167,6 @@ public final class                          WheelEffects {
             return;
         }
 
-        // recorded every grounded tick for the skid ribbon
         Vector3d groundLocal = new Vector3d(contactPoint).sub(0.0, radius - 0.05, 0.0);
         Vec3 world = pose.transformPosition(JOMLConversion.toMojang(groundLocal));
         fx.smokeX = world.x;
@@ -199,7 +191,6 @@ public final class                          WheelEffects {
             fx.smokeSeverity = 0.0;
             return;
         }
-        // taking the worse of lateral or longitudinal slip to determine if slipping
         double slipLong = Math.abs(wheel.slipRatio);
         double slipLat = Math.abs(Math.sin(wheel.slipAngleRad));
         double slip = Math.max(slipLong, slipLat);
@@ -210,7 +201,6 @@ public final class                          WheelEffects {
         }
         double severity = Mth.clamp((slip - threshold) / (1.0 - threshold), 0.0, 1.0);
 
-        // temperature affects smoke levels
         double heatBoost = Config.TIRE_SMOKE_HEAT_BOOST.getAsDouble();
         double heat = Mth.clamp((wheel.tireTemp - SMOKE_HEAT_COLD_C) / (SMOKE_HEAT_HOT_C - SMOKE_HEAT_COLD_C), 0.0, 1.0);
         fx.smokeSeverity = severity * ((1.0 - heatBoost) + heatBoost * heat);

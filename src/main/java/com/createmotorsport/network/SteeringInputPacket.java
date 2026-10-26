@@ -11,12 +11,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-// Client -> server; the driver's controls at (pos)
-//  mask -> one bit per SteeringWheelBlockEntity.SteeringControl, for the on/off controls
-//             (clutch, shifts, engine aids) and for the action-bar readout
-//  throttle -> analog 0 to 100 (keypress = 100 when held, analog controller)
-//  brake    -> analog 0 to 100
-//  steer  ->  analog -100 to 100, positive = left (keyboard left/right = +/-100; stick is analog)
 public record SteeringInputPacket(BlockPos pos, int mask, int throttle, int brake, int steer)
         implements CustomPacketPayload {
     public static final Type<SteeringInputPacket> TYPE =

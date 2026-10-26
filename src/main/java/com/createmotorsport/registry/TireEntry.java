@@ -22,7 +22,6 @@ public record TireEntry(ResourceKey<TireSpec> compound, double designMassKg, flo
 
     public static final float DEFAULT_VERTICAL_DEFLECTION = 0.035f;
 
-    // damping ratio, c = 2 * zeta * sqrt(k * m_unsprung)
     public static final float DEFAULT_VERTICAL_DAMPING = 0.06f;
 
     public float designLoad() {
@@ -37,7 +36,6 @@ public record TireEntry(ResourceKey<TireSpec> compound, double designMassKg, flo
         return designLoad * 4.0 / Gravity.DEFAULT;
     }
 
-    // N per block, designLoad / (verticalDeflection * radius)
     public static double verticalRate(double designLoad, double radius, double deflectionFraction) {
         double sink = Math.max(1.0e-4, deflectionFraction) * Math.max(1.0e-4, radius);
         return designLoad / sink;

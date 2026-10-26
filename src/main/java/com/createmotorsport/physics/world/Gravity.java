@@ -4,7 +4,6 @@ import dev.ryanhcode.sable.physics.config.dimension_physics.DimensionPhysicsData
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
-/** Sable's gravity is 11 by default. Use {@link #of} for any physics */
 public final class Gravity {
 
 

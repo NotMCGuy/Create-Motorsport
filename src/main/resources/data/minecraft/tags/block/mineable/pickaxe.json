@@ -17,6 +17,8 @@
     "createmotorsport:suspension",
     "createmotorsport:passenger_suspension",
     "createmotorsport:truck_suspension",
-    "createmotorsport:steering_wheel"
+    "createmotorsport:steering_wheel",
+    "createmotorsport:glovebox",
+    "#createmotorsport:motorcycle_parts"
   ]
 }

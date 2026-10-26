@@ -2,7 +2,6 @@ package com.createmotorsport.telemetry;
 
 import com.createmotorsport.physics.vehicle.CornerState;
 
-// One wheel's last physics step as the CSV log and the dashboard read it
 public record WheelTelemetry(boolean grounded, double loadN, double slipRatio, double slipAngleDeg,
                              double vLonMs, double vLatMs, double longForceN, double latForceN,
                              double omega, double wheelSpeedMs, double springLenM, double compressionM,

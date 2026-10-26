@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "I I",
+    "ISI",
+    "I I"
+  ],
+  "key": {
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "S": {
+      "item": "create:shaft"
+    }
+  },
+  "result": {
+    "id": "createmotorsport:motorcycle_forks",
+    "count": 1
+  }
+}

@@ -3,10 +3,6 @@ package com.createmotorsport.physics.tire;
 import com.createmotorsport.physics.spec.TireSpec;
 import net.minecraft.util.Mth;
 
-/**
- * Camber thrust, from Dr. Rill's Vehicle Dynamics 3.3.7.3.
- * Every tyre model adds thrust() to its lateral force
- */
 public final class Camber {
 
     private Camber() {

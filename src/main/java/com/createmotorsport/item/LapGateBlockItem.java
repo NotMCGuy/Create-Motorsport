@@ -23,7 +23,6 @@ public class LapGateBlockItem extends BlockItem {
         super(block, properties);
     }
 
-    // Stores the gate to link the next placement to, called by the block when it's clicked with this item
     public static void armLink(ItemStack stack, BlockPos pos) {
         stack.set(CreateMotorsport.GATE_FIRST_POST.get(), pos.asLong());
     }

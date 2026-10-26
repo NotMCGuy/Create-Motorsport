@@ -6,7 +6,6 @@ import net.minecraft.util.Mth;
 
 public final class TerrainAssist {
 
-    // the log's assist_why column
     public static final int OFF = 0;
     public static final int AIRBORNE = 1;
     public static final int SLOPE_OK = 2;
@@ -16,7 +15,7 @@ public final class TerrainAssist {
     private static final int MIN_PROBES = 4;
     private static final int MAX_PROBES = 12;
     private static final double PROBE_SPACING = 1.5;
-    private static final double RELEASE_RATIO = 3.0; // drops faster
+    private static final double RELEASE_RATIO = 3.0;
 
     private TerrainAssist() {
     }
@@ -45,13 +44,11 @@ public final class TerrainAssist {
         }
     }
 
-    // rigid length at distance ahead, or NaN for no ground
     @FunctionalInterface
     public interface Probe {
         double rigidAhead(double distance);
     }
 
-    // everything but lift is telemetry
     public static final class State {
         public double lift;
 
@@ -61,10 +58,6 @@ public final class TerrainAssist {
         public int why;
     }
 
-    /**
-     * @param airborneAbove rigid length above which the wheel is off the ground
-     * @param carSpeed blocks per second
-     */
     public static double lift(TerrainAssistSpec spec, boolean enabled, boolean extra, double radius,
                               double rigidHere, double airborneAbove, double carSpeed, double dt,
                               Probe probe, State s) {
@@ -119,7 +112,6 @@ public final class TerrainAssist {
         return rateLimit(spec, dt, target, s);
     }
 
-    // moves stored lift toward target no more than maxVerticalRate
     private static double rateLimit(TerrainAssistSpec spec, double dt, double target, State s) {
         double step = spec.maxVerticalRate() * dt;
         s.lift = target > s.lift

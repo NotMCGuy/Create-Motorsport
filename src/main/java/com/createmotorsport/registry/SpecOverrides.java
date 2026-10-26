@@ -12,15 +12,11 @@ import net.minecraft.nbt.NumericTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 
-/**
- * A part's Tune screen edits, saved as only the fields that changed
- */
 public final class SpecOverrides {
 
     private SpecOverrides() {
     }
 
-    // the pack spec unchanged if they no longer decode
     public static <T> T apply(Codec<T> codec, T base, CompoundTag overrides) {
         if (overrides.isEmpty()) {
             return base;
@@ -30,7 +26,6 @@ public final class SpecOverrides {
                 .orElse(base);
     }
 
-    // returns a new tag, a part replaces its tag, which is what Memo notices
     public static <T> DataResult<CompoundTag> set(Codec<T> codec, T base, CompoundTag overrides, String path,
                                                   String text) {
         CompoundTag next = overrides.copy();
@@ -97,7 +92,6 @@ public final class SpecOverrides {
         return b.equals(a);
     }
 
-    // list is comma-separated, a trailing comma makes a one item list
     static Tag parse(String text) {
         String t = text.trim();
         if (t.equalsIgnoreCase("true") || t.equalsIgnoreCase("false")) {
@@ -137,7 +131,6 @@ public final class SpecOverrides {
                 .flatMap(tag -> decode(codec, tag));
     }
 
-    // if the constructor refuses
     private static <T> DataResult<T> decode(Codec<T> codec, CompoundTag tag) {
         try {
             return codec.parse(NbtOps.INSTANCE, tag);
@@ -160,7 +153,6 @@ public final class SpecOverrides {
     }
 
 
-    // caches apply(), redone only when the pack spec or the tag is a different object
     public static final class Memo<T> {
         private T base;
         private CompoundTag overrides;

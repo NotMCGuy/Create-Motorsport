@@ -2,18 +2,13 @@ package com.createmotorsport.physics.control;
 
 import net.minecraft.util.Mth;
 
-/**
- * Power mode lets user set torque at mode/max, based on F1 power modes
- * Also covers the overtake boost
- * EngineBlockEntity steps this every tick and multiplies the torque scale by the return
- */
 public final class PowerMode {
 
     public static final int MAX = 8;
 
     private static final double BOOST_FACTOR = 1.25;
-    private static final double BOOST_DRAIN = 1.0 / (20 * 8); // 20 tick * 8 seconds
-    private static final double BOOST_RECHARGE = 1.0 / (20 * 20); // 20 tick * 20 seconds
+    private static final double BOOST_DRAIN = 1.0 / (20 * 8);
+    private static final double BOOST_RECHARGE = 1.0 / (20 * 20);
 
     private int mode = MAX;
     private double reserve = 1.0;
@@ -59,5 +54,5 @@ public final class PowerMode {
 
     public double factor() {
         return factor;
-    } // for logging
+    }
 }

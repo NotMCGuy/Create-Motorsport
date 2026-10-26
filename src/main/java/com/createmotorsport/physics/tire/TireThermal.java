@@ -2,15 +2,11 @@ package com.createmotorsport.physics.tire;
 
 import net.minecraft.util.Mth;
 
-/**
- * Tyre thermal model based on Speed Dreams' simuv4
- * Corner calls step() and gripfactor() each substep while turned on (not by default for now)
- */
 public final class TireThermal {
 
     private static final double MIN_GRIP_FACTOR = 0.1;
 
-    public static final double SPEED_COOL = 0.25; // extra cooling per m/s of airflow over the tyre, as a fraction of the standing rate
+    public static final double SPEED_COOL = 0.25;
 
     private TireThermal() {
     }

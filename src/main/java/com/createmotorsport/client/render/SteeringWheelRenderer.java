@@ -22,16 +22,12 @@ import org.joml.Vector3f;
 
 import java.util.List;
 
-// Steering wheel rendering taken from universal keyboard mod
 public class SteeringWheelRenderer implements BlockEntityRenderer<SteeringWheelBlockEntity> {
-    // Wheel rotation pivot + axis (pixels / 16), authored in the block's default (facing=north) frame
     private static final Vector3f PIVOT = new Vector3f(0.0F / 16F, 11.96447F / 16F, 7.96447F / 16F);
     private static final Vector3f WHEEL_AXIS = new Vector3f(0.96593F, -0.25882F, 0F).normalize();
 
-    // Tilt up to driver so you can read the screen
     private static final float TILT_DEG = 5.0F;
 
-    // Screen face placement (pixels)
     private static final float FACE_X = 0.0F;
     private static final float CENTER_Y = 15.5F;
     private static final float CENTER_Z = 8.0F;
@@ -56,7 +52,6 @@ public class SteeringWheelRenderer implements BlockEntityRenderer<SteeringWheelB
         Direction facing = state.getValue(HorizontalDirectionalBlock.FACING);
         Matrix4f orient = BlockModelRotation.by(0, blockstateYaw(facing)).getRotation().getMatrix();
 
-        // Spinning rim
         ms.pushPose();
         ms.translate(0.5, 0.5, 0.5);
         ms.mulPose(orient);
@@ -78,7 +73,6 @@ public class SteeringWheelRenderer implements BlockEntityRenderer<SteeringWheelB
         wheel.light(light).renderInto(ms, buffer.getBuffer(RenderType.cutoutMipped()));
         ms.popPose();
 
-        // Telemetry screen on the dashboard face
         ms.pushPose();
         ms.translate(0.5, 0.5, 0.5);
         ms.mulPose(orient);
@@ -106,7 +100,6 @@ public class SteeringWheelRenderer implements BlockEntityRenderer<SteeringWheelB
                 : new Line("MODE " + be.dashboard().powerMode(), Theme.DASH_MODE);
         Line tcLine = be.isTractionControlOn() ? new Line("TC ON", Theme.DASH_TC) : new Line("TC off", Theme.DASH_OFF);
 
-        // Three columns, each top-to-bottom: speed/rpm ; gear/brake ; mode-or-boost/traction-control
         List<List<Line>> columns = List.of(
                 List.of(speed, rpm), List.of(gearLine, brake), List.of(modeLine, tcLine));
 

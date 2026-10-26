@@ -13,15 +13,9 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-/**
- * A car as the logs and HUD read it
- *
- * @param state null when there is no assembled car
- */
 public record CarActors(@Nullable EngineBlockEntity engine, List<SuspensionBlockEntity> suspensions, SubLevel subLevel,
                         @Nullable CarState state) {
 
-    // from the assembler rather than a plot walk, suspensions sorted by position
     @Nullable
     public static CarActors of(Level level, @Nullable SubLevel subLevel) {
         if (subLevel == null) {

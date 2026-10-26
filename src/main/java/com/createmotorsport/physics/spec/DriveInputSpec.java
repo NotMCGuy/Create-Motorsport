@@ -1,12 +1,8 @@
 package com.createmotorsport.physics.spec;
 
-/**
- * Torque ramp into an axle with rate limit and optional lag. every substep by AxleDrive
- * Modeled after an engaging clutch like Chrono's hang_on_clutch
- */
 public record DriveInputSpec(
-        double engageRateNmPerS, // rate limit for torque change, 0 is instant
-        double lagSeconds // seconds of first-order lag
+        double engageRateNmPerS,
+        double lagSeconds
 ) {
 
     public static final DriveInputSpec INSTANT = new DriveInputSpec(0.0, 0.0);

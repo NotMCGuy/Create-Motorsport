@@ -4,23 +4,16 @@ import net.minecraft.util.Mth;
 
 import java.util.List;
 
-/**
- * Shares one engine's clutch stiffness across every wheel it drives
- * AssembledCar calls solve() after the driven wheels have stepped
- */
 public final class DriveSplit {
 
     private DriveSplit() {
     }
 
-    // owned by its axle, which keeps change between substeps
     public static final class Wheel {
         public double omega;
         public double from;
         public double inertia;
-        // the tyre's hold where the step ended; NaN for a wheel held by the brake, which takes no correction
         public double coupling = Double.NaN;
-        // the clutch drive the step took, without the differential's torque
         public double own;
         public double torque;
         public double stiffness;
@@ -32,7 +25,6 @@ public final class DriveSplit {
         private double inv;
     }
 
-    /** @return the corrected mean change, for the next substep's warm start */
     public static double solve(List<Wheel> wheels, double dt) {
         if (wheels.isEmpty()) {
             return 0.0;

@@ -2,21 +2,14 @@ package com.createmotorsport.physics.vehicle;
 
 import net.minecraft.util.Mth;
 
-/**
- * Steering for one axle by either driver (steering wheel) or redstone signal
- * SuspensionBlockEntity sets the signal and limit each game tick
- * and calls {@link #chase} on both server and client
- * Ackermann split of the angle per wheel is {@link Ackermann}
- */
 public final class AxleSteering {
 
-    private double signal; // redstone level, -15 to 15, positive left
-    private double angle; // centerline steer angle in rad
+    private double signal;
+    private double angle;
     private double lastAngle;
-    private double lock = 1.0; // the limit of the assist, fraction of full lock
+    private double lock = 1.0;
     private boolean assistOff;
 
-    // returns if it moved enough to be worth a sync
     public boolean setSignal(double signal) {
         if (Math.abs(signal - this.signal) > 0.05) {
             this.signal = signal;

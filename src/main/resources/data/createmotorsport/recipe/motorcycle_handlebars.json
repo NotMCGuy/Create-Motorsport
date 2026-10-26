@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "ISI",
+    " A ",
+    " R "
+  ],
+  "key": {
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "S": {
+      "item": "create:shaft"
+    },
+    "A": {
+      "item": "create:andesite_alloy"
+    },
+    "R": {
+      "item": "create:redstone_link"
+    }
+  },
+  "result": {
+    "id": "createmotorsport:motorcycle_handlebars",
+    "count": 1
+  }
+}

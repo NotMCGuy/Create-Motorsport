@@ -10,7 +10,6 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-// Client -> server; rename entrant and set its starting grid position on the lap gate at (pos)
 public record SetEntrantPacket(BlockPos pos, int index, String name, int grid) implements CustomPacketPayload {
     public static final Type<SetEntrantPacket> TYPE =
             new Type<>(ResourceLocation.fromNamespaceAndPath(CreateMotorsport.MODID, "set_entrant"));
@@ -29,7 +28,6 @@ public record SetEntrantPacket(BlockPos pos, int index, String name, int grid) i
 
     public static void handle(SetEntrantPacket packet, IPayloadContext context) {
         context.enqueueWork(() -> {
-            // Same reach guarding RaceControlPacket
             LapGateBlockEntity gate =
                     LapGateBlockEntity.controllableBy(context.player(), packet.pos());
             if (gate == null) {

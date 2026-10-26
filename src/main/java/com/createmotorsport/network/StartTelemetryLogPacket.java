@@ -10,8 +10,6 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-// Client -> server; starts telemetry csv log for (seconds) at (samplesPerSec) rows per second,
-// Its starting to get way too long so, I added 'extra' flag. Will rearrange it all more later
 public record StartTelemetryLogPacket(int seconds, int samplesPerSec, boolean extra) implements CustomPacketPayload {
     public static final Type<StartTelemetryLogPacket> TYPE =
             new Type<>(ResourceLocation.fromNamespaceAndPath(CreateMotorsport.MODID, "start_telemetry_log"));

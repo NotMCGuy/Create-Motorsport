@@ -9,7 +9,6 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-// Client -> server; flip the engine's crank rotation direction (+1 / -1) at (pos)
 public record ToggleEngineDirectionPacket(BlockPos pos) implements CustomPacketPayload {
     public static final Type<ToggleEngineDirectionPacket> TYPE =
             new Type<>(ResourceLocation.fromNamespaceAndPath(CreateMotorsport.MODID, "toggle_engine_direction"));

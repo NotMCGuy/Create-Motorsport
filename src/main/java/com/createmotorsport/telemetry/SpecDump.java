@@ -155,7 +155,6 @@ public final class SpecDump {
                 SpecRegistries.fittedCompound(access, stack, front));
     }
 
-    // mirrors SpecRegistries.fittedCompound
     private static ResourceKey<TireSpec> compoundId(@Nullable RegistryAccess access, ItemStack tire,
                                                     boolean front) {
         ResourceLocation declared = tire.get(CreateMotorsport.TIRE_COMPOUND);
@@ -215,7 +214,6 @@ public final class SpecDump {
         }
     }
 
-    // one line per overridden field, axle0.setup.override.brakes.abs_floor,0.1
     private static void overrides(List<String> manifest, String prefix, net.minecraft.nbt.CompoundTag tag) {
         overrides(manifest, prefix + ".override", "", tag);
     }

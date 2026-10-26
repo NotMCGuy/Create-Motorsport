@@ -35,7 +35,6 @@ public class SteeringWheelMenu extends AbstractContainerMenu {
     public static int slotAX(int ordinal)  { return columnX(ordinal) + SLOT_A_OFF; }
     public static int slotBX(int ordinal)  { return columnX(ordinal) + SLOT_B_OFF; }
 
-    // inventory
     public static final int INV_X = (WIDTH - 9 * 18) / 2;
     public static final int INV_Y = ROW_Y0 + ROWS_PER_COL * ROW_H + 10;
     public static final int HOTBAR_Y = INV_Y + 58;
@@ -45,12 +44,10 @@ public class SteeringWheelMenu extends AbstractContainerMenu {
     private final SimpleContainer ghosts;
     private boolean suppressWriteThrough;
 
-    // Server: wheel + position
     public SteeringWheelMenu(int containerId, Inventory playerInventory, SteeringWheelBlockEntity wheel) {
         this(containerId, playerInventory, wheel.getBlockPos());
     }
 
-    // Client: reads wheel position
     public SteeringWheelMenu(int containerId, Inventory playerInventory, BlockPos pos) {
         super(CreateMotorsport.STEERING_WHEEL_MENU.get(), containerId);
         this.level = playerInventory.player.level();
@@ -76,7 +73,6 @@ public class SteeringWheelMenu extends AbstractContainerMenu {
             }
         };
 
-        // Seed the ghosts from the block entity
         SteeringWheelBlockEntity be = currentBe();
         if (be != null) {
             suppressWriteThrough = true;
@@ -175,7 +171,6 @@ public class SteeringWheelMenu extends AbstractContainerMenu {
 
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
-        // Shift-clicking a ghost clears it; ghosts never steal yo shi'
         if (index >= 0 && index < GHOST_COUNT) {
             slots.get(index).set(ItemStack.EMPTY);
         }

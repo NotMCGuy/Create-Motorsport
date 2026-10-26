@@ -2,9 +2,10 @@
   "textures": {
     "metal": "minecraft:block/iron_block",
     "dark": "minecraft:block/gray_concrete",
-    "brass": "minecraft:block/yellow_terracotta",
+    "brass": "minecraft:block/gold_block",
     "screen": "minecraft:block/black_concrete",
-    "particle": "minecraft:block/iron_block"
+    "particle": "#metal",
+    "casing": "minecraft:block/gray_concrete"
   },
   "elements": [
     {
@@ -20,24 +21,131 @@
       ],
       "faces": {
         "north": {
-          "texture": "#dark"
+          "texture": "#dark",
+          "uv": [
+            4.0,
+            7.25,
+            12.0,
+            8.75
+          ]
         },
         "south": {
-          "texture": "#dark"
+          "texture": "#dark",
+          "uv": [
+            4.0,
+            7.25,
+            12.0,
+            8.75
+          ]
         },
         "east": {
-          "texture": "#dark"
+          "texture": "#dark",
+          "uv": [
+            4.0,
+            7.25,
+            12.0,
+            8.75
+          ]
         },
         "west": {
-          "texture": "#dark"
+          "texture": "#dark",
+          "uv": [
+            4.0,
+            7.25,
+            12.0,
+            8.75
+          ]
         },
         "up": {
-          "texture": "#dark"
+          "texture": "#dark",
+          "uv": [
+            4.0,
+            4.0,
+            12.0,
+            12.0
+          ]
         },
         "down": {
-          "texture": "#dark"
+          "texture": "#dark",
+          "uv": [
+            4.0,
+            4.0,
+            12.0,
+            12.0
+          ]
+        }
+      }
+    },
+    {
+      "name": "truck_detail_foot_pad",
+      "from": [
+        5,
+        3,
+        5
+      ],
+      "to": [
+        11,
+        3.5,
+        11
+      ],
+      "faces": {
+        "north": {
+          "texture": "#dark",
+          "uv": [
+            5.0,
+            7.75,
+            11.0,
+            8.25
+          ]
+        },
+        "south": {
+          "texture": "#dark",
+          "uv": [
+            5.0,
+            7.75,
+            11.0,
+            8.25
+          ]
+        },
+        "east": {
+          "texture": "#dark",
+          "uv": [
+            5.0,
+            7.75,
+            11.0,
+            8.25
+          ]
+        },
+        "west": {
+          "texture": "#dark",
+          "uv": [
+            5.0,
+            7.75,
+            11.0,
+            8.25
+          ]
+        },
+        "up": {
+          "texture": "#dark",
+          "uv": [
+            5.0,
+            5.0,
+            11.0,
+            11.0
+          ]
+        },
+        "down": {
+          "texture": "#dark",
+          "uv": [
+            5.0,
+            5.0,
+            11.0,
+            11.0
+          ]
         }
       }
     }
-  ]
+  ],
+  "ambientocclusion": true,
+  "parent": "minecraft:block/block"
 }

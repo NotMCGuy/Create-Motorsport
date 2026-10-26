@@ -111,7 +111,7 @@ public class SteeringKeysScreen extends Screen {
             } else {
                 capturing = capturing == hit ? -1 : hit;
                 if (capturing >= 0) {
-                    GamepadInput.beginCapture(); // baseline so held stick/trigger isn't grabbed instantly
+                    GamepadInput.beginCapture();
                     MouseInput.beginCapture();
                 }
             }

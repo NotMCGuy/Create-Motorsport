@@ -38,7 +38,7 @@ public final class SpecRegistries {
 
     public static final ResourceKey<TireSpec> PASSENGER_CAR_70 = compound("passenger_car_70");
     public static final ResourceKey<TireSpec> TRUCK_80 = compound("truck_80");
-    public static final ResourceKey<TireSpec> FOREIGN = compound("foreign"); // for tires from any other mod
+    public static final ResourceKey<TireSpec> FOREIGN = compound("foreign");
     public static final ResourceKey<TireSpec> MOTORCYCLE = compound("motorcycle");
 
     public static final ResourceKey<TireSpec> F1_SLICK_FRONT = compound("f1_slick_front");
@@ -117,7 +117,6 @@ public final class SpecRegistries {
         return fallback;
     }
 
-    // just so a log can say source,fallback
     public static <T> boolean resolves(@Nullable RegistryAccess access, ResourceKey<Registry<T>> registry,
                                        @Nullable ResourceKey<T> id) {
         return access != null && id != null
@@ -158,7 +157,6 @@ public final class SpecRegistries {
         return fittedCompound(access, front);
     }
 
-    // any tires from another mod
     public static boolean isForeign(net.minecraft.world.item.ItemStack tire) {
         return !(tire.getItem() instanceof com.createmotorsport.item.TireItem)
                 && !tire.has(CreateMotorsport.TIRE_COMPOUND);
@@ -236,7 +234,6 @@ public final class SpecRegistries {
         return DifferentialSpec.DEFAULT;
     }
 
-    // race_front to "Race Front"
     public static String displayName(ResourceLocation id) {
         StringBuilder out = new StringBuilder();
         if (!id.getNamespace().equals(CreateMotorsport.MODID)) {

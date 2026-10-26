@@ -33,7 +33,7 @@ public final class MotorsportHud {
             return;
         }
         BlockPos pos = SteeringInputHandler.getActivePos();
-        if (pos == null) { //so only works when driving
+        if (pos == null) {
             return;
         }
         if (!(mc.level.getBlockEntity(pos) instanceof SteeringWheelBlockEntity wheel) || wheel.isRemoved()) {

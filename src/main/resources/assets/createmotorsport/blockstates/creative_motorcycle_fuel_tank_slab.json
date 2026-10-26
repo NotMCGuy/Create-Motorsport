@@ -1,0 +1,36 @@
+{
+  "variants": {
+    "facing=north,half=bottom": {
+      "model": "createmotorsport:block/creative_motorcycle_fuel_tank_slab_bottom",
+      "y": 0
+    },
+    "facing=east,half=bottom": {
+      "model": "createmotorsport:block/creative_motorcycle_fuel_tank_slab_bottom",
+      "y": 90
+    },
+    "facing=south,half=bottom": {
+      "model": "createmotorsport:block/creative_motorcycle_fuel_tank_slab_bottom",
+      "y": 180
+    },
+    "facing=west,half=bottom": {
+      "model": "createmotorsport:block/creative_motorcycle_fuel_tank_slab_bottom",
+      "y": 270
+    },
+    "facing=north,half=top": {
+      "model": "createmotorsport:block/creative_motorcycle_fuel_tank_slab_top",
+      "y": 0
+    },
+    "facing=east,half=top": {
+      "model": "createmotorsport:block/creative_motorcycle_fuel_tank_slab_top",
+      "y": 90
+    },
+    "facing=south,half=top": {
+      "model": "createmotorsport:block/creative_motorcycle_fuel_tank_slab_top",
+      "y": 180
+    },
+    "facing=west,half=top": {
+      "model": "createmotorsport:block/creative_motorcycle_fuel_tank_slab_top",
+      "y": 270
+    }
+  }
+}

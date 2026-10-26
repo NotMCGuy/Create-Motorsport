@@ -9,11 +9,9 @@ import org.lwjgl.glfw.GLFW;
 public final class MotorsportKeybinds {
     private static final String CATEGORY = "key.categories.createmotorsport";
 
-    // Hold this key to move camera while driving
     public static final KeyMapping FREE_LOOK = new KeyMapping(
             "key.createmotorsport.freelook", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_LEFT_ALT, CATEGORY);
 
-    // Stop driving, uncapture the keyboard from the steering wheel controller
     public static final KeyMapping EXIT_VEHICLE = new KeyMapping(
             "key.createmotorsport.exit", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_ESCAPE, CATEGORY);
 

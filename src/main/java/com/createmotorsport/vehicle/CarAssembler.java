@@ -12,12 +12,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
-/**
- * CarAssembler rebuils an AssembledCar whenever something changes
- * Parts call of() at the beginning of the tick, first axle's substep calls refreshed(), and Sable's onPhysicsTick is calling endPhysicsSubstep()
- *
- * any initialize, remove, or onChunkUnloaded raises generation by one and the car rebuilds next time. keyed by sublevel identity
- */
 public final class CarAssembler {
 
     private static final Map<SubLevel, AssembledCar> CARS = new IdentityHashMap<>();

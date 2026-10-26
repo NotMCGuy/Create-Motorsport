@@ -75,15 +75,11 @@ public record TireSpec(
         }
     }
 
-    /** @param peakRatio peak force relative to lateral axis, lat = 1 */
     public record Axis(double slipAtPeak, double peakRatio, double slideGrip, double slideSlipFactor,
                        double initialStiffness) {
 
     }
 
-    // Pacejka B/C/E done the same as Speed dreams: C = 2 - asin(RFactor)*2/PI, B = Ca/C, E = EFactor.
-    // TireModel.longitudinalForce calls these for the arcade model too, so a compound with no Pacejka params
-    // answers with PACEJKA_DEFAULTS
     private ModelParams.Pacejka pacejka() {
         return params instanceof ModelParams.Pacejka p ? p : PACEJKA_DEFAULTS;
     }
@@ -100,7 +96,6 @@ public record TireSpec(
         return Math.min(1.0, pacejka().eFactor());
     }
 
-    // Rill Fig 3.43 and 3.45, 0.65 m scaled by lambda
     public static final double DEFAULT_RELAX_LENGTH_LAT = ModelParams.TMeasy.DEFAULT_RELAX_LENGTH_LAT;
 
     private static final double SLICK_LOAD_FACTOR_LIGHT = 1.15;
@@ -121,7 +116,6 @@ public record TireSpec(
                 TMEASY_BRISTLE_DAMPING, TMEASY_STANDSTILL_LEAK, TMEASY_STANDSTILL_SPEED);
     }
 
-    // Chrono's two TMeasy guess sets, ChTMeasyTire.cpp GuessPassCar70Par and GuessTruck80Par
     public static final TireSpec PASSENGER_CAR_70 = new TireSpec(
             0.80,
             SLICK_LOAD_FACTOR_LIGHT, SLICK_LOAD_FACTOR_HEAVY, SLICK_LOAD_FALLOFF,

@@ -11,7 +11,6 @@ public final class MouseSteerCamera {
     private static float frozenYaw;
     private static float frozenPitch;
 
-    // Called every client tick, shouldLock = driving & mouse steering & free look key not held
     public static void update(boolean shouldLock) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) {
@@ -23,16 +22,15 @@ public final class MouseSteerCamera {
                 frozenYaw = player.getYRot();
                 frozenPitch = player.getXRot();
                 locked = true;
-                MouseInput.recenter(); // recenter absolute mode
+                MouseInput.recenter();
             }
 
-            // undoes whatever the camera turn did to the body this tick so it stays put
             player.setYRot(frozenYaw);
             player.setXRot(frozenPitch);
             player.yRotO = frozenYaw;
             player.xRotO = frozenPitch;
         } else if (locked) {
-            locked = false; //holding free look key to look around
+            locked = false;
         }
     }
 

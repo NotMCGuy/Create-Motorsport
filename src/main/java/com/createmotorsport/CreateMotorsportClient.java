@@ -33,6 +33,9 @@ import net.neoforged.neoforge.common.NeoForge;
 @Mod(value = CreateMotorsport.MODID, dist = Dist.CLIENT)
 public class CreateMotorsportClient {
     public CreateMotorsportClient(IEventBus modEventBus, ModContainer container) {
+        modEventBus.addListener((net.neoforged.fml.event.lifecycle.FMLClientSetupEvent event) ->
+                event.enqueueWork(() -> net.createmod.ponder.foundation.PonderIndex.addPlugin(
+                        new com.createmotorsport.client.ponder.MotorsportPonderPlugin())));
         MotorsportPartialModels.init();
         com.createmotorsport.client.render.TrailerRenderer.init();
         modEventBus.addListener(this::registerMenuScreens);
@@ -43,7 +46,6 @@ public class CreateMotorsportClient {
 
         SteeringWheelBlock.clientDriveToggle = SteeringInputHandler::toggleDriving;
 
-        // Steering wheel live input intercepts keys and streams the driver's controls
         NeoForge.EVENT_BUS.addListener(SteeringInputHandler::onKeyInput);
         NeoForge.EVENT_BUS.addListener(SteeringInputHandler::onClientTick);
         NeoForge.EVENT_BUS.addListener(SteeringInputHandler::onScreenOpening);

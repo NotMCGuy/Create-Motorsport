@@ -12,7 +12,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-// TunePacket for the tire in hand
 public record TuneHeldPacket(boolean mainHand, String section, int action, String path, String text)
         implements CustomPacketPayload {
 

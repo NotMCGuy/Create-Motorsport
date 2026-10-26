@@ -13,7 +13,6 @@ import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.Nullable;
 
-// Client -> server
 public record TunePacket(BlockPos pos, String section, int action, String path, String text)
         implements CustomPacketPayload {
 

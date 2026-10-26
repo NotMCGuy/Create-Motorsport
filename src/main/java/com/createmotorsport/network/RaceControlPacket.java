@@ -11,8 +11,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-// Client -> server; one packet for every button on the lap gate screen
-// value carries the argument for the action
 public record RaceControlPacket(BlockPos pos, int action, int value) implements CustomPacketPayload {
     public static final int ACTION_START = 0;
     public static final int ACTION_STOP = 1;
@@ -43,7 +41,6 @@ public record RaceControlPacket(BlockPos pos, int action, int value) implements 
             if (!(context.player() instanceof ServerPlayer player)) {
                 return;
             }
-            // Need to gate reach for chunk loaded blocks
             LapGateBlockEntity gate = LapGateBlockEntity.controllableBy(player, packet.pos());
             if (gate == null) {
                 return;

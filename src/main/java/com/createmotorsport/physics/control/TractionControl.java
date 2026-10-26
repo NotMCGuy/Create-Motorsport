@@ -2,17 +2,13 @@ package com.createmotorsport.physics.control;
 
 import net.minecraft.util.Mth;
 
-/**
- * Traction Control that works much better now since its stepped every physics substep within the driven axle itself
- * Rill, Vehicle Dynamics eq 8.40
- */
 public final class TractionControl {
 
     public static final double SPEED_FLOOR = 2.0;
 
-    private static final double SIDE_SLIP = 4.0; // m/s sideways slide before it cuts for oversteering
-    private static final double SIDE_RANGE = 8.0; // m/s past that over which that cutting goes to the floor
-    private static final double SIDE_FLOOR = 0.5; // the most the throttle can be trimmed to by lateral cut
+    private static final double SIDE_SLIP = 4.0;
+    private static final double SIDE_RANGE = 8.0;
+    private static final double SIDE_FLOOR = 0.5;
 
     private TractionControl() {
     }
@@ -28,7 +24,6 @@ public final class TractionControl {
     }
 
 
-    // recalcs the capacity cap to the demand about to be applied
     public static Result recap(Result result, double tractionForce, double repRadius, double demandTorque) {
         if (tractionForce <= 0.0 || demandTorque <= 1.0e-6) {
             return result;

@@ -9,10 +9,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-/**
- * CarState is for everything that changes while the car drives, and that which belongs to the car rather than an axle
- * So driver controls and aids, per-body mass
- */
 public final class CarState {
 
     public record Body(double mass, double speed, int wheels) {
@@ -22,7 +18,6 @@ public final class CarState {
 
     private double wheelbase;
 
-    // Driver aid settings, saved by the steering wheel and copied by the car every tick. None would be a car without a steering wheel
     public record Aids(TerrainAssist.Level terrainAssist, boolean steerAssistOff, boolean driftDiff,
                        boolean tractionControl) {
         public static final Aids NONE = new Aids(TerrainAssist.Level.NORMAL, false, false, false);
@@ -80,7 +75,7 @@ public final class CarState {
         return this.cruise;
     }
 
-    private double dragThrottle; // engine drag control
+    private double dragThrottle;
 
     public double dragThrottle() {
         return this.dragThrottle;

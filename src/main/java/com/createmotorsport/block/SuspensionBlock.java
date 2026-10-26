@@ -39,7 +39,6 @@ import org.jetbrains.annotations.Nullable;
 
 public class SuspensionBlock extends HorizontalDirectionalBlock implements EntityBlock, IWrenchable {
     public static final MapCodec<SuspensionBlock> CODEC = simpleCodec(SuspensionBlock::new);
-    // Making it a full block for now because the underside chassis kept getting caught on the ridge between the suspension and the next block
     private static final VoxelShape SHAPE = Shapes.block();
 
     public SuspensionBlock(BlockBehaviour.Properties properties) {

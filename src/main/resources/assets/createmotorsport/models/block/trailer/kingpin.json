@@ -2,9 +2,10 @@
   "textures": {
     "metal": "minecraft:block/iron_block",
     "dark": "minecraft:block/gray_concrete",
-    "brass": "minecraft:block/yellow_terracotta",
+    "brass": "minecraft:block/gold_block",
     "screen": "minecraft:block/black_concrete",
-    "particle": "minecraft:block/iron_block"
+    "particle": "#metal",
+    "casing": "minecraft:block/gray_concrete"
   },
   "elements": [
     {
@@ -20,22 +21,58 @@
       ],
       "faces": {
         "north": {
-          "texture": "#metal"
+          "texture": "#metal",
+          "uv": [
+            2.0,
+            6.0,
+            14.0,
+            10.0
+          ]
         },
         "south": {
-          "texture": "#metal"
+          "texture": "#metal",
+          "uv": [
+            2.0,
+            6.0,
+            14.0,
+            10.0
+          ]
         },
         "east": {
-          "texture": "#metal"
+          "texture": "#metal",
+          "uv": [
+            2.0,
+            6.0,
+            14.0,
+            10.0
+          ]
         },
         "west": {
-          "texture": "#metal"
+          "texture": "#metal",
+          "uv": [
+            2.0,
+            6.0,
+            14.0,
+            10.0
+          ]
         },
         "up": {
-          "texture": "#metal"
+          "texture": "#metal",
+          "uv": [
+            2.0,
+            2.0,
+            14.0,
+            14.0
+          ]
         },
         "down": {
-          "texture": "#metal"
+          "texture": "#metal",
+          "uv": [
+            2.0,
+            2.0,
+            14.0,
+            14.0
+          ]
         }
       }
     },
@@ -52,22 +89,58 @@
       ],
       "faces": {
         "north": {
-          "texture": "#dark"
+          "texture": "#dark",
+          "uv": [
+            6.0,
+            3.5,
+            10.0,
+            12.5
+          ]
         },
         "south": {
-          "texture": "#dark"
+          "texture": "#dark",
+          "uv": [
+            6.0,
+            3.5,
+            10.0,
+            12.5
+          ]
         },
         "east": {
-          "texture": "#dark"
+          "texture": "#dark",
+          "uv": [
+            6.0,
+            3.5,
+            10.0,
+            12.5
+          ]
         },
         "west": {
-          "texture": "#dark"
+          "texture": "#dark",
+          "uv": [
+            6.0,
+            3.5,
+            10.0,
+            12.5
+          ]
         },
         "up": {
-          "texture": "#dark"
+          "texture": "#dark",
+          "uv": [
+            6.0,
+            6.0,
+            10.0,
+            10.0
+          ]
         },
         "down": {
-          "texture": "#dark"
+          "texture": "#dark",
+          "uv": [
+            6.0,
+            6.0,
+            10.0,
+            10.0
+          ]
         }
       }
     },
@@ -84,24 +157,338 @@
       ],
       "faces": {
         "north": {
-          "texture": "#brass"
+          "texture": "#brass",
+          "uv": [
+            5.5,
+            7.0,
+            10.5,
+            9.0
+          ]
         },
         "south": {
-          "texture": "#brass"
+          "texture": "#brass",
+          "uv": [
+            5.5,
+            7.0,
+            10.5,
+            9.0
+          ]
         },
         "east": {
-          "texture": "#brass"
+          "texture": "#brass",
+          "uv": [
+            5.5,
+            7.0,
+            10.5,
+            9.0
+          ]
         },
         "west": {
-          "texture": "#brass"
+          "texture": "#brass",
+          "uv": [
+            5.5,
+            7.0,
+            10.5,
+            9.0
+          ]
         },
         "up": {
-          "texture": "#brass"
+          "texture": "#brass",
+          "uv": [
+            5.5,
+            5.5,
+            10.5,
+            10.5
+          ]
         },
         "down": {
-          "texture": "#brass"
+          "texture": "#brass",
+          "uv": [
+            5.5,
+            5.5,
+            10.5,
+            10.5
+          ]
+        }
+      }
+    },
+    {
+      "name": "truck_detail_plate_bolt",
+      "from": [
+        3,
+        13,
+        3
+      ],
+      "to": [
+        4,
+        14,
+        4
+      ],
+      "faces": {
+        "north": {
+          "texture": "#brass",
+          "uv": [
+            7.5,
+            7.5,
+            8.5,
+            8.5
+          ]
+        },
+        "south": {
+          "texture": "#brass",
+          "uv": [
+            7.5,
+            7.5,
+            8.5,
+            8.5
+          ]
+        },
+        "east": {
+          "texture": "#brass",
+          "uv": [
+            7.5,
+            7.5,
+            8.5,
+            8.5
+          ]
+        },
+        "west": {
+          "texture": "#brass",
+          "uv": [
+            7.5,
+            7.5,
+            8.5,
+            8.5
+          ]
+        },
+        "up": {
+          "texture": "#brass",
+          "uv": [
+            7.5,
+            7.5,
+            8.5,
+            8.5
+          ]
+        },
+        "down": {
+          "texture": "#brass",
+          "uv": [
+            7.5,
+            7.5,
+            8.5,
+            8.5
+          ]
+        }
+      }
+    },
+    {
+      "name": "truck_detail_plate_bolt",
+      "from": [
+        3,
+        13,
+        12
+      ],
+      "to": [
+        4,
+        14,
+        13
+      ],
+      "faces": {
+        "north": {
+          "texture": "#brass",
+          "uv": [
+            7.5,
+            7.5,
+            8.5,
+            8.5
+          ]
+        },
+        "south": {
+          "texture": "#brass",
+          "uv": [
+            7.5,
+            7.5,
+            8.5,
+            8.5
+          ]
+        },
+        "east": {
+          "texture": "#brass",
+          "uv": [
+            7.5,
+            7.5,
+            8.5,
+            8.5
+          ]
+        },
+        "west": {
+          "texture": "#brass",
+          "uv": [
+            7.5,
+            7.5,
+            8.5,
+            8.5
+          ]
+        },
+        "up": {
+          "texture": "#brass",
+          "uv": [
+            7.5,
+            7.5,
+            8.5,
+            8.5
+          ]
+        },
+        "down": {
+          "texture": "#brass",
+          "uv": [
+            7.5,
+            7.5,
+            8.5,
+            8.5
+          ]
+        }
+      }
+    },
+    {
+      "name": "truck_detail_plate_bolt",
+      "from": [
+        12,
+        13,
+        3
+      ],
+      "to": [
+        13,
+        14,
+        4
+      ],
+      "faces": {
+        "north": {
+          "texture": "#brass",
+          "uv": [
+            7.5,
+            7.5,
+            8.5,
+            8.5
+          ]
+        },
+        "south": {
+          "texture": "#brass",
+          "uv": [
+            7.5,
+            7.5,
+            8.5,
+            8.5
+          ]
+        },
+        "east": {
+          "texture": "#brass",
+          "uv": [
+            7.5,
+            7.5,
+            8.5,
+            8.5
+          ]
+        },
+        "west": {
+          "texture": "#brass",
+          "uv": [
+            7.5,
+            7.5,
+            8.5,
+            8.5
+          ]
+        },
+        "up": {
+          "texture": "#brass",
+          "uv": [
+            7.5,
+            7.5,
+            8.5,
+            8.5
+          ]
+        },
+        "down": {
+          "texture": "#brass",
+          "uv": [
+            7.5,
+            7.5,
+            8.5,
+            8.5
+          ]
+        }
+      }
+    },
+    {
+      "name": "truck_detail_plate_bolt",
+      "from": [
+        12,
+        13,
+        12
+      ],
+      "to": [
+        13,
+        14,
+        13
+      ],
+      "faces": {
+        "north": {
+          "texture": "#brass",
+          "uv": [
+            7.5,
+            7.5,
+            8.5,
+            8.5
+          ]
+        },
+        "south": {
+          "texture": "#brass",
+          "uv": [
+            7.5,
+            7.5,
+            8.5,
+            8.5
+          ]
+        },
+        "east": {
+          "texture": "#brass",
+          "uv": [
+            7.5,
+            7.5,
+            8.5,
+            8.5
+          ]
+        },
+        "west": {
+          "texture": "#brass",
+          "uv": [
+            7.5,
+            7.5,
+            8.5,
+            8.5
+          ]
+        },
+        "up": {
+          "texture": "#brass",
+          "uv": [
+            7.5,
+            7.5,
+            8.5,
+            8.5
+          ]
+        },
+        "down": {
+          "texture": "#brass",
+          "uv": [
+            7.5,
+            7.5,
+            8.5,
+            8.5
+          ]
         }
       }
     }
-  ]
+  ],
+  "ambientocclusion": true,
+  "parent": "minecraft:block/block"
 }

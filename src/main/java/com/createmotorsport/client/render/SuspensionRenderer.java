@@ -24,7 +24,7 @@ import software.bernie.geckolib.renderer.GeoBlockRenderer;
 public class SuspensionRenderer extends GeoBlockRenderer<SuspensionBlockEntity> {
     private static final float SPIN_SIGN = 1.0F;
     private static final float STEER_SIGN = 1.0F;
-    private static final float CAMBER_RENDER_SIGN = -1.0F; // which sign leans when inward
+    private static final float CAMBER_RENDER_SIGN = -1.0F;
 
     private static final float DROP_HEIGHT = 0.5F;
 
@@ -32,7 +32,6 @@ public class SuspensionRenderer extends GeoBlockRenderer<SuspensionBlockEntity> 
     private static final float HUB_X = 8.0F / 16F;
     private static final float HUB_Y = 1.0F / 16F;
 
-    // forward is -x, left is +z. Suspension art doesnt move with the fore/aft offset
     private static Vector3f hub(SuspensionBlockEntity be, WheelSide side) {
         float half = (float) be.trackHalfWidth();
         float ahead = (float) be.wheelOffset();
@@ -81,16 +80,15 @@ public class SuspensionRenderer extends GeoBlockRenderer<SuspensionBlockEntity> 
 
         float raiseOffset = (float) (SuspensionModel.hubRaise(be, side, partialTicks) * SuspensionModel.HUB_TRAVEL);
         float deploy = be.getLerpedDeploy(side, partialTicks);
-        float dropOffset = (1.0F - deploy) * DROP_HEIGHT; // starts high, eases to 0
+        float dropOffset = (1.0F - deploy) * DROP_HEIGHT;
         float spin = be.getLerpedAngle(side, partialTicks);
         float steer = be.getLerpedSteer(side, partialTicks);
 
-        // flip one tire so its not inside out
         boolean flip = side == WheelSide.LEFT;
 
         ms.pushPose();
         ms.translate(hub.x, hub.y + raiseOffset + dropOffset, hub.z);
-        ms.mulPose(Axis.YP.rotation(steer * STEER_SIGN)); // steering yaw
+        ms.mulPose(Axis.YP.rotation(steer * STEER_SIGN));
         if (flip) {
             ms.mulPose(Axis.YP.rotation((float) Math.PI));
         }
@@ -101,7 +99,6 @@ public class SuspensionRenderer extends GeoBlockRenderer<SuspensionBlockEntity> 
         }
         ms.mulPose(Axis.ZP.rotation(spin * SPIN_SIGN * (flip ? -1.0F : 1.0F)));
 
-        // Tire's own orientation offset (aero tires default to a 90-deg X rotation)
         Vec3 rot = tire.rotation();
         ms.mulPose(Axis.XP.rotation((float) Math.toRadians(rot.x)));
         ms.mulPose(Axis.YP.rotation((float) Math.toRadians(rot.y)));
@@ -136,7 +133,7 @@ public class SuspensionRenderer extends GeoBlockRenderer<SuspensionBlockEntity> 
             case SOUTH -> 90.0F;
             case WEST -> 0.0F;
             case NORTH -> 270.0F;
-            default -> 180.0F; // EAST
+            default -> 180.0F;
         };
     }
 

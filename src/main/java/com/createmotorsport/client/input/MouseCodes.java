@@ -1,6 +1,5 @@
 package com.createmotorsport.client.input;
 
-// Synthetic keycodes for mouse movement
 public final class MouseCodes {
     private MouseCodes() {}
 
@@ -9,10 +8,10 @@ public final class MouseCodes {
 
     private static final int AXIS_OFF = 20;
 
-    public static final int AXIS_X_POS = BASE + AXIS_OFF;     // move right
-    public static final int AXIS_X_NEG = BASE + AXIS_OFF + 1; // move left
-    public static final int AXIS_Y_POS = BASE + AXIS_OFF + 2; // move down
-    public static final int AXIS_Y_NEG = BASE + AXIS_OFF + 3; // move up
+    public static final int AXIS_X_POS = BASE + AXIS_OFF;
+    public static final int AXIS_X_NEG = BASE + AXIS_OFF + 1;
+    public static final int AXIS_Y_POS = BASE + AXIS_OFF + 2;
+    public static final int AXIS_Y_NEG = BASE + AXIS_OFF + 3;
 
     public static boolean isMouseCode(int code) { return code >= BASE && code < BASE + RANGE; }
 
@@ -22,10 +21,9 @@ public final class MouseCodes {
         return o >= AXIS_OFF && o < AXIS_OFF + 4;
     }
 
-    // yes it is
     public static boolean isAnalog(int code) { return isAxis(code); }
 
-    public static int axisOf(int code) { return ((code - BASE - AXIS_OFF) >= 2) ? 1 : 0; } // 0 = X, 1 = Y
+    public static int axisOf(int code) { return ((code - BASE - AXIS_OFF) >= 2) ? 1 : 0; }
 
     public static boolean axisPositive(int code) { return ((code - BASE - AXIS_OFF) & 1) == 0; }
 

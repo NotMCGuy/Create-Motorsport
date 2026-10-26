@@ -1,6 +1,9 @@
 {
   "replace": false,
   "values": [
-    "minecraft:lava"
+    "minecraft:lava",
+    "#createmotorsport:petrol",
+    "#createmotorsport:gasoline",
+    "#createmotorsport:diesel"
   ]
 }

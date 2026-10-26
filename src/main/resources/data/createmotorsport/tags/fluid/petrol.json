@@ -1,0 +1,13 @@
+{
+  "replace": false,
+  "values": [
+    {
+      "id": "#c:petrol",
+      "required": false
+    },
+    {
+      "id": "#forge:petrol",
+      "required": false
+    }
+  ]
+}

@@ -121,3 +121,11 @@ A collaborative project to bring Motorsports into the world of Create!
 # stop your mod loading on the server for example.
 #[features.${mod_id}]
 #openGLVersion="[3.2,)"
+
+# Client-local audio enhancement; servers and clients can run without it.
+[[dependencies.${mod_id}]]
+    modId="snassets_engines"
+    type="optional"
+    versionRange="[1.0.1,)"
+    ordering="AFTER"
+    side="CLIENT"

@@ -12,7 +12,7 @@ public final class HoverTip {
 
     private static final int MAX_WIDTH = 160;
     private static final int PAD = 4;
-    private static final int OFFSET = 10; // offset from cursor
+    private static final int OFFSET = 10;
     private static final int Z = 400;
 
     private HoverTip() {
@@ -37,7 +37,6 @@ public final class HoverTip {
         int w = textW + PAD * 2;
         int h = lines.size() * font.lineHeight - 1 + PAD * 2;
 
-        // starts right unless it doesnt have room then its left of cursor
         int x = mx + OFFSET + w <= g.guiWidth() ? mx + OFFSET : Math.max(2, mx - OFFSET - w);
         int y = Math.max(2, Math.min(my - OFFSET, g.guiHeight() - h - 2));
 

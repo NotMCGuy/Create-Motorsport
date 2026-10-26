@@ -4,18 +4,13 @@ import com.createmotorsport.physics.spec.TireSpec;
 import com.createmotorsport.Config;
 import net.minecraft.util.Mth;
 
-/**
- * Shared tyre maths for the four models in this folder
- * stepSpin() advances the wheel's spin against drive, brake and the tyre each substep
- */
 public final class TireModel {
 
-    private static final double REST_OMEGA = 0.05; // rad/s, about 0.13 km/h at our wheel size
+    private static final double REST_OMEGA = 0.05;
 
     private TireModel() {
     }
 
-    // normalize force response to slip ratio, odd function, |f| <= 1
     public static double slipCurve(double slip, double b, double c, double e) {
         double bx = b * slip;
         return Math.sin(c * Math.atan(bx * (1.0 - e) + e * Math.atan(bx)));
@@ -31,19 +26,11 @@ public final class TireModel {
 
 
 
-    /** Longitudinal Force (N)
-     * @param normalForce -> current load on the tire from suspension (N)
-     * @param surfaceMu -> friction coefficient of the block under the tire, from Sable
-     * @param wheelSpeed -> omega * radius, contact patch speed (m/s)
-     * @param groundSpeed -> longitudinal velocity of the hub over the ground (m/s)
-     * @param spec -> the tire tier (curve shape + base grip)
-     */
     public static double longitudinalForce(double normalForce, double surfaceMu, double wheelSpeed, double groundSpeed, TireSpec spec) {
         double slipRatio = (wheelSpeed - groundSpeed) / Math.max(Math.abs(groundSpeed), 2.0);
         return normalForce * surfaceMu * spec.grip() * slipCurve(slipRatio, spec.pacejkaB(), spec.pacejkaC(), spec.pacejkaE());
     }
 
-    // stop moving when still, based on how offroad seems to do it
     private static final double ROLL_RESIST_SMOOTH = 0.5;
 
     public static double rollingResistance(double coefficient, double normalForce, double groundSpeed) {
@@ -51,11 +38,6 @@ public final class TireModel {
                 * Mth.clamp(groundSpeed / ROLL_RESIST_SMOOTH, -1.0, 1.0);
     }
 
-    /** Clamps a pair of impulses from each side to the friction ellipse
-    * maxImpulse = N * mu * dt, same thing that Rapier does in DynamicRayCastVehicleController for the sliding check
-    * Longitudinal is weighted 0.5, Bullet does this fwd_factor that is for braking/driving to feel smoother I think
-    * return is scaled factoer in (0,1] to apply to both impulses; 1 is inside the ellipse
-    */
     public static double frictionEllipseScale(double forwardImpulse, double sideImpulse, double maxImpulse) {
         double x = forwardImpulse * Config.FRICTION_ELLIPSE_LONG_WEIGHT.getAsDouble();
         double y = sideImpulse;
@@ -67,7 +49,6 @@ public final class TireModel {
         return maxImpulse / Math.sqrt(lenSq);
     }
 
-    // Nm per rad/s of spin slip, large while the tyre grips and nothing while it slides
     public static double spinCoupling(double tireForce, double radius, double omega, double groundSpeed) {
         double slipOmega = omega - groundSpeed / radius;
         if (Math.abs(slipOmega) <= 1.0e-3) {
@@ -76,20 +57,12 @@ public final class TireModel {
         return Math.max(0.0, tireForce * radius / slipOmega);
     }
 
-    /**
-     * @param tireForce the steady curve's force (N), before relaxation. The relaxed force lags and would pin a wheel
-     *                  whose slip has already collapsed
-     */
     public static double integrateSpin(double omega, double radius, double inertia, double driveTorque,
                                        double brakeTorque, double tireForce, double groundSpeed, double dt) {
         return integrateSpin(omega, radius, inertia, driveTorque, 0.0, Double.NEGATIVE_INFINITY,
                 Double.POSITIVE_INFINITY, brakeTorque, tireForce, groundSpeed, dt);
     }
 
-    /**
-     * @param driveStiffness Nm the drive loses per rad/s the wheel gains this step
-     * @param driveMin       clutch slipping one way, driveMax the other
-     */
     public static double integrateSpin(double omega, double radius, double inertia, double driveTorque,
                                        double driveStiffness, double driveMin, double driveMax,
                                        double brakeTorque, double tireForce, double groundSpeed, double dt) {
@@ -109,7 +82,6 @@ public final class TireModel {
 
     private static final int SPIN_PASSES = 8;
 
-    // retakes the coupling each pass, so the wheel is held back by the same force the car is pushed with
     public static double stepSpin(double omega, double radius, double inertia, double driveTorque,
                                   double driveStiffness, double driveMin, double driveMax, double brakeTorque,
                                   double absOmega, double groundSpeed, double dt, LongForce curve) {

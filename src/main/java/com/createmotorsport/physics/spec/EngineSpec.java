@@ -16,10 +16,10 @@ public record EngineSpec(
         double engineBrakeFraction,
         double engineInertia,
         double finalDrive,
-        double realVehicleMassKg, //
+        double realVehicleMassKg,
         List<TorquePoint> torqueCurve,
         TractionControlSpec tractionControl,
-        double stallRpm, // 0 is idle x 2/5
+        double stallRpm,
         StarterSpec starter
 ) {
 
@@ -37,8 +37,6 @@ public record EngineSpec(
         }
         torqueCurve = List.copyOf(torqueCurve);
     }
-    // we could change this later, but this is based on logs and
-    // subsequent calculations of trying to match the kW output to a realistic example
     private static final double REFERENCE_TORQUE_SCALE = 0.1207;
 
     private static final double REFERENCE_REAL_MASS_KG = 840.0;
@@ -110,8 +108,6 @@ public record EngineSpec(
         return peak;
     }
 
-    // Crank torque (Nm) at full throttle, linear between breakpoints, flat below the 1st and above last point,
-    // nothing at the redline, which may impact keyboard users and need some additional assist there later
     public double torqueAt(double rpm) {
         if (rpm >= this.redlineRpm) {
             return 0.0;

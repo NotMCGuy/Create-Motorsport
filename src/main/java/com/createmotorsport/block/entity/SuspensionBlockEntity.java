@@ -5,6 +5,7 @@ import com.createmotorsport.CreateMotorsport;
 import com.createmotorsport.block.SuspensionBlock;
 import com.createmotorsport.effects.WheelEffects;
 import com.createmotorsport.physics.MassScale;
+import com.createmotorsport.physics.suspension.SuspensionScale;
 import com.createmotorsport.physics.control.SteerAssist;
 import com.createmotorsport.physics.differential.AxleDiff;
 import com.createmotorsport.physics.spec.DifferentialSpec;
@@ -64,22 +65,10 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * One axle and its two wheel corners
- * Sable calls sable$physicsTick each substep, it gathers each CornerInput, runs Corner.step and queues the impulses
- * for AssembledCar to flush. AssembledCar hands it the drive through setDrive
- *
- * HAS TO BE A SABLE ACTOR SO THAT AssembledCar.rebuild FINDS IT
- * see vehicle/AssembledCar for a checklist when adding new kinds of Block Entities for a car
- */
 public class SuspensionBlockEntity extends SmartBlockEntity implements com.createmotorsport.menu.PartPanel, BlockEntitySubLevelActor, GeoBlockEntity,
         Tunable {
 
-    // ==========================================
-    // CONSTANTS / TYPES
-    // ==========================================
 
-    // see ConfiguredDrops
     public static final java.util.Set<String> CONFIGURATION_KEYS = java.util.Set.of(
             "Setup", "Differential", "SetupOverrides", "DifferentialOverrides", "FrontAxle", "Steered", "Controls");
 
@@ -98,12 +87,10 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements com.creat
 
     private static final int LIFT_STEPS_SANITY = 1000;
 
-    // physics and sync
-    private static final double GRAVITY_READ_DIVISOR = 2.1; // this is a magic number from Sable's ServerSubLevel.prePhysicsTick that I need to fix some phantom force in the solver
+    private static final double GRAVITY_READ_DIVISOR = 2.1;
     private static final int SYNC_INTERVAL_TICKS = 2;
     private static final CompoundTag NO_TIRE_OVERRIDES = new CompoundTag();
 
-    // redstone link channels
     public static final SteerChannel[] CHANNELS = SteerChannel.values();
     public static final int CONTROL_SLOT_COUNT = CHANNELS.length * 2;
 
@@ -124,24 +111,20 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements com.creat
             super(REST_LENGTH);
         }
 
-        // interpolation (client)
         double clientSpringLength = REST_LENGTH;
         double lastClientSpringLength = REST_LENGTH;
         double angle;
         double lastAngle;
 
-        // tire placing animation (client), 0 = none, 1 = deployed
         double deploy;
         double lastDeploy;
 
-        // sync
         double syncedOmega;
         double syncedSpringLength = REST_LENGTH;
 
         final WheelEffects.State fx = new WheelEffects.State();
     }
 
-    // redstone link control channels, used by steering menu
     public enum SteerChannel {
         STEER_LEFT("Steer Left"),
         STEER_RIGHT("Steer Right"),
@@ -158,15 +141,12 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements com.creat
         }
     }
 
-    // ==========================================
-    // STATE
-    // ==========================================
 
     private final NonNullList<ItemStack> tires = NonNullList.withSize(2, ItemStack.EMPTY);
     private final WheelState leftWheel = new WheelState();
     private final WheelState rightWheel = new WheelState();
 
-    private boolean frontAxle; //defaults rear for now
+    private boolean frontAxle;
     @Nullable
     private Boolean steered;
 
@@ -179,12 +159,10 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements com.creat
     private final SpecOverrides.Memo<TireSpec> leftCompoundMemo = new SpecOverrides.Memo<>();
     private final SpecOverrides.Memo<TireSpec> rightCompoundMemo = new SpecOverrides.Memo<>();
 
-    // packSetup cache
     private SuspensionSpec resolvedFrom;
     private boolean resolvedFront;
     private SuspensionSpec resolvedPack;
 
-    // Ride height and track as steps
     private int liftSteps;
     private int trackWidthPx = TRACK_DEFAULT_PX;
 
@@ -194,17 +172,17 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements com.creat
     private int cachedWheelCount = 4;
     private double cachedCarSpeed;
     private double cachedGravity = Gravity.DEFAULT;
-    private double cachedWheelbase;                          //wheelbase synced to client for Ackermann
-    private TerrainAssist.Level cachedTerrainAssist = TerrainAssist.Level.NORMAL;  // server only drivers choice for terrain assist
+    private double cachedWheelbase;
+    private TerrainAssist.Level cachedTerrainAssist = TerrainAssist.Level.NORMAL;
     private boolean driftDiffMode;
     private final Corner.Modes modes = new Corner.Modes();
 
-    // drive, brake and steering
     private final AxleDiff drive = new AxleDiff();
     private long driveTorqueGameTime = Long.MIN_VALUE;
     private double brake01;
     private final AxleSteering steering = new AxleSteering();
     private final ForceTotal forceTotal = new ForceTotal();
+    private final Vector3d lastPhysicsScale = new Vector3d(1.0);
 
     private final NonNullList<ItemStack> controlItems = NonNullList.withSize(CONTROL_SLOT_COUNT, ItemStack.EMPTY);
     private final SimpleContainer controls = new SimpleContainer(CONTROL_SLOT_COUNT) {
@@ -220,18 +198,14 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements com.creat
     };
     private final LinkReceivers links = new LinkReceivers(this, controls, CHANNELS.length,
             i -> channelSlotA(CHANNELS[i]), i -> channelSlotB(CHANNELS[i]));
-    private double driverSteer; // -15 to 15, + is left
-    private double driverBrake; // 0 to 15
+    private double driverSteer;
+    private double driverBrake;
     private long driverControlTime = Long.MIN_VALUE;
 
-    // sync and client
     private int syncCooldown;
     private boolean syncDirty;
     private final AnimatableInstanceCache animationCache = GeckoLibUtil.createInstanceCache(this);
 
-    // ==========================================
-    // CONSTRUCTION / LIFECYCLE
-    // ==========================================
 
     public SuspensionBlockEntity(BlockPos pos, BlockState state) {
         super(CreateMotorsport.SUSPENSION_BLOCK_ENTITY.get(), pos, state);
@@ -269,9 +243,6 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements com.creat
         super.onChunkUnloaded();
     }
 
-    // ==========================================
-    // PART SCREEN / SETUP
-    // ==========================================
 
     @Override
     public com.createmotorsport.menu.PartKind partKind() {
@@ -301,19 +272,18 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements com.creat
         return frontAxle;
     }
 
-    // which end of the car this axle is on, for the wheelbase
     public void toggleAxleEnd() {
         if (level == null || level.isClientSide) {
             return;
         }
-        frontAxle = !frontAxle;
+        frontAxle = !isFrontAxle();
         refreshSetup();
         setChanged();
         sendData();
     }
 
     public boolean isSteered() {
-        return steered != null ? steered : frontAxle;
+        return steered != null ? steered : isFrontAxle();
     }
 
     public void toggleSteering() {
@@ -325,7 +295,6 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements com.creat
         sendData();
     }
 
-    // Driven as in receives torque from the engine, not as in if a player is driving
     public void toggleDriven() {
         if (level == null || level.isClientSide) {
             return;
@@ -377,7 +346,7 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements com.creat
 
     public boolean isDriven() {
         SuspensionSpec spec = this.setup != null ? this.setup : packSetup();
-        return spec.drivenOr(!frontAxle);
+        return spec.drivenOr(!isFrontAxle());
     }
 
     public SuspensionSpec packSetup() {
@@ -390,10 +359,10 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements com.creat
         if (pack.driven().isPresent()) {
             return pack;
         }
-        if (pack != resolvedFrom || frontAxle != resolvedFront) {
+        if (pack != resolvedFrom || isFrontAxle() != resolvedFront) {
             resolvedFrom = pack;
-            resolvedFront = frontAxle;
-            resolvedPack = pack.withDriven(!frontAxle);
+            resolvedFront = isFrontAxle();
+            resolvedPack = pack.withDriven(!isFrontAxle());
         }
         return resolvedPack;
     }
@@ -465,9 +434,6 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements com.creat
         return this.level == null ? null : this.level.registryAccess();
     }
 
-    // ==========================================
-    // RIDE HEIGHT / TRACK / WHEEL OFFSET
-    // ==========================================
 
     public boolean isLiftOverridden() {
         return SpecOverrides.isSet(setupSlot.overrides(), "ride_height");
@@ -489,7 +455,6 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements com.creat
         return this.trackWidthPx / 32.0;
     }
 
-    // fore/aft adjustment requested by someone for building purposes. Wont line up with the axle unless you replace the art with something offset the same way
     public double wheelOffset() {
         return Mth.clamp(setup.wheelOffset(), -SuspensionSpec.MAX_WHEEL_OFFSET, SuspensionSpec.MAX_WHEEL_OFFSET);
     }
@@ -508,7 +473,6 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements com.creat
         return Math.round(steps * LIFT_STEP_HEIGHT * 1.0e6) / 1.0e6;
     }
 
-    // in steps, 24 for every shipped setup
     private int maxLiftSteps() {
         return Math.max(0, (int) Math.round(setup.maxRideHeight() / LIFT_STEP_HEIGHT));
     }
@@ -517,9 +481,6 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements com.creat
         return REST_LENGTH + liftHeight();
     }
 
-    // ==========================================
-    // GAME TICK
-    // ==========================================
 
     @Override
     public void tick() {
@@ -533,14 +494,12 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements com.creat
         }
         AssembledCar car = CarAssembler.of(this);
         if (car != null && car.steps(this)) {
-            // after the driver, so steer and brake are this tick's
             car.gameTick(level);
             return;
         }
         gameStep();
     }
 
-    // the car's step calls it, or the tick does for a loose axle
     public void gameStep() {
         refreshSetup();
         Direction facing = getFacing();
@@ -567,7 +526,6 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements com.creat
         steering.chase(maxSteerDegrees());
 
 
-        // torque stops when engine stops ticking
         if (level.getGameTime() - driveTorqueGameTime > 3) {
             drive.clearDrive();
         }
@@ -614,9 +572,6 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements com.creat
     }
 
 
-    // ==========================================
-    // DRIVER CONTROLS / REDSTONE
-    // ==========================================
 
     public void setDriverSteering(double steer, double brake) {
         if (level == null || level.isClientSide) {
@@ -647,30 +602,22 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements com.creat
         links.remove();
     }
 
-    // ==========================================
-    // STEERING
-    // ==========================================
 
-    // at the centerline, the wheels sit either side of it (see ackermannK)
     public double maxSteerDegrees() {
         return setup.maxSteerDegrees();
     }
 
-    // k in cot(inner) - cot(outer) = k, from the setup's percentage and the car's proportions. 0 wheelbase is parallel
     public double ackermannK() {
         double wb = cachedWheelbase;
         return setup.wheelSteerK(wb > 1.0e-6 ? trackWidth() / wb : 0.0);
     }
 
-    // zero until this strut is part of a car
     public double getWheelbase() {
         return cachedWheelbase;
     }
 
-    // see SteerAssist
     private double frontSlipLock() {
-        // the assist reads front tyres, so a steered rear axle gets full lock for now
-        if (steering.assistOff() || level == null || !frontAxle) {
+        if (steering.assistOff() || level == null || !isFrontAxle()) {
             return 1.0;
         }
         Vec3 vel = Sable.HELPER.getVelocity(level, Vec3.atCenterOf(worldPosition));
@@ -680,21 +627,15 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements com.creat
         return SteerAssist.frontLock(steering.angle(), fittedCorners(), maxSteerDegrees());
     }
 
-    // server-side, current steer angle of this axle (rad)
     public double getSteerAngleRad() {
         return steering.angle();
     }
 
-    // see Ackermann. A rear axle steers the other way for the same turn, so it's mirrored there and back, or its
-    // inner and outer wheels swap
     public double wheelSteerAngle(double base, WheelSide side) {
         return frontAxle ? Ackermann.wheelAngle(base, ackermannK(), side == WheelSide.RIGHT)
                 : -Ackermann.wheelAngle(-base, ackermannK(), side == WheelSide.RIGHT);
     }
 
-    // ==========================================
-    // PHYSICS SUBSTEP / DRIVE
-    // ==========================================
 
     @Override
     public void sable$physicsTick(ServerSubLevel subLevel, RigidBodyHandle handle, double timeStep) {
@@ -702,6 +643,21 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements com.creat
             return;
         }
         Pose3d pose = subLevel.logicalPose();
+        if (!SuspensionScale.valid(pose.scale())) {
+            forceTotal.reset();
+            return;
+        }
+        if (lastPhysicsScale.distanceSquared(pose.scale()) > 1.0e-12) {
+            for (WheelState wheel : new WheelState[]{leftWheel, rightWheel}) {
+                wheel.unsprungVel = 0.0;
+                wheel.prevRigidLength = Double.NaN;
+                wheel.tireDeflection = 0.0;
+                wheel.contactLoad = 0.0;
+                wheel.assist.lift = 0.0;
+            }
+            forceTotal.reset();
+            lastPhysicsScale.set(pose.scale());
+        }
         MassData massData = subLevel.getMassTracker();
         if (massData.isInvalid()) {
             return;
@@ -726,7 +682,7 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements com.creat
         Corner.Axle axle = new Corner.Axle(setup, restLength(), MAX_TRAVEL, MAX_DROOP_RENDER, GROUND_MARGIN,
                 brake01, drive.torque() * traction, drive.stiffness() * traction, drive.min() * traction,
                 drive.max() * traction, cachedCarMass, cachedWheelCount, sprungMassPerWheel, cachedGravity,
-                cachedTerrainAssist, cachedCarSpeed);
+                cachedTerrainAssist, cachedCarSpeed, pose.scale().y());
         boolean split = car != null && axle.driveStiffness() > 0.0;
         boolean leftFitted = hasTire(WheelSide.LEFT);
         boolean rightFitted = hasTire(WheelSide.RIGHT);
@@ -738,7 +694,6 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements com.creat
         queued |= stepWheel(WheelSide.RIGHT, subLevel, pose, massData, right, timeStep);
         drive.stepped(traction, diffTorque);
         if (split) {
-            // the car splits the drive across every driven wheel once they have all stepped, then calls finishDrive
             car.queueSplit(this, drive.wheels(axle, diffTorque,
                     leftFitted ? leftWheel : null, leftFitted ? wheelInertia(WheelSide.LEFT) : 0.0,
                     rightFitted ? rightWheel : null, rightFitted ? wheelInertia(WheelSide.RIGHT) : 0.0));
@@ -750,14 +705,19 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements com.creat
         }
     }
 
-    // steer assist is synced because the client chases the steer angle too
     private void mirrorAids(CarState.Aids aids) {
         cachedTerrainAssist = aids.terrainAssist();
         driftDiffMode = aids.driftDiff();
-        if (steering.setAssistOff(aids.steerAssistOff())) {
+        if (steering.setAssistOff(steerAssistOff(aids.steerAssistOff()))) {
             syncDirty = true;
         }
     }
+
+    protected boolean steerAssistOff(boolean requested) { return requested; }
+    protected double camberSign(WheelSide side) { return side == WheelSide.LEFT ? 1.0 : -1.0; }
+    protected double limitBrakeTorque(double requested, double radius, double inertia, double omega,
+                                      double driveTorque, double previousForce, double speed,
+                                      double normalForce, double gripForce, double dt) { return requested; }
 
     private boolean stepWheel(WheelSide side, ServerSubLevel subLevel, Pose3d pose, MassData massData,
                               Corner.Axle axle, double dt) {
@@ -768,8 +728,8 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements com.creat
             wheel.springLength = Mth.lerp(0.5, wheel.springLength, restLength());
             return false;
         }
-        CornerOutput out = Corner.step(axle, side == WheelSide.LEFT ? 1.0 : -1.0, gathered.in(), wheel,
-                modes, dt);
+        CornerOutput out = Corner.step(axle, camberSign(side), gathered.in(), wheel,
+                modes, dt, this::limitBrakeTorque);
         if (out == null) {
             if (!wheel.grounded) {
                 wheel.fx.smokeSeverity = 0.0;
@@ -800,7 +760,6 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements com.creat
                 .add(sideDir.getStepX() * trackHalfWidth(), 0.0, sideDir.getStepZ() * trackHalfWidth());
         Vector3d hardpointJoml = JOMLConversion.toJOML(hardpoint);
 
-        // Ackermann geometry on the steering now, so the outer and inner wheels have to take their own angles (see wheelSteerAngle)
         double wheelSteer = wheelSteerAngle(steering.angle(), side);
         Vector3d forward = new Vector3d(facing.getStepX(), 0.0, facing.getStepZ()).rotateY(wheelSteer);
         Direction rightDir = facing.getClockWise();
@@ -827,19 +786,20 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements com.creat
         }
 
         Vector3d velocity = Sable.HELPER.getVelocity(level, subLevel, hardpointJoml, new Vector3d());
-        double airborneVel = velocity.y;
-        velocity.y += cachedGravity * dt / GRAVITY_READ_DIVISOR; // Sable does this same subtraction in ServerSubLevel.prePhysicsTick but doesnt expose it
+        double airborneVel = pose.transformNormalInverse(new Vector3d(velocity)).y;
+        velocity.y += cachedGravity * dt / GRAVITY_READ_DIVISOR;
         Vector3d localVelocity = pose.transformNormalInverse(velocity);
         double hardpointVel = velocity.y;
 
-        // this is the exact jacobian denominator. I was using this to size the spring and scale the contact load cap before, but that needs to be
-        // the corners static share
-        double invNormalMass = massData.getInverseNormalMass(hardpointJoml, OrientedBoundingBox3d.UP);
+        Vector3d physicalHardpoint = SuspensionScale.point(massData, hardpointJoml, pose.scale());
+        boolean scaledInertia = com.createmotorsport.physics.world.PocketSizeCompat.available();
+        Vector3d responsePoint = scaledInertia ? hardpointJoml : physicalHardpoint;
+        Vector3d responseScale = scaledInertia ? new Vector3d(1.0) : pose.scale();
+        double invNormalMass = massData.getInverseNormalMass(responsePoint, OrientedBoundingBox3d.UP);
         double rollMass = Config.TIRE_COMPLIANCE.get()
-                ? rollResponseMass(massData, hardpointJoml, invNormalMass) : Double.NaN;
-        double invAxleMass = massData.getInverseNormalMass(hardpointJoml, axle);
+                ? rollResponseMass(massData, responsePoint, invNormalMass, responseScale) : Double.NaN;
+        double invAxleMass = massData.getInverseNormalMass(responsePoint, axle);
 
-        // slope correction (got it from Bullet's clipped_inv_contact_dot_suspension)
         Vector3d hitNormal = new Vector3d(cast.normal().getStepX(), cast.normal().getStepY(), cast.normal().getStepZ());
         if (cast.hitSubLevel() != null) {
             cast.hitSubLevel().logicalPose().transformNormal(hitNormal);
@@ -859,7 +819,6 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements com.creat
                 surface, surfaceMu,
                 airborneVel, hardpointVel,
                 localVelocity.dot(forward), localVelocity.dot(axle),
-                // hitNormal is already in body space here, so the velocity has to be rotated the same way before projecting
                 localVelocity.dot(hitNormal), localVelocity.length(),
                 hitNormal.y,
                 invNormalMass, rollMass, invAxleMass,
@@ -873,14 +832,16 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements com.creat
                              MassData massData, double dt) {
         Vector3d hardpointJoml = gathered.hardpoint();
         Vector3d springImpulse = new Vector3d(gathered.normal()).mul(out.springForce() * dt);
-        forceTotal.applyImpulseAtPoint(massData, hardpointJoml, springImpulse);
+        Vector3d physicalHardpoint = SuspensionScale.point(massData, hardpointJoml, pose.scale());
+        forceTotal.applyImpulseAtPoint(massData, physicalHardpoint, springImpulse);
 
         if (out.downforce() > 0.0) {
-            forceTotal.applyImpulseAtPoint(massData, hardpointJoml, new Vector3d(0.0, -out.downforce() * dt, 0.0));
+            forceTotal.applyImpulseAtPoint(massData, physicalHardpoint, new Vector3d(0.0, -out.downforce() * dt, 0.0));
         }
 
         Vector3d contactPoint = new Vector3d(hardpointJoml).sub(0.0, wheel.springLength, 0.0);
-        forceTotal.applyImpulseAtPoint(massData, contactPoint, new Vector3d(gathered.forward()).mul(out.forwardImpulse()));
+        forceTotal.applyImpulseAtPoint(massData, SuspensionScale.point(massData, contactPoint, pose.scale()),
+                new Vector3d(gathered.forward()).mul(out.forwardImpulse()));
 
         Vector3d sidePoint = new Vector3d(contactPoint);
         if (massData.getCenterOfMass() != null) {
@@ -888,18 +849,17 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements com.creat
             double rollInfluence = setup.rollInfluence();
             sidePoint.y -= heightAboveCom * (1.0 - rollInfluence);
         }
-        forceTotal.applyImpulseAtPoint(massData, sidePoint, new Vector3d(gathered.axle()).mul(out.sideImpulse()));
+        forceTotal.applyImpulseAtPoint(massData, SuspensionScale.point(massData, sidePoint, pose.scale()),
+                new Vector3d(gathered.axle()).mul(out.sideImpulse()));
 
         CornerInput in = gathered.in();
         WheelEffects.record(level, wheel.fx, wheel, pose, contactPoint, gathered.forward(), gathered.axle(),
                 in.vLon(), in.vLat(), in.radius(), gathered.cast());
     }
 
-    // The roll mode's mass at one corner, in kg
-    // Not responseMass. The issue is pencil shaped cars diverging real badly in roll mode
-    private double rollResponseMass(MassData massData, Vector3d hardpointJoml, double invCorner) {
+    private double rollResponseMass(MassData massData, Vector3d hardpointJoml, double invCorner, Vector3d scale) {
         Vector3d axleCentre = JOMLConversion.toJOML(axleCentre());
-        double invMid = massData.getInverseNormalMass(axleCentre, OrientedBoundingBox3d.UP);
+        double invMid = massData.getInverseNormalMass(SuspensionScale.point(massData, axleCentre, scale), OrientedBoundingBox3d.UP);
         return Corner.rollResponseMass(invCorner, invMid, cachedWheelCount);
     }
 
@@ -907,7 +867,6 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements com.creat
         return forceTotal;
     }
 
-    // written by AssembledCar's driveline before this axle steps
     public void setDrive(double torquePerWheel, double stiffnessPerWheel, double min, double max) {
         drive.setDrive(torquePerWheel, stiffnessPerWheel, min, max);
         if (level != null) {
@@ -915,17 +874,14 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements com.creat
         }
     }
 
-    // see AxleDiff.passed
     public double getDriveTorquePerWheel() {
         return drive.passed();
     }
 
-    // each wheel's weight in the mean, and last substep's mean
     public void setDriveSplit(double weight, double mean) {
         drive.setSplit(weight, mean);
     }
 
-    // after the car's split, or at once on an axle it doesn't split
     public void finishDrive(double dt) {
         boolean leftFitted = hasTire(WheelSide.LEFT);
         boolean rightFitted = hasTire(WheelSide.RIGHT);
@@ -939,9 +895,6 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements com.creat
         return FittedTire.inertia(getTire(side), cachedCarMass, REST_LENGTH);
     }
 
-    // ==========================================
-    // TIRES
-    // ==========================================
 
     public ItemStack getTire(WheelSide side) {
         return tires.get(side.ordinal());
@@ -980,7 +933,6 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements com.creat
         return getTire(side).get(OffroadDataComponents.TIRE) != null;
     }
 
-    // what the driveline and traction control read
     public List<CornerState> fittedCorners() {
         List<CornerState> out = new ArrayList<>(2);
         for (WheelSide side : WheelSide.values()) {
@@ -1014,7 +966,6 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements com.creat
         return 0.0;
     }
 
-    // see SpecOverrides.Memo
     public TireSpec getTireSpec(WheelSide side) {
         ItemStack stack = getTire(side);
         return (side == WheelSide.LEFT ? leftCompoundMemo : rightCompoundMemo).get(SpecCodecs.TIRE_SPEC,
@@ -1026,20 +977,15 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements com.creat
         return FittedTire.foreignDesignLoad(this.sprungMassPerWheel, cachedGravity);
     }
 
-    // for SpecDump
     public double tireRate(ItemStack stack, double radius) {
         return FittedTire.verticalRate(stack, radius, this.sprungMassPerWheel, cachedGravity);
     }
 
-    // ==========================================
-    // READOUTS FOR THE CAR / TELEMETRY / HUD
-    // ==========================================
 
     public WheelTelemetry getTelemetry(WheelSide side) {
         return WheelTelemetry.of(getWheel(side));
     }
 
-    // peak Mu for the HUD grip readout
     public double getPeakMu(WheelSide side) {
         return getWheel(side).peakMu;
     }
@@ -1056,8 +1002,6 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements com.creat
         return sprungMassPerWheel;
     }
 
-    // omega*dt of the corner's body mode. Over 2 the integrator cant hold it,
-    // and if over Corner.MAX_BODY_MODE_OMEGA_DT this axle substeps to compensate
     public double getBodyModeOmegaDt() {
         return modes.bodyOmegaDt;
     }
@@ -1066,7 +1010,6 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements com.creat
         return modes.rollOmegaDt;
     }
 
-    // the frequency the solver ran, after UnsprungSolver's detune
     public double effectiveSpringFreqHz() {
         return UnsprungSolver.detunedFreq(setup.naturalFreqHz(), modes.bodyOmegaDt, modes.rollOmegaDt,
                 Corner.MAX_BODY_MODE_OMEGA_DT);
@@ -1085,9 +1028,6 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements com.creat
         return side == WheelSide.LEFT ? leftWheel : rightWheel;
     }
 
-    // ==========================================
-    // RENDERING (CLIENT)
-    // ==========================================
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
@@ -1117,7 +1057,6 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements com.creat
         return (float) wheelSteerAngle(getLerpedSteer(partialTicks), side);
     }
 
-    // Tire placement animation
     public float getLerpedDeploy(WheelSide side, float partialTicks) {
         WheelState w = getWheel(side);
         return (float) Mth.lerp(partialTicks, w.lastDeploy, w.deploy);
@@ -1128,9 +1067,6 @@ public class SuspensionBlockEntity extends SmartBlockEntity implements com.creat
         return new AABB(worldPosition).inflate(2.5, 2.0, 2.5);
     }
 
-    // ==========================================
-    // NBT
-    // ==========================================
 
     @Override
     protected void write(CompoundTag tag, HolderLookup.Provider registries, boolean clientPacket) {

@@ -38,7 +38,6 @@ public class MotorsportPartialModels {
                 .listResources(ROOT, path -> path.getPath().endsWith(".json"))
                 .keySet()
                 .forEach(resource -> {
-                    // assets/<ns>/models/parts/tire/x.json is the model <ns>:parts/tire/x
                     String path = resource.getPath();
                     String modelPath = path.substring("models/".length(), path.length() - ".json".length());
                     ResourceLocation id = ResourceLocation.fromNamespaceAndPath(resource.getNamespace(), modelPath);

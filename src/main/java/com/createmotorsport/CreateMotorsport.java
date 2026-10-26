@@ -148,26 +148,23 @@ public class CreateMotorsport {
     private static final DeferredHolder<DataComponentType<?>, DataComponentType<ResourceLocation>> TIRE_HOLDER =
             DATA_COMPONENTS.register("tire", () -> TIRE);
 
-    private static final float RACING_TIRE_RADIUS = 12.0f / 16.0f;   // Motorsports racing tire
-    private static final float TRUCK_TIRE_RADIUS = 15.5f / 16.0f; // offroad's tire, TireLike.TIRE
-    private static final float SMALL_TIRE_RADIUS = 12.0f / 16.0f; // offroad's small_tire, TireLike.SMALL_TIRE
+    private static final float RACING_TIRE_RADIUS = 12.0f / 16.0f;
+    private static final float TRUCK_TIRE_RADIUS = 15.5f / 16.0f;
+    private static final float SMALL_TIRE_RADIUS = 12.0f / 16.0f;
 
     private static final net.minecraft.world.phys.Vec3 UPRIGHT = net.minecraft.world.phys.Vec3.ZERO;
     private static final net.minecraft.world.phys.Vec3 STAND_UP = new net.minecraft.world.phys.Vec3(90.0, 0.0, 0.0);
 
     public static final DeferredItem<Item> RACING_TIRE = registerTire("racing_tire", 65, RACING_TIRE_RADIUS, UPRIGHT);
 
-    // legacy compat
     public static final DeferredItem<Item> RACING_TIRE_1 = registerTire("racing_tire_1", 20, RACING_TIRE_RADIUS, UPRIGHT);
     public static final DeferredItem<Item> RACING_TIRE_2 = registerTire("racing_tire_2", 36, RACING_TIRE_RADIUS, UPRIGHT);
     public static final DeferredItem<Item> RACING_TIRE_3 = registerTire("racing_tire_3", 65, RACING_TIRE_RADIUS, UPRIGHT);
     public static final DeferredItem<Item> RACING_TIRE_4 = registerTire("racing_tire_4", 117, RACING_TIRE_RADIUS, UPRIGHT);
     public static final DeferredItem<Item> RACING_TIRE_5 = registerTire("racing_tire_5", 210, RACING_TIRE_RADIUS, UPRIGHT);
 
-    // Truck tire
     public static final DeferredItem<Item> TRUCK_TIRE = registerTire("truck_tire", 200, TRUCK_TIRE_RADIUS, STAND_UP);
 
-    // offroad's small_tire art for the small passenger car and motorcycle tyres
     public static final DeferredItem<Item> SMALL_TIRE = registerTire("small_tire", 65, SMALL_TIRE_RADIUS, STAND_UP);
 
     public static final DeferredBlock<EngineBlock> ENGINE_BLOCK = BLOCKS.register(
@@ -328,6 +325,9 @@ public class CreateMotorsport {
             MENUS.register("lap_gate",
                     () -> IMenuTypeExtension.create((id, inv, buf) ->
                             new com.createmotorsport.menu.LapGateMenu(id, inv, buf.readBlockPos())));
+    public static final DeferredItem<Item> EXHAUST_MANIFOLD = ITEMS.registerSimpleItem("exhaust_manifold", new Item.Properties().stacksTo(16));
+    public static final DeferredItem<Item> AIR_INTAKE = ITEMS.registerSimpleItem("air_intake", new Item.Properties().stacksTo(16));
+
     public static final DeferredHolder<SoundEvent, SoundEvent> ENGINE_IDLE = registerSound("engine_idle");
     public static final DeferredHolder<SoundEvent, SoundEvent> ENGINE_LOW = registerSound("engine_low");
     public static final DeferredHolder<SoundEvent, SoundEvent> ENGINE_MID = registerSound("engine_mid");
@@ -339,6 +339,8 @@ public class CreateMotorsport {
                     .withTabsBefore(CreativeModeTabs.REDSTONE_BLOCKS)
                     .icon(() -> ENGINE_BLOCK_ITEM.get().getDefaultInstance())
                     .displayItems((parameters, output) -> {
+                        output.accept(EXHAUST_MANIFOLD.get());
+                        output.accept(AIR_INTAKE.get());
                         output.accept(FUEL_PUMP_ITEM.get());
                         output.accept(FUEL_TANK_ITEM.get());
                         output.accept(com.createmotorsport.trailer.TrailerRegistry.FIFTH_WHEEL.get());
@@ -349,6 +351,7 @@ public class CreateMotorsport {
                         output.accept(com.createmotorsport.trailer.TrailerRegistry.COUPLING_HEAD.get());
                         output.accept(com.createmotorsport.trailer.TrailerRegistry.LANDING_LEGS.get());
                         output.accept(com.createmotorsport.trailer.TrailerRegistry.CONTROL_PANEL.get());
+                        output.accept(com.createmotorsport.trailer.TrailerRegistry.GLOVEBOX.get());
                         output.accept(com.createmotorsport.trailer.TrailerRegistry.LINKER.get());
                         output.accept(ENGINE_BLOCK_ITEM.get());
                         output.accept(PASSENGER_ENGINE_BLOCK_ITEM.get());
@@ -384,7 +387,6 @@ public class CreateMotorsport {
         modEventBus.addListener((net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent event) ->
                 event.registerBlockEntity(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK,
                         FUEL_PUMP_ENTITY.get(), (pump, side) -> pump.fluidAccess));
-        // see Surfaces.checkTags
         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(
                 com.createmotorsport.physics.world.Surfaces::checkTags);
         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(com.createmotorsport.item.FuelNozzleItem::cleanup);
@@ -404,7 +406,6 @@ public class CreateMotorsport {
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
 
 
-        // how offroad applies the wheel mount force-- wheel impulses batched per physics substep and applied right before the step
         SableEventPlatform.INSTANCE.onPhysicsTick((physicsSystem, timeStep) -> {
             com.createmotorsport.vehicle.CarAssembler.endPhysicsSubstep(physicsSystem.getLevel(), timeStep);
         });

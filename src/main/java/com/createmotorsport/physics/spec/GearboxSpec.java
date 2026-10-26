@@ -6,12 +6,9 @@ import java.util.Optional;
 public record GearboxSpec(Type type, List<Double> forwardRatios, double reverseRatio,
                           Optional<Double> finalDrive, boolean semiAuto, double shiftInterruptTime,
                           boolean revMatch, ClutchSpec clutch,
-                          // lives here until a centre diff has its own block
                           TorqueSplitSpec centerDiff,
-                          // a tandem's power divider, same as centerDiff
                           TorqueSplitSpec interAxleDiff) {
 
-    // a torque converter and CVT will be added later too
     public enum Type {
         SEQUENTIAL("sequential");
 

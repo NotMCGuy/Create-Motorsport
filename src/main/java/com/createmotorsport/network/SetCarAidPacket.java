@@ -10,7 +10,6 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-// Client -> server: one of the steering wheel screen's aid buttons
 public record SetCarAidPacket(BlockPos pos, SteeringWheelBlockEntity.Aid aid) implements CustomPacketPayload {
     public static final Type<SetCarAidPacket> TYPE =
             new Type<>(ResourceLocation.fromNamespaceAndPath(CreateMotorsport.MODID, "set_car_aid"));

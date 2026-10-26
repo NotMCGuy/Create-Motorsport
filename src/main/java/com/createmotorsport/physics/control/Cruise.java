@@ -68,7 +68,6 @@ public final class Cruise {
             Step step = step(integral, targetMs, speedMs, authority, dt);
             double demand = step.demand();
 
-            // a little different than regular cruise control because I'm having the drivers accelerating set a higher speed
             if (driverThrottle > demand) {
                 override = true;
                 return driverThrottle;

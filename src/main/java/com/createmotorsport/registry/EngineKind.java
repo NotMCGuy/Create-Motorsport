@@ -43,6 +43,7 @@ public enum EngineKind {
     }
 
     public static EngineSpec engineFallback(ResourceKey<EngineSpec> key, EngineKind kind) {
+        if (key.equals(SpecRegistries.MOTORCYCLE_I4)) return EngineSpec.MOTORCYCLE_I4;
         for (EngineKind k : values()) {
             if (k.engine == key) {
                 return k.engineFallback;
@@ -52,6 +53,7 @@ public enum EngineKind {
     }
 
     public static GearboxSpec gearboxFallback(ResourceKey<GearboxSpec> key, EngineKind kind) {
+        if (key.equals(SpecRegistries.MOTORCYCLE_QUICKSHIFT_6)) return GearboxSpec.MOTORCYCLE_QUICKSHIFT_6;
         for (EngineKind k : values()) {
             if (k.gearbox == key) {
                 return k.gearboxFallback;

@@ -93,8 +93,6 @@ public class LapGateScreen extends AbstractContainerScreen<LapGateMenu> {
         return HEADER_H + (isLinked(gate) ? 4 : 16);
     }
 
-    // -------------------------------------------------------------------------------
-    // GRID / default menu area
 
     private void buildGrid(LapGateBlockEntity gate, int x, int right, int y) {
         addRenderableWidget(new FlatButton(right - 56, y, 56, 14, Component.literal("Rescan"),
@@ -145,8 +143,6 @@ public class LapGateScreen extends AbstractContainerScreen<LapGateMenu> {
         addRenderableWidget(startButton);
     }
 
-    // ----------------------------------------------------------------------------------------
-    // SETUP menu area
 
     private void buildSettings(LapGateBlockEntity gate, int x, int right, int y) {
         int r1 = y + SET_ROW_1 + CTRL_ON_TEXT;
@@ -271,7 +267,6 @@ public class LapGateScreen extends AbstractContainerScreen<LapGateMenu> {
         }
     }
 
-    // ------------------------------------------------------------------------------------
 
 
     @Override

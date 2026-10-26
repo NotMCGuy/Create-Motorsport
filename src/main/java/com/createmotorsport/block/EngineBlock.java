@@ -35,10 +35,13 @@ import org.jetbrains.annotations.Nullable;
 public class EngineBlock extends HorizontalDirectionalBlock implements EntityBlock, IWrenchable {
     public static final MapCodec<EngineBlock> CODEC = simpleCodec(EngineBlock::new);
 
+    public static final BooleanProperty HAS_EXHAUST = BooleanProperty.create("has_exhaust");
+    public static final BooleanProperty HAS_INTAKE = BooleanProperty.create("has_intake");
+
     public EngineBlock(BlockBehaviour.Properties properties) {
         super(properties);
         registerDefaultState(defaultBlockState()
-                .setValue(FACING, Direction.NORTH));
+                .setValue(FACING, Direction.NORTH).setValue(HAS_EXHAUST, false).setValue(HAS_INTAKE, false));
     }
 
     @Override
@@ -48,7 +51,7 @@ public class EngineBlock extends HorizontalDirectionalBlock implements EntityBlo
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING);
+        builder.add(FACING, HAS_EXHAUST, HAS_INTAKE);
     }
 
     @Nullable
@@ -64,6 +67,16 @@ public class EngineBlock extends HorizontalDirectionalBlock implements EntityBlo
 
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        if (stack.is(CreateMotorsport.EXHAUST_MANIFOLD.get()) || stack.is(CreateMotorsport.AIR_INTAKE.get())) {
+            if (!(level.getBlockEntity(pos) instanceof EngineBlockEntity engine)) return ItemInteractionResult.FAIL;
+            int slot = stack.is(CreateMotorsport.EXHAUST_MANIFOLD.get()) ? EngineBlockEntity.SLOT_EXHAUST : EngineBlockEntity.SLOT_INTAKE;
+            if (!engine.getInventory().getItem(slot).isEmpty()) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            if (!level.isClientSide) {
+                engine.getInventory().setItem(slot, stack.copyWithCount(1));
+                if (!player.isCreative()) stack.shrink(1);
+            }
+            return ItemInteractionResult.sidedSuccess(level.isClientSide);
+        }
         if (stack.getItem() instanceof WrenchItem) {
             return ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION;
         }

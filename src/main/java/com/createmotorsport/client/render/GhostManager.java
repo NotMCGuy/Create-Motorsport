@@ -12,10 +12,7 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 
 
-// Client side ghost playback holds the best laps samples and moves a marker along them, loops each lap while 'playing' is true
-//
 public final class GhostManager {
-    // Not a car shaped ghost, but a bright blue box that is easy to see and draw
     private static final double BOX_HALF_WIDTH = 1.6;
     private static final double BOX_HEIGHT = 2.4;
 
@@ -24,7 +21,7 @@ public final class GhostManager {
     private static int sampleTicks = 2;
     private static long startGameTime;
     private static String name = "";
-    private static boolean playing; // ghost is kept stored between races, so it only gets drawns while this is true
+    private static boolean playing;
 
     private GhostManager() {
     }
@@ -74,7 +71,6 @@ public final class GhostManager {
         ps.pushPose();
         ps.translate(pos.x - cam.x, pos.y - cam.y, pos.z - cam.z);
 
-        // Pulsing animation will make it look more interesting and like a ghost
         float pulse = 0.75F + 0.25F * (float) Math.sin((mc.level.getGameTime() + partial) * 0.25);
 
         MultiBufferSource.BufferSource buffers = mc.renderBuffers().bufferSource();

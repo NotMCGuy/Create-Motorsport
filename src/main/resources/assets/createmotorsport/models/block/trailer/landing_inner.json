@@ -2,9 +2,10 @@
   "textures": {
     "metal": "minecraft:block/iron_block",
     "dark": "minecraft:block/gray_concrete",
-    "brass": "minecraft:block/yellow_terracotta",
+    "brass": "minecraft:block/gold_block",
     "screen": "minecraft:block/black_concrete",
-    "particle": "minecraft:block/iron_block"
+    "particle": "#metal",
+    "casing": "minecraft:block/gray_concrete"
   },
   "elements": [
     {
@@ -20,24 +21,131 @@
       ],
       "faces": {
         "north": {
-          "texture": "#metal"
+          "texture": "#metal",
+          "uv": [
+            6.5,
+            0.0,
+            9.5,
+            16.0
+          ]
         },
         "south": {
-          "texture": "#metal"
+          "texture": "#metal",
+          "uv": [
+            6.5,
+            0.0,
+            9.5,
+            16.0
+          ]
         },
         "east": {
-          "texture": "#metal"
+          "texture": "#metal",
+          "uv": [
+            6.5,
+            0.0,
+            9.5,
+            16.0
+          ]
         },
         "west": {
-          "texture": "#metal"
+          "texture": "#metal",
+          "uv": [
+            6.5,
+            0.0,
+            9.5,
+            16.0
+          ]
         },
         "up": {
-          "texture": "#metal"
+          "texture": "#metal",
+          "uv": [
+            6.5,
+            6.5,
+            9.5,
+            9.5
+          ]
         },
         "down": {
-          "texture": "#metal"
+          "texture": "#metal",
+          "uv": [
+            6.5,
+            6.5,
+            9.5,
+            9.5
+          ]
+        }
+      }
+    },
+    {
+      "name": "truck_detail_inner_guide",
+      "from": [
+        7,
+        0,
+        6.375
+      ],
+      "to": [
+        7.5,
+        16,
+        6.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#metal",
+          "uv": [
+            7.75,
+            0.0,
+            8.25,
+            16.0
+          ]
+        },
+        "south": {
+          "texture": "#metal",
+          "uv": [
+            7.75,
+            0.0,
+            8.25,
+            16.0
+          ]
+        },
+        "east": {
+          "texture": "#metal",
+          "uv": [
+            7.9375,
+            0.0,
+            8.0625,
+            16.0
+          ]
+        },
+        "west": {
+          "texture": "#metal",
+          "uv": [
+            7.9375,
+            0.0,
+            8.0625,
+            16.0
+          ]
+        },
+        "up": {
+          "texture": "#metal",
+          "uv": [
+            7.75,
+            7.9375,
+            8.25,
+            8.0625
+          ]
+        },
+        "down": {
+          "texture": "#metal",
+          "uv": [
+            7.75,
+            7.9375,
+            8.25,
+            8.0625
+          ]
         }
       }
     }
-  ]
+  ],
+  "ambientocclusion": true,
+  "parent": "minecraft:block/block"
 }

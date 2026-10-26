@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " I ",
+    "WPW",
+    " I "
+  ],
+  "key": {
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "W": {
+      "item": "minecraft:white_wool"
+    },
+    "P": {
+      "item": "create:fluid_pipe"
+    }
+  },
+  "result": {
+    "id": "createmotorsport:air_intake",
+    "count": 1
+  }
+}

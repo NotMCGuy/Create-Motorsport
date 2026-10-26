@@ -2,9 +2,10 @@
   "textures": {
     "metal": "minecraft:block/iron_block",
     "dark": "minecraft:block/gray_concrete",
-    "brass": "minecraft:block/yellow_terracotta",
+    "brass": "minecraft:block/gold_block",
     "screen": "minecraft:block/black_concrete",
-    "particle": "minecraft:block/iron_block"
+    "particle": "#metal",
+    "casing": "minecraft:block/gray_concrete"
   },
   "elements": [
     {
@@ -20,22 +21,58 @@
       ],
       "faces": {
         "north": {
-          "texture": "#dark"
+          "texture": "#dark",
+          "uv": [
+            6.0,
+            3.0,
+            10.0,
+            13.0
+          ]
         },
         "south": {
-          "texture": "#dark"
+          "texture": "#dark",
+          "uv": [
+            6.0,
+            3.0,
+            10.0,
+            13.0
+          ]
         },
         "east": {
-          "texture": "#dark"
+          "texture": "#dark",
+          "uv": [
+            5.0,
+            3.0,
+            11.0,
+            13.0
+          ]
         },
         "west": {
-          "texture": "#dark"
+          "texture": "#dark",
+          "uv": [
+            5.0,
+            3.0,
+            11.0,
+            13.0
+          ]
         },
         "up": {
-          "texture": "#dark"
+          "texture": "#dark",
+          "uv": [
+            6.0,
+            5.0,
+            10.0,
+            11.0
+          ]
         },
         "down": {
-          "texture": "#dark"
+          "texture": "#dark",
+          "uv": [
+            6.0,
+            5.0,
+            10.0,
+            11.0
+          ]
         }
       }
     },
@@ -52,54 +89,126 @@
       ],
       "faces": {
         "north": {
-          "texture": "#dark"
+          "texture": "#dark",
+          "uv": [
+            6.0,
+            3.0,
+            10.0,
+            13.0
+          ]
         },
         "south": {
-          "texture": "#dark"
+          "texture": "#dark",
+          "uv": [
+            6.0,
+            3.0,
+            10.0,
+            13.0
+          ]
         },
         "east": {
-          "texture": "#dark"
+          "texture": "#dark",
+          "uv": [
+            5.0,
+            3.0,
+            11.0,
+            13.0
+          ]
         },
         "west": {
-          "texture": "#dark"
+          "texture": "#dark",
+          "uv": [
+            5.0,
+            3.0,
+            11.0,
+            13.0
+          ]
         },
         "up": {
-          "texture": "#dark"
+          "texture": "#dark",
+          "uv": [
+            6.0,
+            5.0,
+            10.0,
+            11.0
+          ]
         },
         "down": {
-          "texture": "#dark"
+          "texture": "#dark",
+          "uv": [
+            6.0,
+            5.0,
+            10.0,
+            11.0
+          ]
         }
       }
     },
     {
       "from": [
-        -4,
+        0,
         11,
         6
       ],
       "to": [
-        20,
+        16,
         14,
         10
       ],
       "faces": {
         "north": {
-          "texture": "#metal"
+          "texture": "#metal",
+          "uv": [
+            0.0,
+            6.5,
+            16.0,
+            9.5
+          ]
         },
         "south": {
-          "texture": "#metal"
+          "texture": "#metal",
+          "uv": [
+            0.0,
+            6.5,
+            16.0,
+            9.5
+          ]
         },
         "east": {
-          "texture": "#metal"
+          "texture": "#metal",
+          "uv": [
+            6.0,
+            6.5,
+            10.0,
+            9.5
+          ]
         },
         "west": {
-          "texture": "#metal"
+          "texture": "#metal",
+          "uv": [
+            6.0,
+            6.5,
+            10.0,
+            9.5
+          ]
         },
         "up": {
-          "texture": "#metal"
+          "texture": "#metal",
+          "uv": [
+            0.0,
+            6.0,
+            16.0,
+            10.0
+          ]
         },
         "down": {
-          "texture": "#metal"
+          "texture": "#metal",
+          "uv": [
+            0.0,
+            6.0,
+            16.0,
+            10.0
+          ]
         }
       }
     },
@@ -116,24 +225,407 @@
       ],
       "faces": {
         "north": {
-          "texture": "#brass"
+          "texture": "#casing",
+          "uv": [
+            5.0,
+            4.5,
+            11.0,
+            11.5
+          ]
         },
         "south": {
-          "texture": "#brass"
+          "texture": "#casing",
+          "uv": [
+            5.0,
+            4.5,
+            11.0,
+            11.5
+          ]
         },
         "east": {
-          "texture": "#brass"
+          "texture": "#casing",
+          "uv": [
+            4.0,
+            4.5,
+            12.0,
+            11.5
+          ]
         },
         "west": {
-          "texture": "#brass"
+          "texture": "#casing",
+          "uv": [
+            4.0,
+            4.5,
+            12.0,
+            11.5
+          ]
         },
         "up": {
-          "texture": "#brass"
+          "texture": "#casing",
+          "uv": [
+            5.0,
+            4.0,
+            11.0,
+            12.0
+          ]
         },
         "down": {
-          "texture": "#brass"
+          "texture": "#casing",
+          "uv": [
+            5.0,
+            4.0,
+            11.0,
+            12.0
+          ]
+        }
+      }
+    },
+    {
+      "name": "truck_detail_leg_shoulder",
+      "from": [
+        -3,
+        8,
+        3.875
+      ],
+      "to": [
+        1,
+        12,
+        4
+      ],
+      "faces": {
+        "north": {
+          "texture": "#casing",
+          "uv": [
+            6.0,
+            6.0,
+            10.0,
+            10.0
+          ]
+        },
+        "south": {
+          "texture": "#casing",
+          "uv": [
+            6.0,
+            6.0,
+            10.0,
+            10.0
+          ]
+        },
+        "east": {
+          "texture": "#casing",
+          "uv": [
+            7.9375,
+            6.0,
+            8.0625,
+            10.0
+          ]
+        },
+        "west": {
+          "texture": "#casing",
+          "uv": [
+            7.9375,
+            6.0,
+            8.0625,
+            10.0
+          ]
+        },
+        "up": {
+          "texture": "#casing",
+          "uv": [
+            6.0,
+            7.9375,
+            10.0,
+            8.0625
+          ]
+        },
+        "down": {
+          "texture": "#casing",
+          "uv": [
+            6.0,
+            7.9375,
+            10.0,
+            8.0625
+          ]
+        }
+      }
+    },
+    {
+      "name": "truck_detail_leg_bolt",
+      "from": [
+        -2,
+        9,
+        3.75
+      ],
+      "to": [
+        -1,
+        10,
+        3.875
+      ],
+      "faces": {
+        "north": {
+          "texture": "#brass",
+          "uv": [
+            7.5,
+            7.5,
+            8.5,
+            8.5
+          ]
+        },
+        "south": {
+          "texture": "#brass",
+          "uv": [
+            7.5,
+            7.5,
+            8.5,
+            8.5
+          ]
+        },
+        "east": {
+          "texture": "#brass",
+          "uv": [
+            7.9375,
+            7.5,
+            8.0625,
+            8.5
+          ]
+        },
+        "west": {
+          "texture": "#brass",
+          "uv": [
+            7.9375,
+            7.5,
+            8.0625,
+            8.5
+          ]
+        },
+        "up": {
+          "texture": "#brass",
+          "uv": [
+            7.5,
+            7.9375,
+            8.5,
+            8.0625
+          ]
+        },
+        "down": {
+          "texture": "#brass",
+          "uv": [
+            7.5,
+            7.9375,
+            8.5,
+            8.0625
+          ]
+        }
+      }
+    },
+    {
+      "name": "truck_detail_leg_shoulder",
+      "from": [
+        15,
+        8,
+        3.875
+      ],
+      "to": [
+        19,
+        12,
+        4
+      ],
+      "faces": {
+        "north": {
+          "texture": "#casing",
+          "uv": [
+            6.0,
+            6.0,
+            10.0,
+            10.0
+          ]
+        },
+        "south": {
+          "texture": "#casing",
+          "uv": [
+            6.0,
+            6.0,
+            10.0,
+            10.0
+          ]
+        },
+        "east": {
+          "texture": "#casing",
+          "uv": [
+            7.9375,
+            6.0,
+            8.0625,
+            10.0
+          ]
+        },
+        "west": {
+          "texture": "#casing",
+          "uv": [
+            7.9375,
+            6.0,
+            8.0625,
+            10.0
+          ]
+        },
+        "up": {
+          "texture": "#casing",
+          "uv": [
+            6.0,
+            7.9375,
+            10.0,
+            8.0625
+          ]
+        },
+        "down": {
+          "texture": "#casing",
+          "uv": [
+            6.0,
+            7.9375,
+            10.0,
+            8.0625
+          ]
+        }
+      }
+    },
+    {
+      "name": "truck_detail_leg_bolt",
+      "from": [
+        16,
+        9,
+        3.75
+      ],
+      "to": [
+        17,
+        10,
+        3.875
+      ],
+      "faces": {
+        "north": {
+          "texture": "#brass",
+          "uv": [
+            7.5,
+            7.5,
+            8.5,
+            8.5
+          ]
+        },
+        "south": {
+          "texture": "#brass",
+          "uv": [
+            7.5,
+            7.5,
+            8.5,
+            8.5
+          ]
+        },
+        "east": {
+          "texture": "#brass",
+          "uv": [
+            7.9375,
+            7.5,
+            8.0625,
+            8.5
+          ]
+        },
+        "west": {
+          "texture": "#brass",
+          "uv": [
+            7.9375,
+            7.5,
+            8.0625,
+            8.5
+          ]
+        },
+        "up": {
+          "texture": "#brass",
+          "uv": [
+            7.5,
+            7.9375,
+            8.5,
+            8.0625
+          ]
+        },
+        "down": {
+          "texture": "#brass",
+          "uv": [
+            7.5,
+            7.9375,
+            8.5,
+            8.0625
+          ]
+        }
+      }
+    },
+    {
+      "name": "truck_detail_gearbox",
+      "from": [
+        6,
+        7,
+        3.5
+      ],
+      "to": [
+        10,
+        11,
+        5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#casing",
+          "uv": [
+            6.0,
+            6.0,
+            10.0,
+            10.0
+          ]
+        },
+        "south": {
+          "texture": "#casing",
+          "uv": [
+            6.0,
+            6.0,
+            10.0,
+            10.0
+          ]
+        },
+        "east": {
+          "texture": "#casing",
+          "uv": [
+            7.25,
+            6.0,
+            8.75,
+            10.0
+          ]
+        },
+        "west": {
+          "texture": "#casing",
+          "uv": [
+            7.25,
+            6.0,
+            8.75,
+            10.0
+          ]
+        },
+        "up": {
+          "texture": "#casing",
+          "uv": [
+            6.0,
+            7.25,
+            10.0,
+            8.75
+          ]
+        },
+        "down": {
+          "texture": "#casing",
+          "uv": [
+            6.0,
+            7.25,
+            10.0,
+            8.75
+          ]
         }
       }
     }
-  ]
+  ],
+  "ambientocclusion": true,
+  "parent": "minecraft:block/block"
 }

@@ -1,20 +1,10 @@
 package com.createmotorsport.physics.vehicle;
 
-/**
- * Ackermann steering adjustment for the front wheel's steer angle from the centerline,
- *   cot(inner) - cot(outer) = k
- * Called by SuspensionBlockEntity; {@link com.createmotorsport.physics.spec.SuspensionSpec#wheelSteerK} turns the % into k
- */
 public final class Ackermann {
 
     private Ackermann() {
     }
 
-    /**
-     * @param base  the centerline angle (rad), positive is right
-     * @param k     positive is anti-Ackermann, negative classic, 0 parallel
-     * @param right if right/left wheel
-     */
     public static double wheelAngle(double base, double k, boolean right) {
         if (k == 0.0 || base == 0.0) {
             return base;

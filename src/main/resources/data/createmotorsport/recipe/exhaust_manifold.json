@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "IPI",
+    " I "
+  ],
+  "key": {
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "P": {
+      "item": "create:fluid_pipe"
+    }
+  },
+  "result": {
+    "id": "createmotorsport:exhaust_manifold",
+    "count": 1
+  }
+}

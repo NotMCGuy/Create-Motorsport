@@ -15,14 +15,12 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 import org.joml.Vector3f;
 
 
-// Trying to do a particle effect when placing the lap gates,
-// based on how Create does an animation when you place the belts between two shafts
 
 public final class LapGateLinkPreview {
     private static final Vector3f VALID = new Vector3f(0.3F, 0.9F, 0.5F);
     private static final Vector3f INVALID = new Vector3f(0.9F, 0.3F, 0.5F);
-    private static final float STEP = 0.0625F; // 1/16 block, same as Create
-    private static final double SPAWN_CHANCE = 0.1; // sparse so the line shimmers instead of solid
+    private static final float STEP = 0.0625F;
+    private static final double SPAWN_CHANCE = 0.1;
 
     private LapGateLinkPreview() {
     }

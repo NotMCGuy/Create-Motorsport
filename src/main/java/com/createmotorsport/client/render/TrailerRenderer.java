@@ -60,7 +60,20 @@ public class TrailerRenderer implements BlockEntityRenderer<EquipmentBlockEntity
         }
         int color=be.status().fault()?0xE84A3C:be.connected() || be.status()==CouplingRules.Status.DEPLOYED?0x53D77A
                 :be.pending() || be.status()==CouplingRules.Status.ALIGNING || be.legs.moving()?0xFFB83E:0xA5ACB5;
-        CachedBuffers.partial(LAMP,be.getBlockState()).color(color).light(light).renderInto(pose,buffer.getBuffer(RenderType.cutoutMipped()));
+        if(be.kind()==CouplingRules.Kind.CONTROL_PANEL) {
+            var font=net.minecraft.client.Minecraft.getInstance().font;
+            var title=net.minecraft.network.chat.Component.translatable("trailer.createmotorsport.panel_display");
+            var status=net.minecraft.network.chat.Component.translatable("trailer.createmotorsport."
+                    +be.status().name().toLowerCase(java.util.Locale.ROOT));
+            float textScale=Math.min(.0065f,.54f/Math.max(1,Math.max(font.width(title),font.width(status))));
+            pose.pushPose();pose.translate(6.75/16,13.0/16,-.004);
+            pose.mulPose(Axis.YP.rotationDegrees(180));pose.scale(textScale,-textScale,textScale);
+            font.drawInBatch(title,-font.width(title)/2f,0,0xFFE0C080,false,pose.last().pose(),buffer,
+                    net.minecraft.client.gui.Font.DisplayMode.NORMAL,0,0xF000F0);
+            font.drawInBatch(status,-font.width(status)/2f,10,0xFF000000|color,false,pose.last().pose(),buffer,
+                    net.minecraft.client.gui.Font.DisplayMode.NORMAL,0,0xF000F0);
+            pose.popPose();
+        } else CachedBuffers.partial(LAMP,be.getBlockState()).color(color).light(light).renderInto(pose,buffer.getBuffer(RenderType.cutoutMipped()));
         pose.popPose();
     }
     @Override public boolean shouldRenderOffScreen(EquipmentBlockEntity be){return be.kind()==CouplingRules.Kind.LANDING_LEGS || ((com.createmotorsport.trailer.EquipmentBlock)be.getBlockState().getBlock()).horizontalScale>1;}

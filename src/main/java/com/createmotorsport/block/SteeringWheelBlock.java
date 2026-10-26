@@ -49,7 +49,6 @@ public class SteeringWheelBlock extends HorizontalDirectionalBlock implements En
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
-        // turns blockbench model 90 degrees
         return defaultBlockState().setValue(FACING, context.getHorizontalDirection().getCounterClockWise());
     }
 
@@ -65,7 +64,6 @@ public class SteeringWheelBlock extends HorizontalDirectionalBlock implements En
             return InteractionResult.PASS;
         }
 
-        // Right click to drive, sneak+right click to open menu
         if (player.isSecondaryUseActive()) {
             if (!level.isClientSide && player instanceof net.minecraft.server.level.ServerPlayer sp) {
                 com.createmotorsport.menu.PartMenus.openPartScreen(sp, pos);

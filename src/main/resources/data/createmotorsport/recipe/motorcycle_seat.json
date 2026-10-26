@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "LLL",
+    " A ",
+    " I "
+  ],
+  "key": {
+    "L": {
+      "item": "minecraft:leather"
+    },
+    "A": {
+      "item": "create:andesite_alloy"
+    },
+    "I": {
+      "item": "minecraft:iron_ingot"
+    }
+  },
+  "result": {
+    "id": "createmotorsport:motorcycle_seat",
+    "count": 1
+  }
+}

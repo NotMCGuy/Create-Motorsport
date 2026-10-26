@@ -7,13 +7,6 @@ import com.createmotorsport.physics.spec.SurfaceSpec;
 import com.createmotorsport.physics.spec.TireSpec;
 import net.minecraft.util.Mth;
 
-/**
- * TYRE MODEL 3, "Fiala brush model"
- *
- * Ported from Project Chrono
- *
- * Corner calls solve() every substep through TireModels
- */
 public final class FialaTire implements Tire {
 
     public static final FialaTire INSTANCE = new FialaTire();
@@ -21,11 +14,6 @@ public final class FialaTire implements Tire {
     private FialaTire() {
     }
 
-    /** Fiala brush tire model, ported from Project Chrono's ChFialaTire::FialaPatchForces
-     * @param kappa longitudinal slip ratio (wheelSpeed - groundSpeed) / refSpeed
-     * @param alpha slip angle (rad)
-     * @param fz    vertical load (N)
-     */
     private static void fialaForces(double[] out, double kappa, double alpha, double fz,
                                    double cKappa, double cAlpha, double muMax, double muMin, double frictionScale) {
         if (fz <= 0.0 || cKappa <= 0.0 || cAlpha <= 0.0) {
@@ -43,7 +31,6 @@ public final class FialaTire implements Tire {
             return;
         }
 
-        // Longitudinal: linear below the critical slip, brush-saturation toward U*Fz above it
         double sCritical = Math.abs(uFz / (2.0 * cKappa));
         double fx;
         if (Math.abs(kappa) < sCritical) {
@@ -53,7 +40,6 @@ public final class FialaTire implements Tire {
             fx = Math.signum(kappa) * (uFz - fx2);
         }
 
-        // Lateral: brush cubic below the critical slip angle, full slide above it
         double alphaCritical = Math.atan(3.0 * uFz / cAlpha);
         double fy;
         if (Math.abs(alpha) <= alphaCritical) {
@@ -76,10 +62,6 @@ public final class FialaTire implements Tire {
         return fiala;
     }
 
-    /**
-     * Where the brush goes into full slide, {@code alphaCritical} in {@code fialaForces}. Its friction falls
-     * with slip, so the angle is the fixed point of {@code tan a = 3 * u * Fz / C_a} with {@code u} taken at it.
-     */
     @Override
     public double peakSlipAngle(TireSpec spec, double load, double designLoad, SurfaceSpec surface, double mu) {
         ModelParams.Fiala p = spec.params(ModelParams.Fiala.class);
@@ -103,7 +85,6 @@ public final class FialaTire implements Tire {
         c.deflAlpha = c.deflAlpha * decay + vLat * tauEff;
         double alpha = Math.atan2(c.deflAlpha, relaxLen);
 
-        // The wheel is held by the curve at the slip it ends on, and the car is pushed by the same force, as in TmeasyTire
         c.omega = TireModel.stepSpin(c.omega, in.radius(), in.wheelInertia(), in.driveTorque(),
                 in.driveStiffness(), in.driveMin(), in.driveMax(), in.brakeTorque(), in.absOmega(), vLon, dt, w -> {
                     c.omega = w;
@@ -121,7 +102,6 @@ public final class FialaTire implements Tire {
                     * in.surface().rollingResistanceScale();
         }
 
-        // Blend on forward speed, not total
         double speed = Math.abs(vLon);
         double blendSpeed = Config.SIM_LOWSPEED_BLEND_MS.getAsDouble();
         if (blendSpeed > 1.0e-6) {

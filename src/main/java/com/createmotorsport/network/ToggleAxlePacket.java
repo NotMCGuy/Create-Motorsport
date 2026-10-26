@@ -10,7 +10,6 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-// Client -> server; flip one of the suspension's part screen toggles at (pos)
 public record ToggleAxlePacket(BlockPos pos, int setting) implements CustomPacketPayload {
 
     public static final int END = 0;

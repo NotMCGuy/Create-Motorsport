@@ -6,10 +6,6 @@ import com.createmotorsport.physics.spec.DifferentialSpec;
 
 import net.minecraft.util.Mth;
 
-/**
- * Limited slip differential,
- * ported from vdrift (driveline.h ClutchJoint::solve, and the clutch set up at cardynamics.cpp InitDriveline2)
- */
 public final class ClutchLsdDiff implements Differential {
 
     public static final ClutchLsdDiff INSTANCE = new ClutchLsdDiff();

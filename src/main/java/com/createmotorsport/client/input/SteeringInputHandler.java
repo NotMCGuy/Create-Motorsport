@@ -22,7 +22,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 
-// Input handling copied from universal keyboard mod
 public final class SteeringInputHandler {
     private static final Set<Integer> HELD_KEYS = new HashSet<>();
     private static BlockPos activePos;
@@ -34,9 +33,7 @@ public final class SteeringInputHandler {
 
     private static boolean hudTogglePrev;
 
-    // Fake steering input for keypresses to apply a gamma too, so they can have an assist too
     private static float keySteer = 0.0f;
-    // Fake pedal input also
     private static float keyThrottle = 0.0f;
     private static float keyBrake = 0.0f;
 
@@ -69,7 +66,6 @@ public final class SteeringInputHandler {
         startDriving(pos);
     }
 
-    // Client: start capture for wheel at (pos), called by the menu button and by toggleDriving
     public static void startDriving(BlockPos pos) {
         activePos = pos.immutable();
         HELD_KEYS.clear();
@@ -104,12 +100,10 @@ public final class SteeringInputHandler {
         if (MotorsportKeybinds.isFreeLook(key, event.getScanCode())) {
             return;
         }
-        // F1-F12 and slash key passthrough for POV, chat, and other keybinds
         if (isSafePassthroughKey(key)) {
             return;
         }
 
-        // Record keys bound to a control so the tick can build the pressed-control mask
         if (isBound(key)) {
             if (action == GLFW.GLFW_PRESS) {
                 HELD_KEYS.add(key);
@@ -117,7 +111,6 @@ public final class SteeringInputHandler {
                 HELD_KEYS.remove(key);
             }
         }
-        // Capture the rest of the keyboard so they can be used to control car and nothing else
         if (action != GLFW.GLFW_RELEASE) {
             suppressVanillaKey(mc, key, event.getScanCode());
         }
@@ -146,7 +139,6 @@ public final class SteeringInputHandler {
         GamepadInput.poll();
         MouseInput.poll();
 
-        // Lock the camera while driving with the mouse
         boolean mouseLock = MouseInput.enabled() && hasMouseControl() && !MotorsportKeybinds.freeLookHeld();
         MouseSteerCamera.update(mouseLock);
 
@@ -157,7 +149,6 @@ public final class SteeringInputHandler {
             }
         }
 
-        // client only HUD toggle
         boolean hudDown = (mask & (1 << SteeringControl.HUD_TOGGLE.ordinal())) != 0;
         if (hudDown && !hudTogglePrev) {
             MotorsportHud.toggle();
@@ -165,7 +156,6 @@ public final class SteeringInputHandler {
         hudTogglePrev = hudDown;
 
 
-        // Keypress assists create fake inputs so the input isnt instantaneous and its something for the Gamma to work on
         float pedalRamp = (float) Config.PEDAL_KEY_RAMP.getAsDouble();
         float throttleInput = pedalInput(SteeringControl.THROTTLE, pedalRamp, true);
         float brakeInput = pedalInput(SteeringControl.BRAKE, pedalRamp, false);
@@ -231,7 +221,6 @@ public final class SteeringInputHandler {
     }
 
 
-    // True analog steering as opposed to the fake one used for keypress
     private static boolean isAnalogSteer() {
         return isAnalogControl(SteeringControl.STEER_LEFT) || isAnalogControl(SteeringControl.STEER_RIGHT);
     }
@@ -278,7 +267,6 @@ public final class SteeringInputHandler {
         return current;
     }
 
-    // analog strength, keypress or button is just 1
     private static float strength(SteeringControl control) {
         int idx = control.ordinal();
         if (idx >= activeKeyCodes.length) {
@@ -297,7 +285,6 @@ public final class SteeringInputHandler {
         return HELD_KEYS.contains(code) ? 1.0F : 0.0F;
     }
 
-    // sensitivity is for racing wheel users who want to turn the wheel less
     private static float sensitised(SteeringControl control, float raw) {
         if (raw <= 0.0F) {
             return raw;
@@ -358,7 +345,6 @@ public final class SteeringInputHandler {
         }
     }
 
-    // Client: stop capturing and tell server we arent driving
     public static void stop() {
         BlockPos pos = activePos;
         activePos = null;

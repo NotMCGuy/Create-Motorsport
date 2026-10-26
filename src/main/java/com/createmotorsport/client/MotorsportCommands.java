@@ -9,8 +9,6 @@ import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 
-// Client commands: /motorsports log [seconds] [samples per second] [extra], and /motorsports log stop
-// extra is for every column
 public final class MotorsportCommands {
     private MotorsportCommands() {
     }

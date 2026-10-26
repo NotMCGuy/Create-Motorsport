@@ -8,9 +8,6 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
 
-/**
- * An "are you sure" pop up copied from my universal keyboard mod
- */
 public class ConfirmDialog {
 
     private static final int W = 200;

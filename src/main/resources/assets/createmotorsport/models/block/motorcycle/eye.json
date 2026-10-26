@@ -1,0 +1,10 @@
+{
+  "loader": "neoforge:obj",
+  "model": "createmotorsport:models/block/motorcycle/eye.obj",
+  "automatic_culling": false,
+  "flip_v": true,
+  "emissive_ambient": false,
+  "textures": {
+    "particle": "minecraft:block/iron_block"
+  }
+}

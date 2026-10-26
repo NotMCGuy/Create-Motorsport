@@ -1,171 +1,717 @@
 {
+  "format_version": "26.3",
+  "credit": "Made with Blockbench",
   "textures": {
-    "metal": "minecraft:block/iron_block",
-    "dark": "minecraft:block/gray_concrete",
-    "brass": "minecraft:block/yellow_terracotta",
-    "screen": "minecraft:block/black_concrete",
-    "particle": "minecraft:block/iron_block"
+    "metal": "createmotorsport:block/truck/steel",
+    "dark": "block/black_concrete",
+    "brass": "createmotorsport:block/truck/brass",
+    "particle": "block/gray_concrete",
+    "casing": "block/gray_concrete",
+    "screen": "minecraft:block/black_concrete"
   },
   "elements": [
     {
+      "name": "truck_detail_cab_body",
+      "from": [
+        0,
+        10,
+        1
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "rotation": {
+        "angle": 0,
+        "axis": "y",
+        "origin": [
+          0,
+          2,
+          0
+        ]
+      },
+      "faces": {
+        "north": {
+          "uv": [
+            0.0,
+            5.0,
+            16.0,
+            11.0
+          ],
+          "texture": "#casing"
+        },
+        "east": {
+          "uv": [
+            0.5,
+            5.0,
+            15.5,
+            11.0
+          ],
+          "texture": "#casing"
+        },
+        "south": {
+          "uv": [
+            0.0,
+            5.0,
+            16.0,
+            11.0
+          ],
+          "texture": "#casing"
+        },
+        "west": {
+          "uv": [
+            0.5,
+            5.0,
+            15.5,
+            11.0
+          ],
+          "texture": "#casing"
+        },
+        "up": {
+          "uv": [
+            0.0,
+            0.5,
+            16.0,
+            15.5
+          ],
+          "texture": "#casing"
+        },
+        "down": {
+          "uv": [
+            0.0,
+            0.5,
+            16.0,
+            15.5
+          ],
+          "texture": "#casing"
+        }
+      }
+    },
+    {
+      "name": "truck_detail_cab_top",
+      "from": [
+        0,
+        8,
+        8
+      ],
+      "to": [
+        16,
+        10,
+        16
+      ],
+      "rotation": {
+        "angle": 0,
+        "axis": "y",
+        "origin": [
+          0,
+          -6,
+          0
+        ]
+      },
+      "faces": {
+        "north": {
+          "uv": [
+            0.0,
+            7.0,
+            16.0,
+            9.0
+          ],
+          "texture": "#casing"
+        },
+        "east": {
+          "uv": [
+            4.0,
+            7.0,
+            12.0,
+            9.0
+          ],
+          "texture": "#casing"
+        },
+        "south": {
+          "uv": [
+            0.0,
+            7.0,
+            16.0,
+            9.0
+          ],
+          "texture": "#casing"
+        },
+        "west": {
+          "uv": [
+            4.0,
+            7.0,
+            12.0,
+            9.0
+          ],
+          "texture": "#casing"
+        },
+        "up": {
+          "uv": [
+            0.0,
+            4.0,
+            16.0,
+            12.0
+          ],
+          "texture": "#casing"
+        },
+        "down": {
+          "uv": [
+            0.0,
+            4.0,
+            16.0,
+            12.0
+          ],
+          "texture": "#casing"
+        }
+      }
+    },
+    {
+      "name": "truck_detail_dash_lip",
+      "from": [
+        0,
+        15,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        1
+      ],
+      "rotation": {
+        "angle": 0,
+        "axis": "y",
+        "origin": [
+          0,
+          1,
+          0
+        ]
+      },
+      "faces": {
+        "north": {
+          "uv": [
+            0.0,
+            7.5,
+            16.0,
+            8.5
+          ],
+          "texture": "#dark"
+        },
+        "east": {
+          "uv": [
+            7.5,
+            7.5,
+            8.5,
+            8.5
+          ],
+          "texture": "#dark"
+        },
+        "south": {
+          "uv": [
+            0.0,
+            7.5,
+            16.0,
+            8.5
+          ],
+          "texture": "#dark"
+        },
+        "west": {
+          "uv": [
+            7.5,
+            7.5,
+            8.5,
+            8.5
+          ],
+          "texture": "#dark"
+        },
+        "up": {
+          "uv": [
+            0.0,
+            7.5,
+            16.0,
+            8.5
+          ],
+          "texture": "#dark"
+        },
+        "down": {
+          "uv": [
+            0.0,
+            7.5,
+            16.0,
+            8.5
+          ],
+          "texture": "#dark"
+        }
+      }
+    },
+    {
+      "name": "truck_detail_left_edge",
+      "from": [
+        0,
+        10,
+        0
+      ],
+      "to": [
+        1,
+        15,
+        1
+      ],
+      "rotation": {
+        "angle": 0,
+        "axis": "y",
+        "origin": [
+          0,
+          1,
+          0
+        ]
+      },
+      "faces": {
+        "north": {
+          "uv": [
+            7.5,
+            5.5,
+            8.5,
+            10.5
+          ],
+          "texture": "#dark"
+        },
+        "east": {
+          "uv": [
+            7.5,
+            5.5,
+            8.5,
+            10.5
+          ],
+          "texture": "#dark"
+        },
+        "south": {
+          "uv": [
+            7.5,
+            5.5,
+            8.5,
+            10.5
+          ],
+          "texture": "#dark"
+        },
+        "west": {
+          "uv": [
+            7.5,
+            5.5,
+            8.5,
+            10.5
+          ],
+          "texture": "#dark"
+        },
+        "up": {
+          "uv": [
+            7.5,
+            7.5,
+            8.5,
+            8.5
+          ],
+          "texture": "#dark"
+        },
+        "down": {
+          "uv": [
+            7.5,
+            7.5,
+            8.5,
+            8.5
+          ],
+          "texture": "#dark"
+        }
+      }
+    },
+    {
+      "name": "truck_detail_right_edge",
+      "from": [
+        15,
+        10,
+        0
+      ],
+      "to": [
+        16,
+        15,
+        1
+      ],
+      "rotation": {
+        "angle": 0,
+        "axis": "y",
+        "origin": [
+          0,
+          1,
+          0
+        ]
+      },
+      "faces": {
+        "north": {
+          "uv": [
+            7.5,
+            5.5,
+            8.5,
+            10.5
+          ],
+          "texture": "#dark"
+        },
+        "east": {
+          "uv": [
+            7.5,
+            5.5,
+            8.5,
+            10.5
+          ],
+          "texture": "#dark"
+        },
+        "south": {
+          "uv": [
+            7.5,
+            5.5,
+            8.5,
+            10.5
+          ],
+          "texture": "#dark"
+        },
+        "west": {
+          "uv": [
+            7.5,
+            5.5,
+            8.5,
+            10.5
+          ],
+          "texture": "#dark"
+        },
+        "up": {
+          "uv": [
+            7.5,
+            7.5,
+            8.5,
+            8.5
+          ],
+          "texture": "#dark"
+        },
+        "down": {
+          "uv": [
+            7.5,
+            7.5,
+            8.5,
+            8.5
+          ],
+          "texture": "#dark"
+        }
+      }
+    },
+    {
+      "name": "truck_detail_fascia",
+      "from": [
+        1,
+        10,
+        0.25
+      ],
+      "to": [
+        15,
+        15,
+        1
+      ],
+      "rotation": {
+        "angle": 0,
+        "axis": "y",
+        "origin": [
+          0,
+          1,
+          0
+        ]
+      },
+      "faces": {
+        "north": {
+          "uv": [
+            1.0,
+            5.5,
+            15.0,
+            10.5
+          ],
+          "texture": "#casing"
+        },
+        "east": {
+          "uv": [
+            7.625,
+            5.5,
+            8.375,
+            10.5
+          ],
+          "texture": "#casing"
+        },
+        "south": {
+          "uv": [
+            1.0,
+            5.5,
+            15.0,
+            10.5
+          ],
+          "texture": "#casing"
+        },
+        "west": {
+          "uv": [
+            7.625,
+            5.5,
+            8.375,
+            10.5
+          ],
+          "texture": "#casing"
+        },
+        "up": {
+          "uv": [
+            1.0,
+            7.625,
+            15.0,
+            8.375
+          ],
+          "texture": "#casing"
+        },
+        "down": {
+          "uv": [
+            1.0,
+            7.625,
+            15.0,
+            8.375
+          ],
+          "texture": "#casing"
+        }
+      }
+    },
+    {
+      "name": "truck_detail_display",
       "from": [
         2,
-        0,
-        2
+        11,
+        0
+      ],
+      "to": [
+        11.5,
+        14.5,
+        0.375
+      ],
+      "rotation": {
+        "angle": 0,
+        "axis": "y",
+        "origin": [
+          0,
+          1,
+          0
+        ]
+      },
+      "faces": {
+        "north": {
+          "uv": [
+            3.25,
+            6.25,
+            12.75,
+            9.75
+          ],
+          "texture": "#screen"
+        },
+        "east": {
+          "uv": [
+            7.8125,
+            6.25,
+            8.1875,
+            9.75
+          ],
+          "texture": "#screen"
+        },
+        "south": {
+          "uv": [
+            3.25,
+            6.25,
+            12.75,
+            9.75
+          ],
+          "texture": "#screen"
+        },
+        "west": {
+          "uv": [
+            7.8125,
+            6.25,
+            8.1875,
+            9.75
+          ],
+          "texture": "#screen"
+        },
+        "up": {
+          "uv": [
+            3.25,
+            7.8125,
+            12.75,
+            8.1875
+          ],
+          "texture": "#screen"
+        },
+        "down": {
+          "uv": [
+            3.25,
+            7.8125,
+            12.75,
+            8.1875
+          ],
+          "texture": "#screen"
+        }
+      }
+    },
+    {
+      "name": "truck_detail_hitch_switch",
+      "from": [
+        12.5,
+        13,
+        -0.25
       ],
       "to": [
         14,
-        10,
-        14
+        14.5,
+        0.5
       ],
+      "rotation": {
+        "angle": 0,
+        "axis": "y",
+        "origin": [
+          0,
+          1,
+          0
+        ]
+      },
       "faces": {
         "north": {
-          "texture": "#dark"
-        },
-        "south": {
-          "texture": "#dark"
-        },
-        "east": {
-          "texture": "#dark"
-        },
-        "west": {
-          "texture": "#dark"
-        },
-        "up": {
-          "texture": "#dark"
-        },
-        "down": {
-          "texture": "#dark"
-        }
-      }
-    },
-    {
-      "from": [
-        3,
-        10,
-        3
-      ],
-      "to": [
-        13,
-        12,
-        13
-      ],
-      "faces": {
-        "north": {
-          "texture": "#metal"
-        },
-        "south": {
-          "texture": "#metal"
-        },
-        "east": {
-          "texture": "#metal"
-        },
-        "west": {
-          "texture": "#metal"
-        },
-        "up": {
-          "texture": "#metal"
-        },
-        "down": {
-          "texture": "#metal"
-        }
-      }
-    },
-    {
-      "from": [
-        4,
-        12,
-        4
-      ],
-      "to": [
-        12,
-        12.2,
-        9
-      ],
-      "faces": {
-        "north": {
-          "texture": "#screen"
-        },
-        "south": {
-          "texture": "#screen"
-        },
-        "east": {
-          "texture": "#screen"
-        },
-        "west": {
-          "texture": "#screen"
-        },
-        "up": {
-          "texture": "#screen"
-        },
-        "down": {
-          "texture": "#screen"
-        }
-      }
-    },
-    {
-      "from": [
-        4,
-        12,
-        10
-      ],
-      "to": [
-        7,
-        13,
-        12
-      ],
-      "faces": {
-        "north": {
-          "texture": "#brass"
-        },
-        "south": {
+          "uv": [
+            7.25,
+            7.25,
+            8.75,
+            8.75
+          ],
           "texture": "#brass"
         },
         "east": {
+          "uv": [
+            7.625,
+            7.25,
+            8.375,
+            8.75
+          ],
+          "texture": "#brass"
+        },
+        "south": {
+          "uv": [
+            7.25,
+            7.25,
+            8.75,
+            8.75
+          ],
           "texture": "#brass"
         },
         "west": {
+          "uv": [
+            7.625,
+            7.25,
+            8.375,
+            8.75
+          ],
           "texture": "#brass"
         },
         "up": {
+          "uv": [
+            7.25,
+            7.625,
+            8.75,
+            8.375
+          ],
           "texture": "#brass"
         },
         "down": {
+          "uv": [
+            7.25,
+            7.625,
+            8.75,
+            8.375
+          ],
           "texture": "#brass"
         }
       }
     },
     {
+      "name": "truck_detail_leg_switch",
       "from": [
-        9,
-        12,
-        10
+        12.5,
+        10.5,
+        -0.25
       ],
       "to": [
+        14,
         12,
-        13,
-        12
+        0.5
       ],
+      "rotation": {
+        "angle": 0,
+        "axis": "y",
+        "origin": [
+          0,
+          1,
+          0
+        ]
+      },
       "faces": {
         "north": {
-          "texture": "#brass"
-        },
-        "south": {
-          "texture": "#brass"
+          "uv": [
+            7.25,
+            7.25,
+            8.75,
+            8.75
+          ],
+          "texture": "#metal"
         },
         "east": {
-          "texture": "#brass"
+          "uv": [
+            7.625,
+            7.25,
+            8.375,
+            8.75
+          ],
+          "texture": "#metal"
+        },
+        "south": {
+          "uv": [
+            7.25,
+            7.25,
+            8.75,
+            8.75
+          ],
+          "texture": "#metal"
         },
         "west": {
-          "texture": "#brass"
+          "uv": [
+            7.625,
+            7.25,
+            8.375,
+            8.75
+          ],
+          "texture": "#metal"
         },
         "up": {
-          "texture": "#brass"
+          "uv": [
+            7.25,
+            7.625,
+            8.75,
+            8.375
+          ],
+          "texture": "#metal"
         },
         "down": {
-          "texture": "#brass"
+          "uv": [
+            7.25,
+            7.625,
+            8.75,
+            8.375
+          ],
+          "texture": "#metal"
         }
       }
     }
-  ]
+  ],
+  "parent": "minecraft:block/block"
 }

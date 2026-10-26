@@ -9,12 +9,6 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-/**
- * Server -> client; one line of a telemetry log. 'Kind' can be
- * Header (open new CSV and write the headers),
- * Row (make a sample), or
- * End (close file and report save location to client)
-*/
 public record TelemetryLinePacket(int kind, String line) implements CustomPacketPayload {
     public static final int KIND_HEADER = 0;
     public static final int KIND_ROW = 1;

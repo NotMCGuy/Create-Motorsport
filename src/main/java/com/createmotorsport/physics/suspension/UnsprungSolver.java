@@ -3,22 +3,11 @@ package com.createmotorsport.physics.suspension;
 import com.createmotorsport.physics.spec.DamperSpec;
 import net.minecraft.util.Mth;
 
-/**
- * Steps one wheel between its suspension spring and its tyre spring
- * Corner calls solve() per wheel per substep, it returns the force the suspension puts into the body
- * No interface yet. A solid axle can't be solved a corner at a time, so a second geometry would want one per axle
- */
 public final class UnsprungSolver {
 
     private UnsprungSolver() {
     }
 
-    /**
-     * @param responseMass       the body mode's effective mass, not one corner's
-     * @param maxBodyModeOmegaDt above this the spring is detuned rather than allowed to ring
-     * @param tireRate           N per block, from the fitted tyre
-     * @param rollResponseMass   usually much smaller than responseMass
-     */
     public record Input(double rateMass, double rigidLength, double hardpointVel, double responseMass,
                         double rollResponseMass,
                         double dt, double restLength, double maxTravel, double maxDroop,
@@ -40,7 +29,6 @@ public final class UnsprungSolver {
         public double rollModeOmegaDt;
     }
 
-    // zero for a missing mode, so it drops out of the max
     private static double omegaDt(double springK, double modeMass, double dt) {
         return modeMass > 1.0e-9 ? Math.sqrt(springK / modeMass) * dt : 0.0;
     }
@@ -55,10 +43,6 @@ public final class UnsprungSolver {
         boolean rebound = in.hardpointVel() > 0.0;
         double springK = SpringDamper.springRate(in.rateMass(), in.naturalFreqHz());
 
-        // Roll stiffness is 4*k*b^2 against Ixx; a given corners roll mode runs at sqrt(springK/responseMass)
-        // semi implicit euler works here only to omega*dt < 2 based on my tests, alternates/vibrates real bad past that.
-        // This can happen if the car is built like a pencil with no weight on either side of a 1 block chassis.
-        // The solution for now is measuring that value and scaling frequency down when needed
         double cornerOmegaDt = omegaDt(springK, in.responseMass(), in.dt());
         double rollOmegaDt = omegaDt(springK, in.rollResponseMass(), in.dt());
         s.bodyModeOmegaDt = cornerOmegaDt;
@@ -73,7 +57,6 @@ public final class UnsprungSolver {
         double unsprungMass = in.unsprungMass();
         double tireC = 2.0 * in.tireVerticalDamping() * Math.sqrt(tireK * unsprungMass);
 
-        // Re seed if the state is nonsense or the car has moved somewhere else
         if (!Double.isFinite(s.springLength) || !Double.isFinite(s.unsprungVel)
                 || Math.abs(s.springLength - in.rigidLength()) > in.maxTravel() + in.maxDroop()) {
             s.springLength = Mth.clamp(in.rigidLength(), in.restLength() - in.maxTravel(),
@@ -99,7 +82,6 @@ public final class UnsprungSolver {
         s.groundLength = groundLength;
         s.contactLoad = tireK * s.tireDeflection;
 
-        // tried averaging before but reading the state at the end seemed to be better
         double newCompression = Math.max(0.0, in.restLength() - s.springLength);
         double strutVel = s.unsprungVel - in.hardpointVel();
         double bodyC = SpringDamper.effectiveDamping(springC, strutVel, in.damper(), in.dt(),

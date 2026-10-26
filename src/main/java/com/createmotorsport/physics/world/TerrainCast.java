@@ -21,10 +21,6 @@ import org.joml.Vector3dc;
 
 import java.util.Arrays;
 
-/**
- * Reads the ground under a wheel for SuspensionBlockEntity before the Corner steps
- * cast() is the footprint and probe() is to look ahead for the terrain assist
- */
 public final class TerrainCast {
 
     private static final double FOOTPRINT_FRACTION = 0.95;
@@ -33,19 +29,10 @@ public final class TerrainCast {
     private TerrainCast() {
     }
 
-    /**
-     * Raw ground, the terrain assist's lift is taken off later in Corner.step
-     *
-     * @param rigid    hardpoint to ground minus the tyre reach, at the highest point across the footprint
-     * @param castLift how far that point sits above the center sample, for logging
-     */
     public record Result(boolean hit, double rigid, double castLift, @NotNull Direction normal,
                          @Nullable SubLevel hitSubLevel, @Nullable BlockPos hitBlock) {
     }
 
-    // Tyre enveloping method of raycasting should work much better for offroading, but I still need to work on this more
-    // Wheel with radius r, resting on a profile h(x) has center at:
-    //     z = max over x of [ h(x) + sqrt(r^2 - x^2) ]
     public static Result cast(Level level, @Nullable SubLevel ignored, Vec3 wheelCenter, Vector3d forward,
                               Vector3d axle, Pose3dc pose, double radius, double width) {
         double half = radius * FOOTPRINT_FRACTION;
@@ -108,7 +95,7 @@ public final class TerrainCast {
             if (hitSubLevel != null) {
                 hitSubLevel.logicalPose().transformNormal(hitNormal);
             }
-            pose.transformNormalInverse(hitNormal);
+            pose.transformNormalInverse(hitNormal).normalize();
             if (hitNormal.dot(0.0, 1.0, 0.0) < 0.5) {
                 continue;
             }
@@ -136,7 +123,6 @@ public final class TerrainCast {
     }
 
 
-    // rigid length at origin, NaN for no ground
     public static double probe(Level level, @Nullable SubLevel ignored, Vec3 origin, Pose3dc pose, double radius) {
         ClipContext clipContext = new ClipContext(origin, origin.subtract(0.0, 5.0, 0.0),
                 ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
@@ -154,7 +140,6 @@ public final class TerrainCast {
     }
 
 
-    // One sample per block column the footprint crosses, as close to the center as its column lets it
     private static int footprintOffsets(Vec3 center, Vector3d forward, Pose3dc pose, double half,
                                         double[] out) {
         Vector3dc worldCenter = pose.transformPosition(JOMLConversion.toJOML(center));
@@ -195,7 +180,6 @@ public final class TerrainCast {
         return n;
     }
 
-    // wheel mount gives slight friction even at 0
     public static double fudgeFriction(double realValue) {
         return realValue < 1.0 ? 0.1 + 0.9 * realValue : realValue;
     }

@@ -20,6 +20,12 @@ public final class TrailerRegistry {
     public static final DeferredBlock<EquipmentBlock> COUPLING_HEAD=block("coupling_head",CouplingRules.Kind.COUPLING_HEAD);
     public static final DeferredBlock<EquipmentBlock> LANDING_LEGS=block("landing_legs",CouplingRules.Kind.LANDING_LEGS);
     public static final DeferredBlock<EquipmentBlock> CONTROL_PANEL=block("trailer_control_panel",CouplingRules.Kind.CONTROL_PANEL);
+    public static final DeferredBlock<com.createmotorsport.block.GloveboxBlock> GLOVEBOX=CreateMotorsport.BLOCKS.register("glovebox",
+            ()->new com.createmotorsport.block.GloveboxBlock(BlockBehaviour.Properties.of().mapColor(MapColor.METAL).strength(3,6).noOcclusion()));
+    public static final DeferredItem<net.minecraft.world.item.BlockItem> GLOVEBOX_ITEM=CreateMotorsport.ITEMS.registerSimpleBlockItem("glovebox",GLOVEBOX);
+    public static final DeferredHolder<BlockEntityType<?>,BlockEntityType<com.createmotorsport.block.entity.GloveboxBlockEntity>> GLOVEBOX_ENTITY=
+            CreateMotorsport.BLOCK_ENTITY_TYPES.register("glovebox",()->BlockEntityType.Builder.of(
+                    com.createmotorsport.block.entity.GloveboxBlockEntity::new,GLOVEBOX.get()).build(null));
     public static final DeferredItem<EquipmentLinkerItem> LINKER=CreateMotorsport.ITEMS.register("equipment_linker",()->new EquipmentLinkerItem(new Item.Properties().stacksTo(1)));
     public static final DeferredHolder<BlockEntityType<?>,BlockEntityType<EquipmentBlockEntity>> EQUIPMENT_ENTITY=
             CreateMotorsport.BLOCK_ENTITY_TYPES.register("trailer_equipment",()->BlockEntityType.Builder.of(EquipmentBlockEntity::new,

@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "I I",
+    "ISI",
+    " A "
+  ],
+  "key": {
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "S": {
+      "item": "create:shaft"
+    },
+    "A": {
+      "item": "create:andesite_alloy"
+    }
+  },
+  "result": {
+    "id": "createmotorsport:motorcycle_rear_arm",
+    "count": 1
+  }
+}

@@ -10,7 +10,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-// Server -> client
 public record OpenTuneHeldPacket(boolean mainHand, boolean canTune) implements CustomPacketPayload {
 
     public static final Type<OpenTuneHeldPacket> TYPE =

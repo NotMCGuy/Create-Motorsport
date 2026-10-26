@@ -31,7 +31,6 @@ public final class TelemetryLog {
         this.startGameTime = startGameTime;
     }
 
-    // samplesPerSec 1-20, 20 is what debugging needs
     public static TelemetryLog start(Level level, ServerPlayer player, CarActors car, int seconds, int samplesPerSec,
                                      boolean extra) {
         TelemetryLog log = new TelemetryLog(player.getUUID(), extra, seconds, samplesPerSec, level.getGameTime());
@@ -43,14 +42,10 @@ public final class TelemetryLog {
         return startGameTime;
     }
 
-    // the next tick writes the tail and the END marker
     public void stop() {
         ticksRemaining = 1;
     }
 
-    /**
-     * @return false once the log has finished and sent its tail
-     */
     public boolean tick(Level level, BlockPos at, Supplier<CarActors> car, boolean cruiseOn, double cruiseTargetMs,
                         String terrainAssist, DriverInputs inputs) {
         if (ticksRemaining % sampleEveryTicks == 0) {

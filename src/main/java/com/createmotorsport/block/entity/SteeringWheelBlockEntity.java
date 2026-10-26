@@ -29,24 +29,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-/**
- * The Steering Wheel covers the cars driver controls and certain driver aids
- *
- * User input goes to CarState.Controls
- * Turns the client's input into CarState.Controls and CarState.Aids,
- * also transmits signal onto redstone links if applicable
- *
- * HAS TO BE A SABLE ACTOR SO THAT AssembledCar.rebuild FINDS IT
- * see vehicle/AssembledCar for a checklist when adding new kinds of Block Entities for a car
- */
 public class SteeringWheelBlockEntity extends SmartBlockEntity implements dev.ryanhcode.sable.api.block.BlockEntitySubLevelActor,
         com.createmotorsport.menu.PartPanel {
 
-    // ==========================================
-    // CONSTANTS / TYPES
-    // ==========================================
 
-    // kept when broken, not the driver
     public static final java.util.Set<String> CONFIGURATION_KEYS = java.util.Set.of(
             "Frequencies", "KeyCodes", "ControlLayout", "TerrainAssist", "AssistOff", "DiffMode",
             "TractionControl");
@@ -67,7 +53,6 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity implements dev.ry
         return control.ordinal() * 2 + 1;
     }
 
-    // menu ordering of the various keybinds
     public enum SteeringControl {
         THROTTLE("Throttle"),
         BRAKE("Brake"),
@@ -100,9 +85,6 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity implements dev.ry
 
     public enum Aid { TERRAIN_ASSIST, STEER_ASSIST, DIFF_MODE, TRACTION_CONTROL }
 
-    // ==========================================
-    // LOADED WHEELS
-    // ==========================================
 
     private static final Set<SteeringWheelBlockEntity> SERVER_LOADED =
             Collections.newSetFromMap(new WeakHashMap<>());
@@ -127,12 +109,8 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity implements dev.ry
         return null;
     }
 
-    // ==========================================
-    // STATE
-    // ==========================================
 
 
-    // Driver and inputs
     private UUID user;
     private int inputMask;
     private float driverThrottle01;
@@ -141,26 +119,21 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity implements dev.ry
     private float appliedThrottle01;
     private int prevMomentaryMask;
 
-    // GLFW key codes bound to a control by user. -1 is unbound. Synced to client
     private final int[] keyCodes = new int[CONTROLS.length];
 
-    // "ghost" item slots for the backup redstone links
     private final NonNullList<ItemStack> frequencyItems = NonNullList.withSize(SLOT_COUNT, ItemStack.EMPTY);
     private final LinkTransmitters links = new LinkTransmitters(this, slot -> frequencyItems.get(slot),
             CONTROLS.length, i -> slotA(CONTROLS[i]), i -> slotB(CONTROLS[i]));
 
-    // driver aids
     private TerrainAssist.Level terrainAssist = TerrainAssist.Level.NORMAL;
     private boolean driftDiffMode;
     private boolean steerAssistOff;
     private boolean tractionControl;
 
-    // Cruise control
     private boolean cruiseOn;
     private double cruiseTargetMs;
     private int cruiseTargetKmh;
 
-    // Dashboard and HUD
     private Dashboard dashboard = Dashboard.EMPTY;
     private Dashboard dashboardSynced = Dashboard.EMPTY;
     private int telemetryCooldown;
@@ -168,22 +141,15 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity implements dev.ry
     private boolean diffModeSynced;
     private int cruiseSyncedKmh;
 
-    // /motorsports log, while running
     @Nullable
     private TelemetryLog log;
     private long logStartGameTime;
 
-    // client
     private double clientWheelAngle;
     private double lastClientWheelAngle;
 
-    // DownFlap
     private boolean downFlapToggle = false;
 
-    // ==========================================
-    // CONSTRUCTION / LIFECYCLE
-    // ==========================================
-    // If on -> drag activated
 
 
 
@@ -222,9 +188,6 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity implements dev.ry
         super.onChunkUnloaded();
     }
 
-    // ==========================================
-    // PART SCREEN / AIDS
-    // ==========================================
 
     @Override
     public com.createmotorsport.menu.PartKind partKind() {
@@ -281,9 +244,6 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity implements dev.ry
         return driftDiffMode;
     }
 
-    // ==========================================
-    // DRIVING
-    // ==========================================
 
     public boolean isUser(Player player) {
         return user != null && user.equals(player.getUUID());
@@ -297,7 +257,6 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity implements dev.ry
         return user;
     }
 
-    // Set a player as driving, server side. Client pushes this button on the menu itself, Sable already gates that block interaction by interaction range
     public void setDriving(Player player, boolean driving) {
         if (level == null || level.isClientSide) {
             return;
@@ -337,7 +296,6 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity implements dev.ry
         return subLevel.logicalPose().transformPosition(Vec3.atCenterOf(worldPosition));
     }
 
-    // from SteeringInputPacket
     public void setInput(Player sender, int mask, int throttle, int brake, int steer) {
         if (level == null || level.isClientSide || !isUser(sender)) {
             return;
@@ -349,9 +307,6 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity implements dev.ry
         applyPowers();
     }
 
-    // ==========================================
-    // GAME TICK
-    // ==========================================
 
     @Override
     public void tick() {
@@ -360,7 +315,6 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity implements dev.ry
             return;
         }
         if (level.isClientSide) {
-            // configurable steering that responds to analog input
             double target = dashboard.steer() / 100.0
                     * com.createmotorsport.Config.STEERING_WHEEL_MAX_ANGLE.getAsDouble();
             lastClientWheelAngle = clientWheelAngle;
@@ -382,7 +336,6 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity implements dev.ry
         if (user == null) {
             return;
         }
-        // drop the driver if theyve left the game
         Player player = level.getServer() != null ? level.getServer().getPlayerList().getPlayer(user) : null;
         if (player == null) {
             stopUsing();
@@ -391,7 +344,6 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity implements dev.ry
         pushDriverControls();
     }
 
-    // push driver controls to ControlState which distributes them from there
     private void pushDriverControls() {
         SubLevel subLevel = Sable.HELPER.getContaining(this);
         if (subLevel == null) {
@@ -440,11 +392,9 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity implements dev.ry
         double steerSignal = driverSteer01 * 15.0;
         double brakeSignal = driverBrake01 * 15.0;
 
-        // send to CarState to handle and distribute the controls where needed
         car.state().setControls(new CarState.Controls(throttle01, clutch, shiftUp, shiftDown,
                 overtake, modeUp, modeDown, steerSignal, brakeSignal, ignition), level.getGameTime());
 
-        // Get all pillar downflaps
         List<DownFlapBlockEntity> downflaps = new ArrayList<>();
         for (var actor : subLevel.getPlot().getBlockEntityActors()) {
             if (actor instanceof DownFlapBlockEntity d && d.getBlockState().getValue(DownFlapBlock.PILLAR)) {
@@ -471,15 +421,11 @@ public class SteeringWheelBlockEntity extends SmartBlockEntity implements dev.ry
         }
     }
 
-// ==========================================
-// KEY BINDINGS / REDSTONE LINKS
-// ==========================================
 
 public int getKeyCode(int controlIndex) {
     return controlIndex >= 0 && controlIndex < keyCodes.length ? keyCodes[controlIndex] : -1;
 }
 
-// from SetSteeringKeyPacket, -1 clears
 public void setKeyCode(int controlIndex, int keyCode) {
     if (level == null || level.isClientSide || controlIndex < 0 || controlIndex >= keyCodes.length) {
         return;
@@ -489,7 +435,6 @@ public void setKeyCode(int controlIndex, int keyCode) {
     notifyUpdate();
     }
 
-    // the 'ghost' item frequency in a link slot
     public ItemStack getFrequencyItem(int slot) {
         return slot >= 0 && slot < SLOT_COUNT ? frequencyItems.get(slot) : ItemStack.EMPTY;
     }
@@ -516,7 +461,6 @@ public void setKeyCode(int controlIndex, int keyCode) {
         }
         for (SteeringControl control : CONTROLS) {
             boolean pressed = (inputMask & (1 << control.ordinal())) != 0;
-            // redstone to %
             int power = switch (control) {
                 case THROTTLE -> Math.round(driverThrottle01 * 15.0F);
                 case BRAKE -> Math.round(driverBrake01 * 15.0F);
@@ -540,9 +484,6 @@ public void setKeyCode(int controlIndex, int keyCode) {
         links.remove();
     }
 
-    // ==========================================
-    // CRUISE / DASHBOARD
-    // ==========================================
 
     private void mirrorCruise(@Nullable Cruise.Controller cruise) {
         cruiseOn = cruise != null && cruise.on();
@@ -550,7 +491,6 @@ public void setKeyCode(int controlIndex, int keyCode) {
         cruiseTargetKmh = cruise == null ? 0 : cruise.targetKmh();
     }
 
-    // 0 when cruise is off
     public int getCruiseTargetKmh() {
         return cruiseTargetKmh;
     }
@@ -579,9 +519,6 @@ public void setKeyCode(int controlIndex, int keyCode) {
         return dashboard;
     }
 
-    // ==========================================
-    // LOGGING
-    // ==========================================
 
     @Nullable
     private CarActors gatherCar() {
@@ -636,7 +573,6 @@ public void setKeyCode(int controlIndex, int keyCode) {
         return new DriverInputs(driverThrottle01, driverBrake01, driverSteer01, keys(inputMask));
     }
 
-    // telemetry's (in_keys) column
     public static String keys(int mask) {
         StringBuilder sb = new StringBuilder();
         for (SteeringControl control : CONTROLS) {
@@ -650,17 +586,11 @@ public void setKeyCode(int controlIndex, int keyCode) {
         return sb.length() == 0 ? "-" : sb.toString();
     }
 
-    // ==========================================
-    // CLIENT RENDER
-    // ==========================================
 
     public float getLerpedWheelAngle(float partialTick) {
         return (float) Mth.lerp(partialTick, lastClientWheelAngle, clientWheelAngle);
     }
 
-    // ==========================================
-    // NBT
-    // ==========================================
 
     @Override
     protected void write(CompoundTag tag, HolderLookup.Provider registries, boolean clientPacket) {

@@ -8,29 +8,22 @@ import com.createmotorsport.physics.vehicle.CornerState;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * One axle's drive and differential for a substep, used by SuspensionBlockEntity
- * warmStart() builds each wheel's Corner.Axle, wheels() goes to AssembledCar's DriveSplit,
- * and finish() runs the differential once the car is done (or at once on an axle the car doesn't split)
- */
 public final class AxleDiff {
 
-    // state carried into the next substep. (change) for warmStart, (diffTorque) for carried
     private final Differential.Axle diff = new Differential.Axle();
     private final DriveSplit.Wheel left = new DriveSplit.Wheel();
     private final DriveSplit.Wheel right = new DriveSplit.Wheel();
 
     private double torque;
-    private double stiffness; // the clutch's, per wheel: Nm less per rad/s gained over a substep
+    private double stiffness;
     private double min;
     private double max;
-    private double passed; // per wheel, what the clutch passed last substep before traction control's cut
+    private double passed;
     private double weight = 0.5;
     private double mean;
     private boolean pending;
     private double lastTraction = 1.0;
 
-    // per wheel for the coming substep, min and max are the window the drive stays in
     public void setDrive(double torquePerWheel, double stiffnessPerWheel, double min, double max) {
         this.torque = torquePerWheel;
         this.stiffness = stiffnessPerWheel;
@@ -75,9 +68,6 @@ public final class AxleDiff {
         return split && pair ? this.diff.diffTorque : 0.0;
     }
 
-    // The clutch's stiffness on this wheel's own change at its weight in the mean, the rest of last substep's mean
-    // as an offset, and the differential's last torque shifting the window
-    // clamp(x, a, b) + t = clamp(x + t, a + t, b + t), exact when the changes repeat
     public Corner.Axle warmStart(Corner.Axle axle, boolean leftSide, double diffTorque) {
         DriveSplit.Wheel wheel = leftSide ? this.left : this.right;
         double c = axle.driveStiffness();
@@ -139,7 +129,6 @@ public final class AxleDiff {
             axle.inertiaRight = rightInertia
                     + (Double.isNaN(rightState.spinCoupling) ? 0.0 : rightState.spinCoupling * dt);
             double input = leftState.telem.driveTorque + rightState.telem.driveTorque;
-            // positive while driving, negative while engine braking
             axle.inputTorque = input * (leftState.omega + rightState.omega) >= 0.0 ? Math.abs(input) : -Math.abs(input);
             Differentials.of(spec.type()).solve(axle, spec, massScale, driftMode, dt);
             leftState.omega = axle.omegaLeft;

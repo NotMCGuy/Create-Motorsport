@@ -14,8 +14,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 
-// Writes CSV lines streamed from the server into game directory (/motorsports folder)
-// HEADER opens file, ROW appends, END closes and chats the path to the client
 public final class TelemetryCsvWriter {
     private static final DateTimeFormatter STAMP = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
 
@@ -37,7 +35,7 @@ public final class TelemetryCsvWriter {
     }
 
     private static void open(String header) {
-        close(); // finish any previous log
+        close();
         try {
             Path dir = Minecraft.getInstance().gameDirectory.toPath().resolve("motorsports");
             Files.createDirectories(dir);

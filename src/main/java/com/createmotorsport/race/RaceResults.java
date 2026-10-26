@@ -14,7 +14,6 @@ public final class RaceResults {
     private RaceResults() {
     }
 
-    // m:ss.sss, or s.sss s under a minute
     public static String formatTime(long ticks) {
         double seconds = ticks / 20.0;
         int minutes = (int) (seconds / 60.0);
@@ -58,7 +57,6 @@ public final class RaceResults {
                     row.toString()));
         }
 
-        // Full car telemetry underneath race results, if user chooses
         if (telemetryHeader != null && !telemetryRows.isEmpty()) {
             PacketDistributor.sendToPlayer(player, new TelemetryLinePacket(TelemetryLinePacket.KIND_ROW, ""));
             PacketDistributor.sendToPlayer(player,
@@ -68,7 +66,6 @@ public final class RaceResults {
         PacketDistributor.sendToPlayer(player, new TelemetryLinePacket(TelemetryLinePacket.KIND_END, ""));
     }
 
-    // Sends results in a few packets instead of one huge one sent over a single tick
     private static void sendBatched(ServerPlayer player, List<String> lines) {
         final int maxChars = 24_000;
         StringBuilder batch = new StringBuilder(maxChars + 256);

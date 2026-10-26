@@ -2,7 +2,6 @@ package com.createmotorsport.physics;
 
 import com.createmotorsport.physics.spec.DifferentialSpec;
 
-// see physics/differential
 public interface Differential {
 
     final class Axle {

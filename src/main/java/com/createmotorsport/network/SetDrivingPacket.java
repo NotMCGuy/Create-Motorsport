@@ -11,9 +11,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 
-// Client -> server; set whether the sending player is driving the steering wheel at (pos)
-// The client starts input capture immediately but this packet just tells the server to
-// register/clear the driver so it accepts the input steam and broadcasts the control links
 public record SetDrivingPacket(BlockPos pos, boolean driving) implements CustomPacketPayload {
     public static final Type<SetDrivingPacket> TYPE =
             new Type<>(ResourceLocation.fromNamespaceAndPath(CreateMotorsport.MODID, "set_driving"));

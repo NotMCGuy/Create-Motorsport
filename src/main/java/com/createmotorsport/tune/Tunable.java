@@ -12,9 +12,6 @@ import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 
 
-/**
- * Parts that the Tune screen can edit
- * */
 public interface Tunable {
 
     record Section<T>(String key, String title, ResourceLocation specId, Codec<T> codec, T pack,

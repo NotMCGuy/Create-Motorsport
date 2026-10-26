@@ -87,7 +87,6 @@ public record SuspensionSpec(Type type, Optional<Boolean> driven, double natural
                     DEFAULT_STEER_FULL_LOCK_SPEED, DEFAULT_ROLL_INFLUENCE,
                     DEFAULT_MAX_RIDE_HEIGHT, SuspensionArt.DEFAULT,
                     BrakeSpec.DEFAULT, DamperSpec.F1_DIGRESSIVE, TerrainAssistSpec.DEFAULT);
-    // only differs in camber
     public static final SuspensionSpec RACE_REAR =
             new SuspensionSpec(Type.VERTICAL_STRUT, Optional.of(true),
                     4.6, 0.70, DEFAULT_RIDE_HEIGHT, DEFAULT_TRACK_WIDTH, DEFAULT_WHEEL_OFFSET,
@@ -110,7 +109,6 @@ public record SuspensionSpec(Type type, Optional<Boolean> driven, double natural
                     DEFAULT_MAX_RIDE_HEIGHT, SuspensionArt.DEFAULT,
                     BrakeSpec.DEFAULT, DamperSpec.TRUCK, TerrainAssistSpec.DEFAULT);
 
-    // before the tyre's deflection
     public double staticSagBlocks(double gravity) {
         double omega0 = 2.0 * Math.PI * naturalFreqHz;
         return gravity / (omega0 * omega0);

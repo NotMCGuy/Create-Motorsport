@@ -7,24 +7,17 @@ import net.minecraft.util.Mth;
 import java.util.List;
 import java.util.stream.IntStream;
 
-/**
- * One engine's torque to the axles, as a tree of splits with an axle at each leaf
- * Based on Chrono's ChShaftsDriveline4WD
- * DrivelineSynthesizer builds one per engine, AssembledCar calls distribute() each substep
- */
 public final class Driveline {
 
     public sealed interface Node permits Leaf, Share, Split {
     }
 
-    // axle index in the CarSpec
     public record Leaf(int axle) implements Node {
     }
 
     public record Share(List<Node> children) implements Node {
     }
 
-    // a centre diff or a tandem's divider
     public record Split(TorqueSplitSpec spec, Node first, Node second) implements Node {
     }
 

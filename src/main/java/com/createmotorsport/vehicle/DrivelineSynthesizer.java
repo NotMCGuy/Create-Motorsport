@@ -7,9 +7,6 @@ import com.createmotorsport.physics.vehicle.Driveline;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Temporary way of synthesizing the driven axles until we redo this to work more like Create shaft network
- */
 public final class DrivelineSynthesizer {
 
     private DrivelineSynthesizer() {

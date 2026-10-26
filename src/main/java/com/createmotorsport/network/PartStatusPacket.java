@@ -14,7 +14,6 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.List;
 
-// Server -> client: a part's status lines for its open part screen
 public record PartStatusPacket(BlockPos pos, List<Component> lines) implements CustomPacketPayload {
 
     public static final Type<PartStatusPacket> TYPE =

@@ -38,7 +38,7 @@ public final class GamepadInput {
             return POLLER.button(d, GamepadCodes.basicButtonIndex(code)) ? 1.0F : 0.0F;
         }
         if (GamepadCodes.isBasicTrigger(code)) {
-            float raw = (POLLER.axis(d, GamepadCodes.triggerAxis(code)) + 1.0F) * 0.5F; // -1 rest to +1 pulled
+            float raw = (POLLER.axis(d, GamepadCodes.triggerAxis(code)) + 1.0F) * 0.5F;
             return raw <= triggerDeadzone() ? 0.0F : ramp(raw, triggerDeadzone());
         }
         if (GamepadCodes.isBasicStick(code)) {
@@ -91,7 +91,6 @@ public final class GamepadInput {
         return found;
     }
 
-    // Everything currently pressed across every device, as synthetic codes (for bind capture)
     private static Set<Integer> pressedSet() {
         Set<Integer> set = new HashSet<>();
         for (int d = 0; d < JoystickPoller.MAX_DEVICES; d++) {
@@ -140,13 +139,12 @@ public final class GamepadInput {
     }
 
     private static void addBasicStick(Set<Integer> set, int d, float x, float y, int kBase) {
-        if (x >= stickDeadzone())  set.add(GamepadCodes.stickCode(d, kBase));       // right (+x)
-        if (x <= -stickDeadzone()) set.add(GamepadCodes.stickCode(d, kBase + 1));   // left  (-x)
-        if (y >= stickDeadzone())  set.add(GamepadCodes.stickCode(d, kBase + 2));   // down  (+y)
-        if (y <= -stickDeadzone()) set.add(GamepadCodes.stickCode(d, kBase + 3));   // up    (-y)
+        if (x >= stickDeadzone())  set.add(GamepadCodes.stickCode(d, kBase));
+        if (x <= -stickDeadzone()) set.add(GamepadCodes.stickCode(d, kBase + 1));
+        if (y >= stickDeadzone())  set.add(GamepadCodes.stickCode(d, kBase + 2));
+        if (y <= -stickDeadzone()) set.add(GamepadCodes.stickCode(d, kBase + 3));
     }
 
-    // GamepadCodes hat direction
     private static int hatBit(int dir) {
         return switch (dir) {
             case 0 -> GLFW.GLFW_HAT_UP;

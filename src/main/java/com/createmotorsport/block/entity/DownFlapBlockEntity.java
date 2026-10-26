@@ -23,7 +23,6 @@ import java.util.List;
 
 
 public class DownFlapBlockEntity extends SmartBlockEntity implements IHaveGoggleInformation, BlockEntitySubLevelActor {
-    // max state limit
     public ScrollValueBehaviour targetState;
     int state = 0;
     public LerpedFloat clientState;
@@ -104,7 +103,6 @@ public class DownFlapBlockEntity extends SmartBlockEntity implements IHaveGoggle
 
         @Override
         protected boolean isSideActive(BlockState state, Direction direction) {
-            // also check if pillar
             if (!state.getValue(DownFlapBlock.PILLAR) || direction.getAxis()
                     .isVertical())
                 return false;

@@ -186,7 +186,6 @@ public final class SpecFields {
         return value.toString();
     }
 
-    // natural_freq_hz as "Natural freq (Hz)"
     static String words(String name, boolean withUnit) {
         String stem = name;
         String unit = UNITS.get(name);

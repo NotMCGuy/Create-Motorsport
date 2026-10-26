@@ -57,7 +57,6 @@ public class DownFlapRenderer extends SafeBlockEntityRenderer<DownFlapBlockEntit
         float state = be.clientState.getValue(partialTicks);
         float angle = (float) ((state / 15) * 90 / 180 * Math.PI);
 
-        // downflap wing
         SuperByteBuffer wing = CachedBuffers.partialFacing(MotorsportPartialModels.DOWNFLAP_WING, blockState, facing);
         float[] wingOffset = getRotatedContext(0f, 6.992f, facing);
         wing.translate(wingOffset[0] / 16f, 8.5446f / 16f, wingOffset[1] / 16f);

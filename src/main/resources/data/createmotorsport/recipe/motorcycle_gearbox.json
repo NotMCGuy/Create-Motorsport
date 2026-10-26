@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " I ",
+    "CGC",
+    " I "
+  ],
+  "key": {
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "C": {
+      "item": "create:cogwheel"
+    },
+    "G": {
+      "item": "create:gearbox"
+    }
+  },
+  "result": {
+    "id": "createmotorsport:motorcycle_gearbox",
+    "count": 1
+  }
+}

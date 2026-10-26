@@ -51,7 +51,6 @@ public final class Theme {
     private Theme() {
     }
 
-    // highlight on hover
     public static int hover(int argb) {
         int r = Math.min(255, ((argb >> 16) & 0xFF) + HOVER_LIFT);
         int g = Math.min(255, ((argb >> 8) & 0xFF) + HOVER_LIFT);

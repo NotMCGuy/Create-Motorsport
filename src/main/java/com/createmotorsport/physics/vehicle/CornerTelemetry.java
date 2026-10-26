@@ -12,7 +12,7 @@ public final class CornerTelemetry {
     public double wheelSpeed;
     public double compression;
     public double brakeTorque;
-    public double driveTorque; // what the wheel received this substep, the clutch's stiffness included
+    public double driveTorque;
     public double lockSlip;
     public double gripMult = 1.0;
     public double tempFactor = 1.0;

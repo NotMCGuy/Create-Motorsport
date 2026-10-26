@@ -1,9 +1,5 @@
 package com.createmotorsport.physics.spec;
 
-/**
- * Differential l/r split for an axle
- * Front/rear split is TorqueSplitSpec
- */
 public record DifferentialSpec(DiffParams params, DriveInputSpec input) {
 
     public enum Type {

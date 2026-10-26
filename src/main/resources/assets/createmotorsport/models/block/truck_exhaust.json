@@ -1,0 +1,358 @@
+{
+  "textures": {
+    "metal": "minecraft:block/iron_block",
+    "dark": "minecraft:block/gray_concrete",
+    "brass": "minecraft:block/gold_block",
+    "casing": "minecraft:block/gray_concrete",
+    "screen": "minecraft:block/black_concrete",
+    "particle": "#metal"
+  },
+  "elements": [
+    {
+      "name": "truck_detail_exhaust_elbow",
+      "from": [
+        13,
+        6,
+        6
+      ],
+      "to": [
+        18,
+        9,
+        10
+      ],
+      "faces": {
+        "north": {
+          "texture": "#metal",
+          "uv": [
+            5.5,
+            6.5,
+            10.5,
+            9.5
+          ]
+        },
+        "south": {
+          "texture": "#metal",
+          "uv": [
+            5.5,
+            6.5,
+            10.5,
+            9.5
+          ]
+        },
+        "east": {
+          "texture": "#metal",
+          "uv": [
+            6.0,
+            6.5,
+            10.0,
+            9.5
+          ]
+        },
+        "west": {
+          "texture": "#metal",
+          "uv": [
+            6.0,
+            6.5,
+            10.0,
+            9.5
+          ]
+        },
+        "up": {
+          "texture": "#metal",
+          "uv": [
+            5.5,
+            6.0,
+            10.5,
+            10.0
+          ]
+        },
+        "down": {
+          "texture": "#metal",
+          "uv": [
+            5.5,
+            6.0,
+            10.5,
+            10.0
+          ]
+        }
+      }
+    },
+    {
+      "name": "truck_detail_exhaust_stack",
+      "from": [
+        16,
+        8,
+        6
+      ],
+      "to": [
+        19,
+        25,
+        9
+      ],
+      "faces": {
+        "north": {
+          "texture": "#dark",
+          "uv": [
+            6.5882,
+            0.0,
+            9.4118,
+            16.0
+          ]
+        },
+        "south": {
+          "texture": "#dark",
+          "uv": [
+            6.5882,
+            0.0,
+            9.4118,
+            16.0
+          ]
+        },
+        "east": {
+          "texture": "#dark",
+          "uv": [
+            6.5882,
+            0.0,
+            9.4118,
+            16.0
+          ]
+        },
+        "west": {
+          "texture": "#dark",
+          "uv": [
+            6.5882,
+            0.0,
+            9.4118,
+            16.0
+          ]
+        },
+        "up": {
+          "texture": "#dark",
+          "uv": [
+            6.5,
+            6.5,
+            9.5,
+            9.5
+          ]
+        },
+        "down": {
+          "texture": "#dark",
+          "uv": [
+            6.5,
+            6.5,
+            9.5,
+            9.5
+          ]
+        }
+      }
+    },
+    {
+      "name": "truck_detail_lower_band",
+      "from": [
+        15.75,
+        10,
+        5.75
+      ],
+      "to": [
+        19.25,
+        11,
+        9.25
+      ],
+      "faces": {
+        "north": {
+          "texture": "#brass",
+          "uv": [
+            6.25,
+            7.5,
+            9.75,
+            8.5
+          ]
+        },
+        "south": {
+          "texture": "#brass",
+          "uv": [
+            6.25,
+            7.5,
+            9.75,
+            8.5
+          ]
+        },
+        "east": {
+          "texture": "#brass",
+          "uv": [
+            6.25,
+            7.5,
+            9.75,
+            8.5
+          ]
+        },
+        "west": {
+          "texture": "#brass",
+          "uv": [
+            6.25,
+            7.5,
+            9.75,
+            8.5
+          ]
+        },
+        "up": {
+          "texture": "#brass",
+          "uv": [
+            6.25,
+            6.25,
+            9.75,
+            9.75
+          ]
+        },
+        "down": {
+          "texture": "#brass",
+          "uv": [
+            6.25,
+            6.25,
+            9.75,
+            9.75
+          ]
+        }
+      }
+    },
+    {
+      "name": "truck_detail_upper_band",
+      "from": [
+        15.75,
+        22,
+        5.75
+      ],
+      "to": [
+        19.25,
+        23,
+        9.25
+      ],
+      "faces": {
+        "north": {
+          "texture": "#metal",
+          "uv": [
+            6.25,
+            7.5,
+            9.75,
+            8.5
+          ]
+        },
+        "south": {
+          "texture": "#metal",
+          "uv": [
+            6.25,
+            7.5,
+            9.75,
+            8.5
+          ]
+        },
+        "east": {
+          "texture": "#metal",
+          "uv": [
+            6.25,
+            7.5,
+            9.75,
+            8.5
+          ]
+        },
+        "west": {
+          "texture": "#metal",
+          "uv": [
+            6.25,
+            7.5,
+            9.75,
+            8.5
+          ]
+        },
+        "up": {
+          "texture": "#metal",
+          "uv": [
+            6.25,
+            6.25,
+            9.75,
+            9.75
+          ]
+        },
+        "down": {
+          "texture": "#metal",
+          "uv": [
+            6.25,
+            6.25,
+            9.75,
+            9.75
+          ]
+        }
+      }
+    },
+    {
+      "name": "truck_detail_rain_cap",
+      "from": [
+        15.5,
+        25,
+        5.5
+      ],
+      "to": [
+        19.5,
+        26,
+        9.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#metal",
+          "uv": [
+            6.0,
+            7.5,
+            10.0,
+            8.5
+          ]
+        },
+        "south": {
+          "texture": "#metal",
+          "uv": [
+            6.0,
+            7.5,
+            10.0,
+            8.5
+          ]
+        },
+        "east": {
+          "texture": "#metal",
+          "uv": [
+            6.0,
+            7.5,
+            10.0,
+            8.5
+          ]
+        },
+        "west": {
+          "texture": "#metal",
+          "uv": [
+            6.0,
+            7.5,
+            10.0,
+            8.5
+          ]
+        },
+        "up": {
+          "texture": "#metal",
+          "uv": [
+            6.0,
+            6.0,
+            10.0,
+            10.0
+          ]
+        },
+        "down": {
+          "texture": "#metal",
+          "uv": [
+            6.0,
+            6.0,
+            10.0,
+            10.0
+          ]
+        }
+      }
+    }
+  ],
+  "parent": "minecraft:block/block"
+}

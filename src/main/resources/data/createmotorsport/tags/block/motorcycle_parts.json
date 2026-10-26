@@ -1,0 +1,12 @@
+{
+  "replace": false,
+  "values": [
+    "createmotorsport:motorcycle_forks",
+    "createmotorsport:motorcycle_rear_arm",
+    "createmotorsport:motorcycle_handlebars",
+    "createmotorsport:motorcycle_gearbox",
+    "createmotorsport:motorcycle_seat",
+    "createmotorsport:motorcycle_fuel_tank_slab",
+    "createmotorsport:creative_motorcycle_fuel_tank_slab"
+  ]
+}

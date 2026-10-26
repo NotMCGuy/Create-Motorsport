@@ -25,6 +25,7 @@ public class EnginePartScreen extends PartScreen {
             int dir = engine != null ? engine.getRotationDirection() : 1;
             return Component.literal("Rotation: " + (dir > 0 ? "1" : "-1"));
         }, Theme.NEUTRAL, () -> PacketDistributor.sendToServer(new ToggleEngineDirectionPacket(pos)));
-        return List.of(List.of(tune()), List.of(rotation), List.of(wireless()));
+        return List.of(List.of(tune()), List.of(rotation), List.of(new Button(() -> Component.literal("Attachments & Redstone Links"), Theme.NEUTRAL,
+                () -> PacketDistributor.sendToServer(new com.createmotorsport.network.OpenWirelessPacket(pos)))));
     }
 }

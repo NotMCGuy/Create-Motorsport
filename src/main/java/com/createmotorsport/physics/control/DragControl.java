@@ -2,10 +2,6 @@ package com.createmotorsport.physics.control;
 
 import net.minecraft.util.Mth;
 
-/**
- * Engine drag torque control stops a wheel from slipping from the engine drag, mainly useful for low traction surfaces
- * AssembledCar steps it each substep with the traction control
- */
 public final class DragControl {
 
     private DragControl() {

@@ -24,10 +24,9 @@ public final class DrivetrainSim {
 
     private double rpm;
     private int gear = GEAR_NEUTRAL;
-    private double clutchEngage = 0.0; // 0 = disengaged
+    private double clutchEngage = 0.0;
     private double shiftReleaseTimer = 0.0;
 
-    // For csv logging, last computed value
     private double lastEngineTorque;
     private double lastRatio;
     private double lastWheelTorque;
@@ -53,12 +52,6 @@ public final class DrivetrainSim {
         return GEAR_FIRST + this.gearbox.gearCount() - 1;
     }
 
-    /**
-     * The clutch's hold on the wheels for one substep, before the caller's torque scale
-     *
-     * @param stiffness Nm less per rad/s the gearbox gains
-     * @param limit the most the coupling passes either direction before it slips
-     */
     public record Coupling(double torque, double stiffness, double limit) {
         public static final Coupling NONE = new Coupling(0.0, 0.0, 0.0);
     }
@@ -166,12 +159,6 @@ public final class DrivetrainSim {
         this.clutchCap = (clutch.maxTorque() * engineScale) * this.clutchEngage;
     }
 
-    /**
-     * The wheel step solves the Coupling with its tyre and brake, so engine, clutch and wheels step together implicitly
-     *
-     * @param wheelOmega  average driven-wheel spin (rad/s) at the substep's start
-     * @param minThrottle from engine drag control
-     */
     public Coupling couple(double wheelOmega, double dt, double minThrottle) {
         settle(wheelOmega);
         double inertia = this.spec.engineInertia();
@@ -200,7 +187,6 @@ public final class DrivetrainSim {
 
         tEng = netEngineTorque(Math.max(this.effThrottle, minThrottle), omega) + cranking;
 
-        // The engine's half of the implicit step, with the gearbox's change left as the unknown the wheels solve
         double kc = this.gearbox.clutch().lockStiffness();
         double omegaGb = wheelOmega * ratio;
         double stiffness = kc / (1.0 + dt * kc / inertia);
@@ -302,7 +288,6 @@ public final class DrivetrainSim {
         return this.lastClutchLocked;
     }
 
-    // Signed overall ratio from crank -> wheel for gear index; 0 for neutral, negative for reverse
     private double overallRatio(int gearIndex) {
         double finalDrive = this.gearbox.finalDriveOr(this.spec.finalDrive());
         if (gearIndex == GEAR_REVERSE) {
@@ -326,7 +311,6 @@ public final class DrivetrainSim {
         return this.rpm;
     }
 
-    // combustion plus the pumping loss throttle takes away. Cruise control divides its gains by this
     public double wheelTorquePerThrottle() {
         double n = Mth.clamp(Math.abs(this.rpm) / this.spec.redlineRpm(), 0.0, 1.2);
         double pumping = this.spec.engineBrakeFraction() * this.spec.peakTorque() * (0.35 + 1.40 * n * n);
@@ -354,7 +338,6 @@ public final class DrivetrainSim {
         };
     }
 
-    // menu sync code, 0=R, 1=N, 2=1st gear
     public int gearCode() {
         return this.gear;
     }

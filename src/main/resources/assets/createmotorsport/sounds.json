@@ -1,22 +1,326 @@
 {
   "engine_idle": {
     "sounds": [
-      "createmotorsport:engine_idle"
+      {
+        "name": "createmotorsport:engine_loop_idle",
+        "attenuation_distance": 32
+      }
     ]
   },
   "engine_low": {
     "sounds": [
-      "createmotorsport:engine_low"
+      {
+        "name": "createmotorsport:engine_loop_low",
+        "attenuation_distance": 32
+      }
     ]
   },
   "engine_mid": {
     "sounds": [
-      "createmotorsport:engine_mid"
+      {
+        "name": "createmotorsport:engine_loop_mid",
+        "attenuation_distance": 32
+      }
     ]
   },
   "engine_fast": {
     "sounds": [
-      "createmotorsport:engine_fast"
+      {
+        "name": "createmotorsport:engine_loop_fast",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "diesel_idle": {
+    "subtitle": "subtitles.createmotorsport.diesel",
+    "sounds": [
+      {
+        "name": "createmotorsport:diesel_idle",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "diesel_low": {
+    "subtitle": "subtitles.createmotorsport.diesel",
+    "sounds": [
+      {
+        "name": "createmotorsport:diesel_low",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "diesel_mid": {
+    "subtitle": "subtitles.createmotorsport.diesel",
+    "sounds": [
+      {
+        "name": "createmotorsport:diesel_mid",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "diesel_fast": {
+    "subtitle": "subtitles.createmotorsport.diesel",
+    "sounds": [
+      {
+        "name": "createmotorsport:diesel_fast",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "motorcycle_idle": {
+    "sounds": [
+      {
+        "name": "createmotorsport:motorcycle_idle",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "motorcycle_low": {
+    "sounds": [
+      {
+        "name": "createmotorsport:motorcycle_low",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "motorcycle_mid": {
+    "sounds": [
+      {
+        "name": "createmotorsport:motorcycle_mid",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "motorcycle_fast": {
+    "sounds": [
+      {
+        "name": "createmotorsport:motorcycle_fast",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "engine_coast_low": {
+    "sounds": [
+      {
+        "name": "createmotorsport:engine_coast_low",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "motorcycle_coast_low": {
+    "sounds": [
+      {
+        "name": "createmotorsport:motorcycle_coast_low",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "engine_backfire": {
+    "sounds": [
+      {
+        "name": "createmotorsport:engine_backfire",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "engine_coast_fast": {
+    "sounds": [
+      {
+        "name": "createmotorsport:engine_coast_fast",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "motorcycle_coast_fast": {
+    "sounds": [
+      {
+        "name": "createmotorsport:motorcycle_coast_fast",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "engine_shift": {
+    "sounds": [
+      {
+        "name": "createmotorsport:engine_shift",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "engine_coast_mid": {
+    "sounds": [
+      {
+        "name": "createmotorsport:engine_coast_mid",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "engine_grind": {
+    "sounds": [
+      {
+        "name": "createmotorsport:engine_grind",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "engine_limiter": {
+    "sounds": [
+      {
+        "name": "createmotorsport:engine_limiter",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "engine_coast_idle": {
+    "sounds": [
+      {
+        "name": "createmotorsport:engine_coast_idle",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "motorcycle_coast_idle": {
+    "sounds": [
+      {
+        "name": "createmotorsport:motorcycle_coast_idle",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "motorcycle_coast_mid": {
+    "sounds": [
+      {
+        "name": "createmotorsport:motorcycle_coast_mid",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "f1_idle": {
+    "sounds": [
+      {
+        "name": "createmotorsport:f1_idle",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "f1_low": {
+    "sounds": [
+      {
+        "name": "createmotorsport:f1_low",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "f1_mid": {
+    "sounds": [
+      {
+        "name": "createmotorsport:f1_mid",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "f1_fast": {
+    "sounds": [
+      {
+        "name": "createmotorsport:f1_fast",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "f1_coast_idle": {
+    "sounds": [
+      {
+        "name": "createmotorsport:f1_coast_idle",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "f1_coast_low": {
+    "sounds": [
+      {
+        "name": "createmotorsport:f1_coast_low",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "f1_coast_mid": {
+    "sounds": [
+      {
+        "name": "createmotorsport:f1_coast_mid",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "f1_coast_fast": {
+    "sounds": [
+      {
+        "name": "createmotorsport:f1_coast_fast",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "f1_shift": {
+    "sounds": [
+      {
+        "name": "createmotorsport:f1_shift",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "f1_grind": {
+    "sounds": [
+      {
+        "name": "createmotorsport:f1_grind",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "f1_limiter": {
+    "sounds": [
+      {
+        "name": "createmotorsport:f1_limiter",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "f1_backfire": {
+    "sounds": [
+      {
+        "name": "createmotorsport:f1_backfire",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "f1_intake": {
+    "sounds": [
+      {
+        "name": "createmotorsport:f1_intake",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "f1_transmission": {
+    "sounds": [
+      {
+        "name": "createmotorsport:f1_transmission",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "f1_tyre": {
+    "sounds": [
+      {
+        "name": "createmotorsport:f1_tyre",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "f1_wind": {
+    "sounds": [
+      {
+        "name": "createmotorsport:f1_wind",
+        "attenuation_distance": 32
+      }
     ]
   }
 }

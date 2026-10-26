@@ -5,7 +5,7 @@
         "facing": "east"
       },
       "apply": {
-        "model": "createmotorsport:block/engine"
+        "model": "createmotorsport:block/truck_engine"
       }
     },
     {
@@ -13,7 +13,7 @@
         "facing": "west"
       },
       "apply": {
-        "model": "createmotorsport:block/engine",
+        "model": "createmotorsport:block/truck_engine",
         "y": 180
       }
     },
@@ -22,7 +22,7 @@
         "facing": "south"
       },
       "apply": {
-        "model": "createmotorsport:block/engine",
+        "model": "createmotorsport:block/truck_engine",
         "y": 90
       }
     },
@@ -31,7 +31,85 @@
         "facing": "north"
       },
       "apply": {
-        "model": "createmotorsport:block/engine",
+        "model": "createmotorsport:block/truck_engine",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "facing": "east",
+        "has_intake": "true"
+      },
+      "apply": {
+        "model": "createmotorsport:block/truck_intake"
+      }
+    },
+    {
+      "when": {
+        "facing": "west",
+        "has_intake": "true"
+      },
+      "apply": {
+        "model": "createmotorsport:block/truck_intake",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "south",
+        "has_intake": "true"
+      },
+      "apply": {
+        "model": "createmotorsport:block/truck_intake",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "north",
+        "has_intake": "true"
+      },
+      "apply": {
+        "model": "createmotorsport:block/truck_intake",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "facing": "east",
+        "has_exhaust": "true"
+      },
+      "apply": {
+        "model": "createmotorsport:block/truck_exhaust"
+      }
+    },
+    {
+      "when": {
+        "facing": "west",
+        "has_exhaust": "true"
+      },
+      "apply": {
+        "model": "createmotorsport:block/truck_exhaust",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "south",
+        "has_exhaust": "true"
+      },
+      "apply": {
+        "model": "createmotorsport:block/truck_exhaust",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "north",
+        "has_exhaust": "true"
+      },
+      "apply": {
+        "model": "createmotorsport:block/truck_exhaust",
         "y": 270
       }
     }

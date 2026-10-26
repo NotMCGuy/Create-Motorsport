@@ -10,7 +10,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-// Client -> server
 public record OpenWirelessPacket(BlockPos pos) implements CustomPacketPayload {
 
     public static final Type<OpenWirelessPacket> TYPE =

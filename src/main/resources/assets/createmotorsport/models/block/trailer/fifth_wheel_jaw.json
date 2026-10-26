@@ -2,9 +2,10 @@
   "textures": {
     "metal": "minecraft:block/iron_block",
     "dark": "minecraft:block/gray_concrete",
-    "brass": "minecraft:block/yellow_terracotta",
+    "brass": "minecraft:block/gold_block",
     "screen": "minecraft:block/black_concrete",
-    "particle": "minecraft:block/iron_block"
+    "particle": "#metal",
+    "casing": "minecraft:block/gray_concrete"
   },
   "elements": [
     {
@@ -20,24 +21,62 @@
       ],
       "faces": {
         "north": {
-          "texture": "#dark"
+          "texture": "#dark",
+          "uv": [
+            6.65,
+            6.0,
+            9.35,
+            10.0
+          ]
         },
         "south": {
-          "texture": "#dark"
+          "texture": "#dark",
+          "uv": [
+            6.65,
+            6.0,
+            9.35,
+            10.0
+          ]
         },
         "east": {
-          "texture": "#dark"
+          "texture": "#dark",
+          "uv": [
+            5.0,
+            6.0,
+            11.0,
+            10.0
+          ]
         },
         "west": {
-          "texture": "#dark"
+          "texture": "#dark",
+          "uv": [
+            5.0,
+            6.0,
+            11.0,
+            10.0
+          ]
         },
         "up": {
-          "texture": "#dark"
+          "texture": "#dark",
+          "uv": [
+            6.65,
+            5.0,
+            9.35,
+            11.0
+          ]
         },
         "down": {
-          "texture": "#dark"
+          "texture": "#dark",
+          "uv": [
+            6.65,
+            5.0,
+            9.35,
+            11.0
+          ]
         }
       }
     }
-  ]
+  ],
+  "ambientocclusion": true,
+  "parent": "minecraft:block/block"
 }

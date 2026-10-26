@@ -17,8 +17,14 @@ import org.joml.Vector3d;
 @PrefixGameTestTemplate(false)
 public final class TrailerGameTests {
     private record Pair(ServerSubLevel first,ServerSubLevel second,EquipmentBlockEntity hitch,EquipmentBlockEntity head) {}
+    private static int pairIndex;
+    private static final java.util.Map<java.util.UUID, net.minecraft.world.level.ChunkPos> PAIR_CHUNKS = new java.util.HashMap<>();
     private static Pair pair(GameTestHelper helper,boolean fifth) {
-        var p=helper.absolutePos(new BlockPos(5,6,5));
+        int chunkX = 20 + pairIndex++;
+        var chunk = new net.minecraft.world.level.ChunkPos(chunkX, 20);
+        boolean forced = helper.getLevel().getForcedChunks().contains(chunk.toLong());
+        helper.getLevel().setChunkForced(chunkX, 20, true);
+        var p=new BlockPos(chunkX * 16 + 8, 86, 328);
         Vector3d position=new Vector3d(p.getX(),p.getY(),p.getZ());
         var a=TrailerTestRig.body(helper.getLevel(),position);
         var b=TrailerTestRig.body(helper.getLevel(),new Vector3d(position).add(0,fifth?1.0/32:1.0/16,fifth?0:43.0/64));
@@ -26,6 +32,7 @@ public final class TrailerGameTests {
         var head=TrailerTestRig.equipment(b,BlockPos.ZERO,fifth?TrailerRegistry.KINGPIN.get():TrailerRegistry.COUPLING_HEAD.get());
         TrailerTestRig.finishPlacement(a,position);
         TrailerTestRig.finishPlacement(b,new Vector3d(position).add(0,fifth?1.0/32:1.0/16,fifth?0:43.0/64));
+        if (!forced) PAIR_CHUNKS.put(b.getUniqueId(), chunk);
         return new Pair(a,b,hitch,head);
     }
     @GameTest(template="trailer_empty",timeoutTicks=100)
@@ -60,7 +67,11 @@ public final class TrailerGameTests {
     }
     private static void remove(GameTestHelper helper,ServerSubLevel... bodies) {
         var container=SubLevelContainer.getContainer(helper.getLevel());
-        for(var body:bodies)if(!body.isRemoved())container.removeSubLevel(body,SubLevelRemovalReason.REMOVED);
+        for(var body:bodies) {
+            if(!body.isRemoved())container.removeSubLevel(body,SubLevelRemovalReason.REMOVED);
+            var chunk = PAIR_CHUNKS.remove(body.getUniqueId());
+            if (chunk != null) helper.getLevel().setChunkForced(chunk.x, chunk.z, false);
+        }
     }
     private static void stop(ServerSubLevel body) {
         var handle=RigidBodyHandle.of(body);

@@ -5,11 +5,11 @@ import net.minecraft.nbt.CompoundTag;
 
 public final class Ghost {
 
-    public static final int SAMPLE_TICKS = 2; // every 2 ticks is one sample
-    public static final int MAX_SAMPLES = 18_000; // 30 minute lap at 10 hz should be enough, bound is safer
+    public static final int SAMPLE_TICKS = 2;
+    public static final int MAX_SAMPLES = 18_000;
 
     private float[] samples = new float[0];
-    private int syncedSampleCount; // samples arent synced, so client-side mirror of samples.length
+    private int syncedSampleCount;
     private long lapTicks;
     private long leadInTicks;
     private String name = "";
@@ -48,7 +48,6 @@ public final class Ghost {
         this.name = "";
     }
 
-    // keeps the lap if it beats the stored one
     public boolean offer(Entrant e, long lapTicks) {
         if (!this.enabled || lapTicks <= 0 || e.recording.size() < 2) {
             return false;

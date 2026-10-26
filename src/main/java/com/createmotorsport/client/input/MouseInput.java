@@ -3,17 +3,16 @@ package com.createmotorsport.client.input;
 import com.createmotorsport.Config;
 import net.minecraft.client.Minecraft;
 
-// mouse input ported from Universal Keyboard, but looked at how speed dreams did it for calibration
 public final class MouseInput {
     private MouseInput() {}
 
     private static final float FULL_DEFLECTION_PX = 18f;
     private static final float ABSOLUTE_SENS_FACTOR = 0.1f;
-    private static final float CAPTURE_MOVE = 0.5f; // larger deadzone for initial binding
+    private static final float CAPTURE_MOVE = 0.5f;
 
     private static double lastX = Double.NaN, lastY;
-    private static float curDX, curDY;      // per tick pixel delta
-    private static double anchorX, anchorY; // cursor position when the lock engaged, for absolute mode
+    private static float curDX, curDY;
+    private static double anchorX, anchorY;
     private static float absOffX, absOffY;
 
     public static boolean enabled() {
@@ -56,7 +55,6 @@ public final class MouseInput {
         absOffY = (float) (y - anchorY);
     }
 
-    // Recenter to the current cursor
     public static void recenter() {
         Minecraft mc = Minecraft.getInstance();
         anchorX = mc.mouseHandler.xpos();
@@ -96,7 +94,6 @@ public final class MouseInput {
         return analogMagnitude(code) > 0f;
     }
 
-    // Binding capture
     public static void beginCapture() {
         poll();
     }

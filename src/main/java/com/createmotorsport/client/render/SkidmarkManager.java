@@ -17,7 +17,6 @@ import org.joml.Matrix4f;
 
 import java.util.ArrayDeque;
 
-// Client-only store + renderer for skid marks
 
 public final class SkidmarkManager {
     private static final ResourceLocation TEXTURE =
@@ -30,7 +29,7 @@ public final class SkidmarkManager {
     }
 
     private static final class Skid {
-        final float[] q; // 12 corner floats: prevL, prevR, curR, curL
+        final float[] q;
         final float intensity;
         final long spawnMs;
         final int light;
@@ -43,7 +42,6 @@ public final class SkidmarkManager {
         }
     }
 
-    // Called from the packet handler, 13 floats, 12 corners + intensity
     public static void add(float[] quad) {
         Level level = Minecraft.getInstance().level;
         if (level == null) {
@@ -77,7 +75,6 @@ public final class SkidmarkManager {
         double lifeMs = Config.SKIDMARK_LIFETIME.getAsDouble() * 1000.0;
         float opacity = (float) Config.SKIDMARK_OPACITY.getAsDouble();
 
-        // Drop the oldest ones from the head
         while (!SKIDS.isEmpty() && now - SKIDS.peekFirst().spawnMs >= lifeMs) {
             SKIDS.pollFirst();
         }
@@ -103,15 +100,15 @@ public final class SkidmarkManager {
             }
             float[] q = s.q;
 
-            corner(vc, matrix, cam, q, 0, 0.0f, 0.0f, alpha, s.light); // prevL
-            corner(vc, matrix, cam, q, 3, 1.0f, 0.0f, alpha, s.light); // prevR
-            corner(vc, matrix, cam, q, 6, 1.0f, 1.0f, alpha, s.light); // curR
-            corner(vc, matrix, cam, q, 9, 0.0f, 1.0f, alpha, s.light); // curL
+            corner(vc, matrix, cam, q, 0, 0.0f, 0.0f, alpha, s.light);
+            corner(vc, matrix, cam, q, 3, 1.0f, 0.0f, alpha, s.light);
+            corner(vc, matrix, cam, q, 6, 1.0f, 1.0f, alpha, s.light);
+            corner(vc, matrix, cam, q, 9, 0.0f, 1.0f, alpha, s.light);
 
-            corner(vc, matrix, cam, q, 9, 0.0f, 1.0f, alpha, s.light); // curL
-            corner(vc, matrix, cam, q, 6, 1.0f, 1.0f, alpha, s.light); // curR
-            corner(vc, matrix, cam, q, 3, 1.0f, 0.0f, alpha, s.light); // prevR
-            corner(vc, matrix, cam, q, 0, 0.0f, 0.0f, alpha, s.light); // prevL
+            corner(vc, matrix, cam, q, 9, 0.0f, 1.0f, alpha, s.light);
+            corner(vc, matrix, cam, q, 6, 1.0f, 1.0f, alpha, s.light);
+            corner(vc, matrix, cam, q, 3, 1.0f, 0.0f, alpha, s.light);
+            corner(vc, matrix, cam, q, 0, 0.0f, 0.0f, alpha, s.light);
         }
 
         buffers.endBatch(RENDER_TYPE);

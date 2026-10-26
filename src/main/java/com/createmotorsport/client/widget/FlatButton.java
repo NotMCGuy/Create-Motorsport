@@ -30,13 +30,11 @@ public class FlatButton extends AbstractButton {
         return this;
     }
 
-    // Draws the label dimmed for toggle currently off
     public FlatButton muted(boolean muted) {
         this.muted = muted;
         return this;
     }
 
-    // tooltips are nice, see HoverTip
     public FlatButton hoverTip(@Nullable Component hoverTip) {
         this.hoverTip = hoverTip;
         return this;

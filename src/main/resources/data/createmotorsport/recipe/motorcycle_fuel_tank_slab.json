@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "III",
+    "ITI"
+  ],
+  "key": {
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "T": {
+      "item": "create:fluid_tank"
+    }
+  },
+  "result": {
+    "id": "createmotorsport:motorcycle_fuel_tank_slab",
+    "count": 1
+  }
+}

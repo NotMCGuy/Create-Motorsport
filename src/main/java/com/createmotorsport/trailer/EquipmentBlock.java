@@ -115,7 +115,7 @@ public class EquipmentBlock extends HorizontalDirectionalBlock implements Entity
             case TOW_BALL -> Shapes.or(box(5,0,2,11,4,12),box(6,3,11,10,8,15));
             case COUPLING_HEAD -> box(4,11,6,12,16,16);
             case LANDING_LEGS -> box(-4, 2, 5, 20, 14, 11);
-            case CONTROL_PANEL -> box(2, 0, 2, 14, 12, 14);
+            case CONTROL_PANEL -> box(0, 8, 0, 16, 16, 16);
         };
     }
 }

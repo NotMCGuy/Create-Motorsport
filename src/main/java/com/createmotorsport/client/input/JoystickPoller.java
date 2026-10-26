@@ -6,9 +6,6 @@ import org.lwjgl.glfw.GLFWGamepadState;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
-// Polls every connected joystick each tick
-// Theres a basic mode that is on by default, which looks for GLFW reconized axis.
-// to use a racing wheel and pedal, enable Advanced Controls which allows for raw inputs
 public final class JoystickPoller {
 
     public static final int MAX_DEVICES = GamepadCodes.MAX_DEVICES;
@@ -37,7 +34,6 @@ public final class JoystickPoller {
     }
 
     private void pollBasic(int d) {
-        // Basic mode only brings up devices that GLFW recognizes as gamepads
         if (GLFW.glfwJoystickIsGamepad(d) && GLFW.glfwGetGamepadState(d, state)) {
             present[d] = true;
             basic[d]   = true;
