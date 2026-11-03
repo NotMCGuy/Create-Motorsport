@@ -6,6 +6,13 @@ import com.createmotorsport.physics.spec.SurfaceSpec;
 import com.createmotorsport.physics.spec.TireSpec;
 import net.minecraft.util.Mth;
 
+/**
+ * TYRE MODEL 2, "Pacejka Magic Formula"
+ *
+ * Dr. Pacejka's combined slip model and a friction ellipse
+ *
+ * Corner calls solve() every substep in TireModels
+ */
 public final class PacejkaTire implements Tire {
 
     public static final PacejkaTire INSTANCE = new PacejkaTire();
@@ -13,6 +20,7 @@ public final class PacejkaTire implements Tire {
     private PacejkaTire() {
     }
 
+    /** Longitudinal and lateral force on the steady curve at the wheel's current spin. */
     private static double[] curve(Input in, Contact c) {
         double vLon = in.vLon();
         double vLat = in.vLat();
@@ -21,6 +29,7 @@ public final class PacejkaTire implements Tire {
         double slipLon = (wheelSpeed - vLon) / denom;
         double slipLat = vLat / Math.max(Math.abs(vLon), Config.SIM_LOWSPEED_REF.getAsDouble());
 
+        // friction ellipse instead of circle for configurable lateral slipperiness
         double latGrip = Config.SIM_LATERAL_GRIP.getAsDouble();
         double slipLatEff = slipLat / latGrip;
         double s = Math.sqrt(slipLon * slipLon + slipLatEff * slipLatEff);
@@ -37,6 +46,10 @@ public final class PacejkaTire implements Tire {
         return new double[]{forwardForce, lateralForce};
     }
 
+    /**
+     * Where {@code slipCurve} peaks, {@code C * atan(phi) = pi/2}, solved for the slip and taken back through the
+     * lateral ellipse {@code curve} divides by. A curve with {@code C <= 1} only rises, so its peak is the slip limit.
+     */
     @Override
     public double peakSlipAngle(TireSpec spec, double load, double designLoad, SurfaceSpec surface, double mu) {
         double limit = Config.SIM_SLIP_LIMIT.getAsDouble();

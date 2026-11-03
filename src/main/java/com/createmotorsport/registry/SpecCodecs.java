@@ -126,6 +126,7 @@ public final class SpecCodecs {
                     .forGetter(SuspensionArt::animation)
     ).apply(i, SuspensionArt::new));
 
+    // the fields past RecordCodecBuilder's 16, still flat in the JSON
     private record SuspensionExtras(double wheelOffset, double maxRideHeight, SuspensionArt art) {
     }
 
@@ -302,6 +303,7 @@ public final class SpecCodecs {
             field(Vec3.CODEC, "rotation", Vec3.ZERO).forGetter(TireEntry::rotation),
             field(Vec3.CODEC, "offset", Vec3.ZERO).forGetter(TireEntry::offset),
             ResourceLocation.CODEC.optionalFieldOf("model").forGetter(TireEntry::model),
+            Codec.floatRange(0.05f, 16.0f).optionalFieldOf("art_radius").forGetter(TireEntry::artRadius),
             field(Codec.FLOAT, "minimum_friction", 0.0f).forGetter(TireEntry::minimumFriction),
             field(Codec.FLOAT, "vertical_deflection", TireEntry.DEFAULT_VERTICAL_DEFLECTION)
                     .forGetter(TireEntry::verticalDeflection),

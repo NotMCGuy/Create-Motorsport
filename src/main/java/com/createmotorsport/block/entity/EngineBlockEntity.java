@@ -38,23 +38,38 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.List;
 
+/**
+ * Engine and (for now) the gearbox, run by DrivetrainSim
+ * The car calls beginStep and gameStep each tick, coupling and settle each substep
+ * An engine runs them itself if no Steering Wheel is attached, markKeyed()
+ *
+ * HAS TO BE A SABLE ACTOR SO THAT AssembledCar.rebuild FINDS IT
+ * see vehicle/AssembledCar for a checklist when adding new kinds of Block Entities for a car
+ */
 public class EngineBlockEntity extends SmartBlockEntity implements com.createmotorsport.menu.PartPanel, dev.ryanhcode.sable.api.block.BlockEntitySubLevelActor,
         Tunable {
 
+    // ==========================================
+    // CONSTANTS / TYPES
+    // ==========================================
 
+    // see ConfiguredDrops
     public static final java.util.Set<String> CONFIGURATION_KEYS = java.util.Set.of(
             "Engine", "Gearbox", "EngineOverrides", "GearboxOverrides", "RotationDirection",
             "PowerMode", "Items", "SlotLayout");
 
+    // sound and fuel
     private static final int FUEL_PER_BURN = 100;
     private static final int BURN_TICKS = 100;
 
+    // redstone link channels
     public static final ControlChannel[] CHANNELS = ControlChannel.values();
     public static final int SLOT_CHANNELS_START = 0;
     public static final int SLOT_EXHAUST = CHANNELS.length * 2;
     public static final int SLOT_INTAKE = SLOT_EXHAUST + 1;
     public static final int SLOT_COUNT = SLOT_INTAKE + 1;
 
+    // legacy compat
     private static final int LEGACY_CHANNELS_START = 2;
 
     public static int channelSlotA(ControlChannel channel) {
@@ -65,6 +80,7 @@ public class EngineBlockEntity extends SmartBlockEntity implements com.createmot
         return SLOT_CHANNELS_START + channel.ordinal() * 2 + 1;
     }
 
+    // redstone link channels
     public enum ControlChannel {
         THROTTLE("Throttle"),
         CLUTCH("Clutch"),
@@ -83,21 +99,26 @@ public class EngineBlockEntity extends SmartBlockEntity implements com.createmot
         }
     }
 
+    // ==========================================
+    // STATE
+    // ==========================================
 
     private final EngineKind kind;
     private final SpecSlot<EngineSpec> engineSlot;
     private final SpecSlot<GearboxSpec> gearboxSlot;
     private EngineSpec baseSpec;
 
+    // ENGINE
     private final DrivetrainSim drivetrain;
-    private double torqueScale;
-    private int rotationDirection = 1;
+    private double torqueScale; // design mass, trim and power mode, set each game tick
+    private int rotationDirection = 1; // User selected engine crank rotation direction (+1 or -1)
     private float throttle;
     private int burnTicks;
 
     private final IgnitionSwitch ignition = new IgnitionSwitch();
-    private final PowerMode power = new PowerMode();
+    private final PowerMode power = new PowerMode(); // engine power mode and overtake boost
 
+    // DRIVER CONTROLS from steering wheel
     private final int[] driverSignals = new int[CHANNELS.length];
     private float driverThrottle01;
     private long driverSignalTime = Long.MIN_VALUE;
@@ -112,6 +133,8 @@ public class EngineBlockEntity extends SmartBlockEntity implements com.createmot
     private int lastShiftDownSignal;
 
     private boolean loadingInventory;
+
+    // redstone link items
     private final NonNullList<ItemStack> items = NonNullList.withSize(SLOT_COUNT, ItemStack.EMPTY);
     private final SimpleContainer inventory = new SimpleContainer(SLOT_COUNT) {
         @Override
@@ -126,10 +149,14 @@ public class EngineBlockEntity extends SmartBlockEntity implements com.createmot
     private final LinkReceivers links = new LinkReceivers(this, inventory, CHANNELS.length,
             i -> channelSlotA(CHANNELS[i]), i -> channelSlotB(CHANNELS[i]));
 
+    // logging and sound
     private double telemAvgWheelOmega;
     private int telemDrivenWheels;
     private boolean clientSoundRunning;
 
+    // ==========================================
+    // CONSTRUCTION / LIFECYCLE
+    // ==========================================
 
     public EngineBlockEntity(BlockPos pos, BlockState state) {
         super(CreateMotorsport.ENGINE_BLOCK_ENTITY.get(), pos, state);
@@ -174,6 +201,9 @@ public class EngineBlockEntity extends SmartBlockEntity implements com.createmot
         super.onChunkUnloaded();
     }
 
+    // ==========================================
+    // PART SCREEN / SETUP
+    // ==========================================
 
     @Override
     public com.createmotorsport.menu.PartKind partKind() {
@@ -204,6 +234,7 @@ public class EngineBlockEntity extends SmartBlockEntity implements com.createmot
         sendData();
     }
 
+    // gearbox here for now
     public ResourceKey<GearboxSpec> getGearboxId() {
         return gearboxSlot.id();
     }
@@ -212,6 +243,7 @@ public class EngineBlockEntity extends SmartBlockEntity implements com.createmot
         return engineSlot.id();
     }
 
+    // beginStep refreshes spec
     public ResourceKey<EngineSpec> cycleEngine() {
         return cycleEngine(1);
     }
@@ -283,6 +315,9 @@ public class EngineBlockEntity extends SmartBlockEntity implements com.createmot
         return level == null ? null : level.registryAccess();
     }
 
+    // ==========================================
+    // GAME TICK / PHYSICS SUBSTEP
+    // ==========================================
 
     @Override
     public void tick() {
@@ -303,6 +338,7 @@ public class EngineBlockEntity extends SmartBlockEntity implements com.createmot
         settle(0.0);
     }
 
+    // To check for changes before synthesizing driveline, /reload can change things
     public void beginStep() {
         if (com.createmotorsport.motorcycle.MotorcycleGearboxBlock.hasConnectedGearbox(this)) {
             boolean changed = false;
@@ -372,8 +408,11 @@ public class EngineBlockEntity extends SmartBlockEntity implements com.createmot
             clientSoundRunning = drivetrain.firing();
             sendData();
         }
+        // muting engine for now
+        // playEngineSound(drivetrain.firing());
     }
 
+    // torque, stiffness, slip limit, at the wheels. For the driveline
     public DrivetrainSim.Coupling coupling(double wheelOmega, double dt, double dragThrottle) {
         DrivetrainSim.Coupling c = drivetrain.couple(wheelOmega, dt, dragThrottle);
         this.telemAvgWheelOmega = wheelOmega;
@@ -385,6 +424,9 @@ public class EngineBlockEntity extends SmartBlockEntity implements com.createmot
         drivetrain.settle(wheelOmega);
     }
 
+    // ==========================================
+    // FUEL / THROTTLE
+    // ==========================================
 
     private boolean isFueled() {
         return burnTicks > 0;
@@ -418,13 +460,16 @@ public class EngineBlockEntity extends SmartBlockEntity implements com.createmot
         return Mth.clamp(signalFor(ControlChannel.THROTTLE) / 15.0F, 0.0F, 1.0F);
     }
 
+    // ==========================================
+    // DRIVER CONTROLS / REDSTONE
+    // ==========================================
 
     public void setDriverControls(float throttle01, boolean clutch, boolean shiftUp, boolean shiftDown) {
         if (level == null || level.isClientSide) {
             return;
         }
         driverThrottle01 = Mth.clamp(throttle01, 0.0F, 1.0F);
-        driverSignals[ControlChannel.THROTTLE.ordinal()] = Math.round(driverThrottle01 * 15);
+        driverSignals[ControlChannel.THROTTLE.ordinal()] = Math.round(driverThrottle01 * 15); // for the debug readout
         driverSignals[ControlChannel.CLUTCH.ordinal()] = clutch ? 15 : 0;
         driverSignals[ControlChannel.SHIFT_UP.ordinal()] = shiftUp ? 15 : 0;
         driverSignals[ControlChannel.SHIFT_DOWN.ordinal()] = shiftDown ? 15 : 0;
@@ -439,6 +484,7 @@ public class EngineBlockEntity extends SmartBlockEntity implements com.createmot
         driverSignalTime = level.getGameTime();
     }
 
+    // if the car has a steering wheel
     public void markKeyed() {
         if (level != null) {
             keyedTime = level.getGameTime();
@@ -453,6 +499,7 @@ public class EngineBlockEntity extends SmartBlockEntity implements com.createmot
         return ignition.on();
     }
 
+    // Overtake and engine mode
     public void setDriverAids(boolean overtake, boolean modeUp, boolean modeDown) {
         if (level == null || level.isClientSide) {
             return;
@@ -508,11 +555,15 @@ public class EngineBlockEntity extends SmartBlockEntity implements com.createmot
     public boolean hasExhaust() { return inventory.getItem(SLOT_EXHAUST).is(CreateMotorsport.EXHAUST_MANIFOLD.get()); }
     public boolean hasIntake() { return inventory.getItem(SLOT_INTAKE).is(CreateMotorsport.AIR_INTAKE.get()); }
 
+    // ==========================================
+    // TELEMETRY
+    // ==========================================
 
     public int driveSign(Direction suspensionFacing) {
         return rotationDirection * facingSign(getBlockState().getValue(EngineBlock.FACING), suspensionFacing);
     }
 
+    // trying to auto-align the car, so +1 is the suspension facing same way as engine, -1 if opposite
     private static int facingSign(Direction engineFacing, Direction suspensionFacing) {
         int dot = engineFacing.getStepX() * suspensionFacing.getStepX()
                 + engineFacing.getStepZ() * suspensionFacing.getStepZ();
@@ -583,16 +634,23 @@ public class EngineBlockEntity extends SmartBlockEntity implements com.createmot
         return (int) (drivetrain.getRpmFraction() * drivetrain.spec().redlineRpm());
     }
 
+    // 0 is reverse, 1 is neutral, 2 is 1st, etc
     public int getGearCode() {
         return drivetrain.gearCode();
     }
 
+    // ==========================================
+    // SOUND
+    // ==========================================
 
     private double clientSoundRpmFraction;
 
     public boolean soundRunning() { return clientSoundRunning; }
     public double soundRpmFraction() { return clientSoundRpmFraction; }
 
+    // ==========================================
+    // NBT
+    // ==========================================
 
     @Override
     protected void write(CompoundTag tag, HolderLookup.Provider registries, boolean clientPacket) {
@@ -653,6 +711,7 @@ public class EngineBlockEntity extends SmartBlockEntity implements com.createmot
     }
 
 
+    // legacy compatibility
     private void migrateDesignMass(CompoundTag tag) {
         double old = tag.getDouble("DesignMassOverride");
         if (old > 0.0 && !SpecOverrides.isSet(engineSlot.overrides(), "design_vehicle_mass_blocks")) {

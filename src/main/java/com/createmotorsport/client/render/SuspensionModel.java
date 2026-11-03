@@ -16,14 +16,19 @@ import java.util.function.Function;
 
 public class SuspensionModel extends GeoModel<SuspensionBlockEntity> {
 
+    // the art's pose at REST_LENGTH, 0 being full droop and 1 full bump
     public static final double RENDER_REST_RAISE = 0.8;
+    // blocks the hub moves per unit of pose, the 7 px the attachment bones travel
     public static final double HUB_TRAVEL = 7.0 / 16.0;
 
+    // Where the physics has the hub, in units of pose, one to one with the spring. Below 0 or above 1 the art has run
+    // out of travel and the tyre carries on without it. Not scaled to fit the art: then the tyre floats or sinks
     public static double hubRaise(SuspensionBlockEntity be, WheelSide side, float partialTicks) {
         double droop = be.getLerpedSpringLength(side, partialTicks) - SuspensionBlockEntity.REST_LENGTH;
         return RENDER_REST_RAISE - droop / HUB_TRAVEL;
     }
 
+    // the art's pose, as far as its travel goes
     public static float raise(SuspensionBlockEntity be, WheelSide side, float partialTicks) {
         return (float) Mth.clamp(hubRaise(be, side, partialTicks), 0.0, 1.0);
     }
@@ -31,6 +36,7 @@ public class SuspensionModel extends GeoModel<SuspensionBlockEntity> {
 
     private record BoneDelta(String bone, double rotX, double rotY, double rotZ, double posX, double posY, double posZ) {}
 
+    // Left side taken from suspension.animation.json left_suspension at t = 1.0
     private static final BoneDelta[] LEFT = {
             new BoneDelta("LeftUpperWishbone", 30.0, 0.0, 0.0, 0.0, 0.0, 0.0),
             new BoneDelta("LeftLowerWishbone", 27.5, 0.0, 0.0, 0.0, 0.0, 0.0),
@@ -43,6 +49,7 @@ public class SuspensionModel extends GeoModel<SuspensionBlockEntity> {
             new BoneDelta("bone3", 0.0, 35.0, 0.0, 0.0, 0.0, 0.0),
     };
 
+    // Right side, from "right_suspension" at t = 1.0
     private static final BoneDelta[] RIGHT = {
             new BoneDelta("RightUpperWishbone", -32.5, 0.0, 0.0, 0.0, 0.0, 0.0),
             new BoneDelta("RightLowerWishbone", -27.5, 0.0, 0.0, 0.0, 0.0, 0.0),
@@ -112,11 +119,11 @@ public class SuspensionModel extends GeoModel<SuspensionBlockEntity> {
 
     private void applySpin(float angleLeft, float angleRight) {
         spinZ("LeftWheel", angleLeft);
-        spinZ("bone", angleLeft);
-        spinZ("bone5", angleLeft);
+        spinZ("bone", angleLeft);             // left wheel hub spins with tire
+        spinZ("bone5", angleLeft);            // left outer half-shaft
         spinZ("RightWheel", angleRight);
-        spinZ("bone2", angleRight);
-        spinZ("ShaftRightRotation", angleRight);
+        spinZ("bone2", angleRight);           // right wheel hub spinny
+        spinZ("ShaftRightRotation", angleRight); // right outer half-shaft
         spinZ("MiddleShaft", 0.5F * (angleLeft + angleRight));
         GeoBone prop = getAnimationProcessor().getBone("MainShaft");
         if (prop != null) {

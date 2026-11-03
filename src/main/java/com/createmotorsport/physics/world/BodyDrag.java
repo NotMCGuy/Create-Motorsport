@@ -9,6 +9,10 @@ import dev.ryanhcode.sable.sublevel.ServerSubLevel;
 import net.minecraft.server.level.ServerLevel;
 import org.joml.Vector3d;
 
+/**
+ * Drag applied to the body, applied once per body, per substep by AssembledCar
+ * Cancels out Sables universal drag numbers
+ */
 public final class BodyDrag {
 
     private BodyDrag() {

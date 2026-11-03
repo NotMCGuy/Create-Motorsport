@@ -8,6 +8,10 @@ import net.neoforged.api.distmarker.OnlyIn;
 
 import java.util.function.DoubleConsumer;
 
+// A text box that holds one number. Saves on enter or loss of focus
+//
+// forward keyPressed before super, because AbstractContainerScreen takes
+// the inventory key and closes the menu
 
 @OnlyIn(Dist.CLIENT)
 public class NumberField extends EditBox {
@@ -50,6 +54,7 @@ public class NumberField extends EditBox {
         return true;
     }
 
+    // Set from the server's value without firing a commit back at it
     public void showValue(double value) {
         this.committed = value;
         setValue(trim(value));
@@ -74,7 +79,7 @@ public class NumberField extends EditBox {
 
     @Override
     public boolean keyPressed(int key, int scan, int mods) {
-        if (isFocused() && (key == 257 || key == 335)) {
+        if (isFocused() && (key == 257 || key == 335)) {   // codes for enter & numpad enter
             commit();
             return true;
         }

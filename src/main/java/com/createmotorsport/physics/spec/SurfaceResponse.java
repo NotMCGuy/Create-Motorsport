@@ -1,5 +1,9 @@
 package com.createmotorsport.physics.spec;
 
+/**
+ * For making tyre compounds have different surface responses
+ * Corner uses SurfaceSpec.scaledBy
+ */
 public record SurfaceResponse(double peakMuScale, double slipAtPeakScale, double slideGripScale,
                               double rollingResistanceScale) {
 

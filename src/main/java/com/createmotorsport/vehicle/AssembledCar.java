@@ -44,15 +44,36 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ *
+ * CHECKLIST FOR ADDING A NEW KIND OF BLOCK TO THE CAR
+ *
+ *  1. Implement Sable's BlockEntitySubLevelActor. rebuild() see only that actor list
+ *
+ *  2. Add an instanceof branch and member list for it in rebuild()
+ *
+ *  3. Call CarAssembler.memberChanged(level) from initialize(), remove(), and onChunkUnloaded()
+ *
+ *  4. If the car should run its tick, add to gameTick()'s order and give it a steps() overload,
+ *     and have its own tick return when car.steps(this) is true, so it doesn't run twice
+ */
 public final class AssembledCar {
 
+    // ==========================================
+    // CONSTANTS / TYPES
+    // ==========================================
 
     private static final double TICK_SECONDS = 1.0 / 20.0;
 
+    // built each tick in DrivelineSynthesizer, stepDrive every substep
     private record Drive(EngineBlockEntity engine, Driveline line, int[] sign) {
     }
 
+    // ==========================================
+    // STATE
+    // ==========================================
 
+    // walk order of members & what generation they are
     private List<SubLevel> bodies = List.of();
     private List<EngineBlockEntity> engines = List.of();
     private List<SuspensionBlockEntity> suspensions = List.of();
@@ -60,28 +81,40 @@ public final class AssembledCar {
     private Map<SuspensionBlockEntity, SubLevel> bodyOf = Map.of();
     long builtGeneration = Long.MIN_VALUE;
 
+    // car-level state, and the game tick it last stepped
     private final CarState state = new CarState();
     private long steppedGameTime = Long.MIN_VALUE;
 
+    // the driveline this game tick built, and what its substeps hand each other
     private List<SuspensionBlockEntity> driveAxles = List.of();
     @Nullable
     private CarSpec driveSpec;
     private List<Drive> drives = List.of();
     private boolean substepped;
+    // this game tick's driven axles, for traction control in the substeps
     private List<SuspensionBlockEntity> drivenAxles = List.of();
-    private double stepDemand;
+    private double stepDemand; // this step's clutch demand over the driven wheels, for recapTraction
     private final List<SuspensionBlockEntity> splitAxles = new ArrayList<>();
     private final List<DriveSplit.Wheel> splitWheels = new ArrayList<>();
     private double splitMean;
 
+    // this substep's forces: the axles with impulses, in the order they stepped, flushed and cleared at its end,
+    // and drag for a body none of them queued for
     private final Set<SuspensionBlockEntity> queuedForces = new LinkedHashSet<>();
     private final ForceTotal dragForces = new ForceTotal();
 
+    // ==========================================
+    // CONSTRUCTION
+    // ==========================================
 
     AssembledCar() {
     }
 
+    // ==========================================
+    // MEMBERSHIP
+    // ==========================================
 
+    // the only plot walk left, run on a lifecycle change rather than every tick
     void rebuild(Level level, SubLevel root, long generation) {
         List<SubLevel> foundBodies = new ArrayList<>();
         List<EngineBlockEntity> foundEngines = new ArrayList<>();
@@ -107,6 +140,7 @@ public final class AssembledCar {
                 } else if (actor instanceof SteeringWheelBlockEntity w && !w.isRemoved()) {
                     foundWheels.add(w);
                 }
+                // nothing implements SubLevelBridge yet
                 if (actor instanceof SubLevelBridge bridge && container != null) {
                     for (UUID id : bridge.bridgedSubLevels()) {
                         SubLevel other = container.getSubLevel(id);
@@ -132,6 +166,7 @@ public final class AssembledCar {
         this.state.retainAxles(axleKeys);
     }
 
+    // a part not in the members yet runs itself
     public boolean steps(EngineBlockEntity engine) {
         return this.engines.contains(engine);
     }
@@ -144,6 +179,7 @@ public final class AssembledCar {
         return this.steeringWheels.contains(wheel);
     }
 
+    // what a chunk unload leaves, CarAssembler sweeps these
     boolean isAbandoned() {
         for (EngineBlockEntity e : this.engines) {
             if (!e.isRemoved()) {
@@ -172,6 +208,9 @@ public final class AssembledCar {
         return false;
     }
 
+    // ==========================================
+    // GAME TICK
+    // ==========================================
 
     public void gameTick(Level level) {
         long now = level.getGameTime();
@@ -208,6 +247,7 @@ public final class AssembledCar {
             }
             for (SuspensionBlockEntity axle : this.suspensions) {
                 if (!axle.isRemoved()) {
+                    // flip the direction for rear steered
                     double steer = !axle.isSteered() ? 0.0 : axle.isFrontAxle() ? controls.steer() : -controls.steer();
                     axle.setDriverSteering(steer, controls.brake());
                 }
@@ -221,7 +261,11 @@ public final class AssembledCar {
         driveStep(now);
     }
 
+    // ==========================================
+    // DRIVELINE
+    // ==========================================
 
+    // each engine's game tick, and the drivelines its torque takes in stepDrive
     private void driveStep(long now) {
         List<SuspensionBlockEntity> fitted = fittedAxles();
         CarGeometry.Axis axis = axis(fitted);
@@ -317,6 +361,7 @@ public final class AssembledCar {
         }
     }
 
+    // A slipping clutch's capacity over the driven wheels
     private double demand(double[] torque, double[] limit, boolean[] driven) {
         double demand = 0.0;
         for (int i = 0; i < torque.length; i++) {
@@ -331,11 +376,13 @@ public final class AssembledCar {
         return demand;
     }
 
+    // from a driven axle's physics tick
     public void queueSplit(SuspensionBlockEntity axle, List<DriveSplit.Wheel> wheels) {
         this.splitAxles.add(axle);
         this.splitWheels.addAll(wheels);
     }
 
+    // DriveSplit across every driven wheel, then each axle's AxleDiff.finish, before the engines settle next substep
     void finishSplit(double dt) {
         if (this.splitAxles.isEmpty()) {
             return;
@@ -407,7 +454,11 @@ public final class AssembledCar {
                 + (axle.hasTire(SuspensionBlockEntity.WheelSide.RIGHT) ? 1 : 0);
     }
 
+    // ==========================================
+    // PHYSICS SUBSTEP / FORCES
+    // ==========================================
 
+    // Once per substep by whichever axle asks first, before the axle itself steps
     void refresh(long serial, double dt) {
         if (!this.state.beginRefresh(serial)) {
             return;
@@ -457,10 +508,12 @@ public final class AssembledCar {
         this.state.setWheelbase(axis.wheelbase());
     }
 
+    // from SuspensionBlockEntity's physics tick
     public void queueForces(SuspensionBlockEntity axle) {
         this.queuedForces.add(axle);
     }
 
+    // to Sable in the order the axles stepped, and BodyDrag once per body
     void flushForces(ServerLevel level, double dt) {
         Set<ServerSubLevel> dragged = Collections.newSetFromMap(new IdentityHashMap<>());
         for (SuspensionBlockEntity axle : this.queuedForces) {
@@ -481,6 +534,8 @@ public final class AssembledCar {
         }
         this.queuedForces.clear();
 
+        // Need to apply drag even when no axle queues it
+        // And the event fires for every dimension, so only this level's bodies
         for (SubLevel body : this.bodies) {
             if (body instanceof ServerSubLevel server && server.getLevel() == level && !server.isRemoved()
                     && dragged.add(server)) {
@@ -493,6 +548,9 @@ public final class AssembledCar {
         }
     }
 
+    // ==========================================
+    // TRACTION CONTROL
+    // ==========================================
 
     private void stepTraction(double dt) {
         EngineBlockEntity rep = engine();
@@ -545,6 +603,7 @@ public final class AssembledCar {
                 spec.minThrottle(), tractionForce, repRadius, demand, dt));
     }
 
+    // engine drag control keeps tires from slipping due to sudden engine drag when the throttle is released
     private void stepDragControl(TractionControlSpec spec, double dt) {
         double slowest = Double.MAX_VALUE, lon = 0.0;
         int grounded = 0;
@@ -566,6 +625,7 @@ public final class AssembledCar {
         this.state.setDragThrottle(throttle);
     }
 
+    // recap TC against this substep's clutch demand, see TractionControl.recap. Only tightens
     private void recapTraction() {
         if (!this.state.aids().tractionControl() || throttle() <= 0.1) {
             return;
@@ -596,6 +656,9 @@ public final class AssembledCar {
         return throttle;
     }
 
+    // ==========================================
+    // READOUTS
+    // ==========================================
 
     @Nullable
     public EngineBlockEntity engine() {
@@ -622,6 +685,7 @@ public final class AssembledCar {
         return this.state;
     }
 
+    // cruise controls gain, blocks/s^2 per unit of throttle across all engines of a car, 0 when nothing is driven
     public double throttleAuthority() {
         double radius = 0.0;
         double mass = 0.0;

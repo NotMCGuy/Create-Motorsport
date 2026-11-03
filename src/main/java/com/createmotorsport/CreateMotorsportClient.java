@@ -46,6 +46,7 @@ public class CreateMotorsportClient {
 
         SteeringWheelBlock.clientDriveToggle = SteeringInputHandler::toggleDriving;
 
+        // Steering wheel live input intercepts keys and streams the driver's controls
         NeoForge.EVENT_BUS.addListener(SteeringInputHandler::onKeyInput);
         NeoForge.EVENT_BUS.addListener(SteeringInputHandler::onClientTick);
         NeoForge.EVENT_BUS.addListener(SteeringInputHandler::onScreenOpening);

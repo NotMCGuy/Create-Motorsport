@@ -99,6 +99,7 @@ public class DownFlapBlock extends HorizontalDirectionalBlock
         BlockState newState = state.setValue(PILLAR, !state.getValue(PILLAR));
         level.setBlockAndUpdate(pos, newState);
 
+        // TODO: add diff sound
         if (level.getBlockState(pos) != state) {
             IWrenchable.playRotateSound(level, pos);
             IWrenchable.playRotateSound(level, pos);
@@ -150,6 +151,7 @@ public class DownFlapBlock extends HorizontalDirectionalBlock
             level.scheduleTick(pos, this, 1);
     }
 
+    // Called by steeringwheel toggle
     public void steeringBack(BlockState state, Level level, BlockPos pos, boolean toggle) {
         if (level == null || level.isClientSide) {
             return;
@@ -180,6 +182,7 @@ public class DownFlapBlock extends HorizontalDirectionalBlock
         Stack<BlockPos> flapStack = new Stack<>();
         BlockPos nextPos = pos.relative(direction);
 
+        // clockwise or counter-clockwise
         while (level.getBlockState(nextPos).getBlock() instanceof DownFlapBlock) {
             if (level.getBlockState(nextPos).getValue(PILLAR)) {
                 power = Math.max(level.getBlockState(nextPos).getValue(FLAP_POWER), power);
@@ -270,6 +273,7 @@ public class DownFlapBlock extends HorizontalDirectionalBlock
                 BlockPos newPos = pos.relative(dir, poles + 1);
                 BlockState newState = world.getBlockState(newPos);
                 Direction facing = state.getValue(property);
+                // Inverted compared to #getStateForPlacement
                 Boolean right = !(world.getBlockState(newPos.relative(facing.getClockWise()))
                         .getBlock() instanceof DownFlapBlock);
                 Boolean left = !(world.getBlockState(newPos.relative(facing.getCounterClockWise()))
@@ -292,6 +296,7 @@ public class DownFlapBlock extends HorizontalDirectionalBlock
         return state.getValue(FACING);
     }
 
+    // force of the flap at 52.5321°
     @Override
     public float sable$getParallelDragScalar() {
         return 1.0F;

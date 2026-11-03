@@ -15,6 +15,8 @@ import java.util.function.BiFunction;
 import java.util.function.IntConsumer;
 import java.util.function.Supplier;
 
+/** A spec that parts point to, so the key, overrides, their merging, cycling, and its tune section and nbt
+ * */
 public final class SpecSlot<T> {
 
     private final String key;
@@ -27,9 +29,14 @@ public final class SpecSlot<T> {
     private final String overridesTag;
 
     private ResourceKey<T> id;
+    // See SpecOverrides
     private CompoundTag overrides = new CompoundTag();
     private final SpecOverrides.Memo<T> memo = new SpecOverrides.Memo<>();
 
+    /**
+     * @param resolver the pack's spec for a key, with the part's fallback
+     * @param idTag    NBT key for the id, overrides go under idTag + "Overrides"
+     */
     public SpecSlot(String key, String title, ResourceKey<Registry<T>> registry, Codec<T> codec,
                     List<ResourceKey<T>> builtIn, BiFunction<RegistryAccess, ResourceKey<T>, T> resolver,
                     String idTag, ResourceKey<T> initial) {
@@ -57,6 +64,7 @@ public final class SpecSlot<T> {
         return this.overrides;
     }
 
+    // kept when equal, so the memo doesn't merge again
     public void setOverrides(CompoundTag overrides) {
         if (!overrides.equals(this.overrides)) {
             this.overrides = overrides;
@@ -67,6 +75,7 @@ public final class SpecSlot<T> {
         return this.resolver.apply(access, this.id);
     }
 
+    // see SpecOverrides.Memo
     public T fitted(@Nullable RegistryAccess access) {
         return this.memo.get(this.codec, pack(access), this.overrides);
     }

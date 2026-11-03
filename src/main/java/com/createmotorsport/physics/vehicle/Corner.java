@@ -18,11 +18,18 @@ import com.createmotorsport.physics.tire.TireThermal;
 
 import net.minecraft.util.Mth;
 
+/**
+ * One corner each substep: terrain assist, brakes, unsprung mass, ABS, load, thermal, tyre
+ * SuspensionBlockEntity takes a CornerInput, calls step(), and applies the CornerOutput to the body
+ * Like Chrono's subsystem Synchronize and Advance
+ */
 public final class Corner {
 
+    // Semi-implicit euler holds only to omega*dt < 2, so we need to have this cap, above which a corner just
+    // carries its own hardpoint through the unsprung loop instead of freezing. The host's frequency readout uses it too
     public static final double MAX_BODY_MODE_OMEGA_DT = 1.8;
     private static final double UNSPRUNG_MAX_STEP = 0.004;
-    private static final double CAMBER_FADE_SPEED = 2.0;
+    private static final double CAMBER_FADE_SPEED = 2.0; // full strength camber thrust at this speed
 
     private Corner() {
     }
@@ -33,6 +40,7 @@ public final class Corner {
                        int wheelCount, double sprungMassPerWheel, double gravity,
                        TerrainAssist.Level terrainAssist, double carSpeed, double suspensionScale) {
 
+        // one wheel's drive for the differential's warm start
         public Axle withDrive(double torque, double stiffness, double min, double max) {
             return new Axle(setup, restLength, maxTravel, maxDroop, groundMargin, brake01, torque, stiffness, min, max,
                     carMass, wheelCount, sprungMassPerWheel, gravity, terrainAssist, carSpeed, suspensionScale);
@@ -41,23 +49,29 @@ public final class Corner {
 
     private static final double NO_GROUND_DISTANCE = 5.0;
 
+    // one pair per axle
     public static final class Modes {
         public double bodyOmegaDt;
         public double rollOmegaDt;
     }
 
+    // Wheel mass needs to just scale with the car mass for now, since people are going to want to build very
+    // different weights and not know how/where to change this
     public static double wheelMass(double carMass) {
         return Math.max(0.1, Config.WHEEL_MASS.getAsDouble() * MassScale.measured(carMass));
     }
 
+    // in the log's car.mass units
     public static double wheelMass(double stated, double carMass) {
         return stated > 0.0 ? stated : wheelMass(carMass);
     }
 
+    // I = m*r^2
     public static double wheelInertia(double radius, double wheelMass) {
         return Math.max(0.5, wheelMass * radius * radius);
     }
 
+    // from the inverse normal mass at the corner and at the axle's centre
     public static double rollResponseMass(double invCorner, double invMid, int wheels) {
         double invRoll = 2.0 * (invCorner - invMid);
         return invRoll > 1.0e-9 ? 1.0 / (Math.max(1, wheels) * invRoll) : Double.POSITIVE_INFINITY;
@@ -69,12 +83,19 @@ public final class Corner {
                      double previousForce, double speed, double normalForce, double gripForce, double dt);
     }
 
+    /**
+     * Null where the corner pushes nothing, airborne or no response at the hardpoint (wheel.grounded tells which)
+     *
+     * @param camberSign +1 on the left, -1 on the right
+     * @param modes      shared by the axle's corners, last one to solve wins
+     */
     public static CornerOutput step(Axle axle, double camberSign, CornerInput in, CornerState wheel, Modes modes,
                                     double dt, BrakeLimiter brakeLimiter) {
         double radius = in.radius();
         wheel.spinFrom = wheel.omega;
         wheel.spinCoupling = Double.NaN;
 
+        // The terrain assist lifts the ground reference so a step becomes a ramp, probing through the input's callback
         double assistLift = 0.0;
         double distance = NO_GROUND_DISTANCE;
         if (in.hit()) {
@@ -174,7 +195,7 @@ public final class Corner {
             wheel.springLength = Mth.clamp(rigidLength, axle.restLength() - axle.maxTravel(), axle.restLength() + axle.maxDroop());
             wheel.tireDeflection = 0.0;
             wheel.unsprungVel = 0.0;
-            wheel.telem.tireRate = 0.0;
+            wheel.telem.tireRate = 0.0; // if tireCompliance off
             compression = Math.max(0.0, axle.restLength() - wheel.springLength);
             double scale = axle.suspensionScale();
             double frequency = SuspensionScale.frequency(axle.setup().naturalFreqHz(), scale);
@@ -199,9 +220,13 @@ public final class Corner {
         double forceCap = Config.MAX_CORNERING_G.getAsDouble() * rateMass * axle.gravity();
         springForce = Mth.clamp(springForce, -forceCap, forceCap);
 
+        // Downforce
         double airspeed = in.airspeed();
         double downforce = Config.AERO_DOWNFORCE.getAsDouble() * airspeed * airspeed;
 
+        // ================================
+        // Load sensitive tire friction
+        // ===================================
 
         double normalForce = springForce;
         if (Config.TIRE_COMPLIANCE.get()) {
@@ -212,6 +237,7 @@ public final class Corner {
         double vLat = in.vLat();
 
 
+        // Logged whether or not ABS is on or reached
         wheel.telem.lockSlip = Abs.lockSlip(wheel.omega, radius, vLon);
 
         double absOmega = 0.0;
@@ -227,6 +253,7 @@ public final class Corner {
         float designLoad = in.designLoad();
         double gripMult = TireModel.loadSensitivity(normalForce, designLoad, tireSpec);
 
+        // See TireThermal. Off by default, so this is 1.0
         double tempFactor = Config.TIRE_THERMAL_MODEL.get()
                 ? TireThermal.gripFactor(wheel.tireTemp, tireSpec.thermal().optimalTempC(),
                         Config.TIRE_AMBIENT_TEMP.getAsDouble(), tireSpec.thermal().coldGripFactor())
@@ -237,8 +264,9 @@ public final class Corner {
 
         double effectiveMu = surfaceMu * gripMult * tempFactor;
         wheel.telem.gripMult = gripMult;
-        wheel.peakMu = effectiveMu * tireSpec.grip();
+        wheel.peakMu = effectiveMu * tireSpec.grip(); // peak grip the tire can deliver right now
 
+        // Every wheel's spin is stepped; this decides only rolling resistance and the drive split's coupling
         boolean powered = Math.max(-axle.driveMin(), axle.driveMax()) > 1.0e-3 || brakeTorque > 1.0e-3;
         double forwardImpulse;
         double sideImpulse;
@@ -275,6 +303,7 @@ public final class Corner {
         wheel.latBristle = contact.latBristle;
         wheel.lonBristle = contact.lonBristle;
         wheel.latRelax = contact.latRelax;
+        // Only TMeasyTire writes these six so they need this guard if it swapped suddenly
         boolean modelSlip = contact.telemModelSlip;
         if (modelSlip) {
             wheel.peakForce = contact.telemPeakForce;
@@ -293,8 +322,10 @@ public final class Corner {
         forwardImpulse = forces.forward();
         sideImpulse = forces.side();
 
+        //-----------------------------------------------------------------------
 
 
+        // This is for more detailed grip HUD and is unused right now
         double gripCircle = gripForce * dt;
         double demand = Math.hypot(forwardImpulse, sideImpulse);
         wheel.telem.gripUse = gripCircle > 1.0e-9 ? demand / gripCircle : 0.0;
@@ -302,6 +333,7 @@ public final class Corner {
         wheel.telem.gripLat = gripCircle > 1.0e-9 ? sideImpulse / gripCircle : 0.0;
         wheel.latUse = gripCircle > 1.0e-9 ? Math.abs(sideImpulse) / gripCircle : 0.0;
 
+        // recording the resolved physics for csv logging
         wheel.telem.load = normalForce;
         wheel.vLon = vLon;
         wheel.vLat = vLat;
@@ -331,6 +363,7 @@ public final class Corner {
         return new CornerOutput(springForce, downforce, forwardImpulse, sideImpulse);
     }
 
+    // Advances the wheel between the suspension spring and the tyre spring, returns the force the suspension puts into the body
     private static double stepUnsprung(Axle axle, Modes modes, CornerState wheel, double rateMass, double rigidLength,
                                 double hardpointVel, double responseMass, double rollResponseMass,
                                 double tireRate, double tireDampingRatio, double wheelMass, double dt) {

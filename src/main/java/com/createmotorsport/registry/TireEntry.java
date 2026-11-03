@@ -16,16 +16,22 @@ import net.minecraft.world.phys.Vec3;
 import java.util.Optional;
 
 public record TireEntry(ResourceKey<TireSpec> compound, double designMassKg, float radius,
-                        Vec3 rotation, Vec3 offset, Optional<ResourceLocation> model,
+                        Vec3 rotation, Vec3 offset, Optional<ResourceLocation> model, Optional<Float> artRadius,
                         float minimumFriction, float verticalDeflection, float verticalDampingRatio,
                         float mass, float width, Optional<ResourceLocation> item) {
 
     public static final float DEFAULT_VERTICAL_DEFLECTION = 0.035f;
 
+    // damping ratio, c = 2 * zeta * sqrt(k * m_unsprung)
     public static final float DEFAULT_VERTICAL_DAMPING = 0.06f;
 
     public float designLoad() {
         return designLoad(designMassKg);
+    }
+
+    // the radius the art is drawn for; a fitted tyre's art scales by its radius over this
+    public float drawnRadius() {
+        return artRadius.orElse(radius);
     }
 
     public static float designLoad(double designMassKg) {
@@ -36,6 +42,7 @@ public record TireEntry(ResourceKey<TireSpec> compound, double designMassKg, flo
         return designLoad * 4.0 / Gravity.DEFAULT;
     }
 
+    // N per block, designLoad / (verticalDeflection * radius)
     public static double verticalRate(double designLoad, double radius, double deflectionFraction) {
         double sink = Math.max(1.0e-4, deflectionFraction) * Math.max(1.0e-4, radius);
         return designLoad / sink;

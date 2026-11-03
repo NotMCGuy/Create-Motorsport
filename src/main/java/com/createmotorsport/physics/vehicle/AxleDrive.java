@@ -2,10 +2,14 @@ package com.createmotorsport.physics.vehicle;
 
 import com.createmotorsport.physics.spec.DriveInputSpec;
 
+/**
+ * The torque ramp into one axle (DriveInputSpec), one per axle in CarState
+ */
 public final class AxleDrive {
 
     private double taken;
 
+    // Per wheel Nm that the axle took last substep, not counting traction control
     public void took(double perWheel) {
         this.taken = perWheel;
     }

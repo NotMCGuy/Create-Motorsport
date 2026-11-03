@@ -91,6 +91,7 @@ public class EngineMenu extends AbstractContainerMenu {
 
 
 
+    // Item slots for Redstone links
     private static class FrequencySlot extends Slot {
         FrequencySlot(Container container, int index, int x, int y) {
             super(container, index, x, y);

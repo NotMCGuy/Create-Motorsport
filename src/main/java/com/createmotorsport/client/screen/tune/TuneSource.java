@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
+// either a tire in hand or a placed car part is a TuneSource
 public interface TuneSource {
 
     @Nullable

@@ -11,6 +11,7 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 import java.util.ArrayList;
 import java.util.List;
 
+// Server -> client
 public record SkidmarkPacket(List<float[]> quads) implements CustomPacketPayload {
     public static final int FLOATS_PER_QUAD = 13;
 

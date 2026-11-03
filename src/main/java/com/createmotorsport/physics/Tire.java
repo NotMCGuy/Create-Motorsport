@@ -15,12 +15,12 @@ public interface Tire {
 
     final class Contact {
         public double omega;
-        public double deflAlpha;
+        public double deflAlpha; // Fiala's relaxation deflection
         public double prevLongForce;
-        public double curveLongForce;
-        public double latBristle;
-        public double lonBristle;
-        public double latRelax;
+        public double curveLongForce; // steady curve's force on this slip, before relaxation
+        public double latBristle;// TMeasy's Dahl standstill bristle
+        public double lonBristle; // and the longitudinal
+        public double latRelax; // Rill 3.4.2 lateral carcass deflection y_e
 
         public double telemPeakForce;
         public double telemSlipCombined;
@@ -31,7 +31,7 @@ public interface Tire {
         public boolean telemModelSlip;
     }
 
-    record Forces(double forward, double side) {
+    record Forces(double forward, double side) { // impulses for this substep, N*s
     }
 
     Forces solve(Input in, Contact contact);

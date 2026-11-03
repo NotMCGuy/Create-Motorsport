@@ -11,6 +11,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
+// Client -> server: an open part screen asking for its status lines
 public record PartStatusRequestPacket(BlockPos pos) implements CustomPacketPayload {
 
     public static final Type<PartStatusRequestPacket> TYPE =

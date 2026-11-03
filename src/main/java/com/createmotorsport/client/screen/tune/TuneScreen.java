@@ -115,6 +115,7 @@ public class TuneScreen extends Screen {
                 fields(section).forEach(field -> built.add(new Row(section, field)));
                 continue;
             }
+            // splitting the compound row with the model specific info
             TireSpec.Model model = ((TireSpec) applied(section)).model();
             Set<String> own = SpecCodecs.modelFields(model);
             List<Line> physics = new ArrayList<>();
@@ -135,6 +136,7 @@ public class TuneScreen extends Screen {
                 () -> source.send(section.key(), TunePacket.CYCLE, "", String.valueOf(step)));
     }
 
+    // see HeldTire.onModelChange
     private void cycleModel(Header header, int step) {
         TireSpec.Model[] models = TireSpec.Model.values();
         TireSpec.Model next = models[Math.floorMod(header.model().ordinal() + step, models.length)];
@@ -143,6 +145,7 @@ public class TuneScreen extends Screen {
                 () -> source.send(section.key(), TunePacket.SET, "model", next.id()));
     }
 
+    // confirms before overwriting user changes
     private void confirmIf(boolean costs, Runnable action) {
         if (!costs) {
             action.run();
@@ -291,7 +294,7 @@ public class TuneScreen extends Screen {
         }
         source.send(row.section().key(), TunePacket.SET, row.field().path(), text);
         shown.put(key, text);
-        box.setTextColor(Theme.TEXT);
+        box.setTextColor(Theme.TEXT); // changes color to tell user its updated
         status = Component.empty();
     }
 
@@ -340,6 +343,7 @@ public class TuneScreen extends Screen {
         dialog.render(g, mouseX, mouseY);
     }
 
+    // the whole width of the row, the number box included
     @Nullable
     private Row rowAt(int mouseX, int mouseY) {
         if (mouseX < left() + PAD || mouseX >= right() - PAD || mouseY < rowY(0)) {
@@ -350,6 +354,8 @@ public class TuneScreen extends Screen {
         return onPage < rowsPerPage() && index < lines.size() && lines.get(index) instanceof Row row ? row : null;
     }
 
+    // tune.createmotorsport.<section>.<path> in the lang file; a compound's model fields try the model's own
+    // key first, since Pacejka and Fiala both have a cornering_stiffness that means different things
     @Nullable
     private static Component tip(Row row) {
         String base = "tune.createmotorsport." + row.section().key() + ".";

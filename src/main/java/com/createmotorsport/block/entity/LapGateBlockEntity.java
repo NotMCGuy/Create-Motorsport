@@ -28,6 +28,9 @@ import java.util.UUID;
 
 public class LapGateBlockEntity extends SmartBlockEntity {
 
+    // ==========================================
+    // CONSTANTS
+    // ==========================================
 
     public static final int MARKER_START_FINISH = 0;
     public static final double RACE_SCAN_RADIUS = 512.0;
@@ -36,12 +39,16 @@ public class LapGateBlockEntity extends SmartBlockEntity {
     private static final int TELEMETRY_SAMPLE_TICKS = 4;
     private static final int TELEMETRY_MAX_ROWS = 40000;
 
+    // ==========================================
+    // LOADED GATES
+    // ==========================================
 
     private static final java.util.Set<LapGateBlockEntity> LOADED =
             java.util.Collections.newSetFromMap(new java.util.WeakHashMap<>());
 
     private static int gateSetVersion;
 
+    // Proximity gate the lap gate since we have to force load it
     public static LapGateBlockEntity controllableBy(net.minecraft.world.entity.player.Player player,
                                                     BlockPos pos) {
         if (player == null || pos == null) {
@@ -57,10 +64,14 @@ public class LapGateBlockEntity extends SmartBlockEntity {
         return level.getBlockEntity(pos) instanceof LapGateBlockEntity gate ? gate : null;
     }
 
+    // ==========================================
+    // STATE
+    // ==========================================
 
+    // this post and its pair
     private BlockPos partner;
     private int marker = MARKER_START_FINISH;
-    private boolean reversed;
+    private boolean reversed; // for direction of travel setting
 
     private List<LapGateBlockEntity> cachedGates;
     private int cachedGatesVersion = -1;
@@ -78,6 +89,9 @@ public class LapGateBlockEntity extends SmartBlockEntity {
     private final Ghost ghost = new Ghost();
     private final RaceChunks raceChunks = new RaceChunks();
 
+    // ==========================================
+    // CONSTRUCTION / LIFECYCLE
+    // ==========================================
 
     public LapGateBlockEntity(BlockPos pos, BlockState state) {
         super(CreateMotorsport.LAP_GATE_BLOCK_ENTITY.get(), pos, state);
@@ -117,6 +131,9 @@ public class LapGateBlockEntity extends SmartBlockEntity {
         super.onChunkUnloaded();
     }
 
+    // ==========================================
+    // LINKING THE POSTS
+    // ==========================================
 
     public BlockPos getPartner() {
         return partner;
@@ -201,6 +218,9 @@ public class LapGateBlockEntity extends SmartBlockEntity {
         }
     }
 
+    // ==========================================
+    // GATE ORDERING
+    // ==========================================
 
     private List<LapGateBlockEntity> orderedGates() {
         if (cachedGates != null && cachedGatesVersion == gateSetVersion) {
@@ -253,6 +273,9 @@ public class LapGateBlockEntity extends SmartBlockEntity {
         return gates;
     }
 
+    // ==========================================
+    // RACE SETUP
+    // ==========================================
 
     public RaceState getState() {
         return state;
@@ -338,7 +361,11 @@ public class LapGateBlockEntity extends SmartBlockEntity {
         }
     }
 
+    // ==========================================
+    // START / STOP
+    // ==========================================
 
+    // Start race begins countdown after delay, and syncs data
     public void startRace(ServerPlayer starter, int delaySeconds) {
         if (level == null || level.isClientSide) {
             return;
@@ -416,6 +443,7 @@ public class LapGateBlockEntity extends SmartBlockEntity {
         sendData();
     }
 
+    // Gotta chunk load the lap gates. We will consider server balancing later, because I know this could cause issues if we let anyone place a chunk loader.
     private void setRaceChunksForced(boolean forced) {
         if (!(level instanceof net.minecraft.server.level.ServerLevel serverLevel)) {
             return;
@@ -443,6 +471,9 @@ public class LapGateBlockEntity extends SmartBlockEntity {
         setChanged();
     }
 
+    // ==========================================
+    // RACE TICK
+    // ==========================================
 
     @Override
     public void tick() {
@@ -535,6 +566,7 @@ public class LapGateBlockEntity extends SmartBlockEntity {
         }
     }
 
+    // A crossing is detected by watching which side of the segment a car is on, and looking for a sign flip between ticks
     private boolean crossed(Vec3 carPos, Entrant e, int gateIndex) {
         if (partner == null) {
             return false;
@@ -547,12 +579,14 @@ public class LapGateBlockEntity extends SmartBlockEntity {
         long now = level.getGameTime() - raceStartGameTime;
         e.splits.add(now);
         e.lastCrossTick = now;
+        // Count lap at the 0 marker only
         e.nextMarker = (gateIndex + 1) % Math.max(1, gateCount);
         if (gateIndex != MARKER_START_FINISH) {
             broadcast("§7[Race] " + e.name + " sector " + gateIndex + " at " + formatTime(now));
             return;
         }
 
+        // Theres probably a better way to do this, but this just gives the cars time to cross the grid
         long lapTime = now - e.lapStartTick;
         long minLap = (long) (Config.RACE_MIN_LAP_TIME.getAsDouble() * 20.0);
         boolean lapCompleted = lapTime >= minLap;
@@ -589,6 +623,9 @@ public class LapGateBlockEntity extends SmartBlockEntity {
         return !entrants.isEmpty();
     }
 
+    // ==========================================
+    // GHOST
+    // ==========================================
 
     public boolean isGhostEnabled() {
         return ghost.enabled();
@@ -627,6 +664,7 @@ public class LapGateBlockEntity extends SmartBlockEntity {
                 RACE_SCAN_RADIUS, ghost.packet(startGameTime, playing));
     }
 
+    // store the ghost if it beats the old one
     private void considerGhost(Entrant e, long lapTicks) {
         if (!ghost.offer(e, lapTicks)) {
             return;
@@ -637,6 +675,9 @@ public class LapGateBlockEntity extends SmartBlockEntity {
         sendData();
     }
 
+    // ==========================================
+    // BROADCAST RESULTS
+    // ==========================================
 
     private void broadcast(String message) {
         if (level == null || level.getServer() == null) {
@@ -668,6 +709,9 @@ public class LapGateBlockEntity extends SmartBlockEntity {
         }
     }
 
+    // ==========================================
+    // NBT
+    // ==========================================
 
     @Override
     protected void write(CompoundTag tag, HolderLookup.Provider registries, boolean clientPacket) {
