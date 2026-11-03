@@ -408,8 +408,6 @@ public class EngineBlockEntity extends SmartBlockEntity implements com.createmot
             clientSoundRunning = drivetrain.firing();
             sendData();
         }
-        // muting engine for now
-        // playEngineSound(drivetrain.firing());
     }
 
     // torque, stiffness, slip limit, at the wheels. For the driveline

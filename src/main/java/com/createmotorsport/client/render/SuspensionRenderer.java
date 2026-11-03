@@ -104,8 +104,6 @@ public class SuspensionRenderer extends GeoBlockRenderer<SuspensionBlockEntity> 
         ms.translate(hub.x, hub.y + raiseOffset + dropOffset + HUB_ABOVE_WHEEL * (scale - 1.0F), hub.z);
         ms.scale(scale, scale, scale);
         ms.mulPose(Axis.YP.rotation(steer * STEER_SIGN)); // steering yaw
-        ms.translate(hub.x, hub.y + raiseOffset + dropOffset, hub.z);
-        ms.mulPose(Axis.YP.rotation(steer * STEER_SIGN)); // steering yaw
         if (flip) {
             ms.mulPose(Axis.YP.rotation((float) Math.PI));
         }
