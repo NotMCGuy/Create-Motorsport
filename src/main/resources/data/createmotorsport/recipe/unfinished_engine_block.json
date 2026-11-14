@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "BBB",
+    "I I",
+    "ISC"
+  ],
+  "key": {
+    "C": {
+      "item": "create:belt_connector"
+    },
+    "S": {
+      "item": "create:shaft"
+    },
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "B": {
+      "item": "create:brass_ingot"
+    }
+  },
+  "result": {
+    "id": "createmotorsport:unfinished_engine_block",
+    "count": 1
+  }
+}

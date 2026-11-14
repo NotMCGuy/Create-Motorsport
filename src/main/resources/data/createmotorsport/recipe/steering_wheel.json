@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "CRC",
+    "ASA",
+    "ALA"
+  ],
+  "key": {
+    "C": {
+      "item": "minecraft:iron_ingot"
+    },
+    "A": {
+      "item": "create:andesite_alloy"
+    },
+    "R": {
+      "item": "create:electron_tube"
+    },
+    "S": {
+      "item": "create:shaft"
+    },
+    "L": {
+      "item": "create:redstone_link"
+    }
+  },
+  "result": {
+    "id": "createmotorsport:steering_wheel",
+    "count": 1
+  }
+}

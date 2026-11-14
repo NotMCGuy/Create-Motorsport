@@ -1,0 +1,21 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": { "item": "createmotorsport:unfinished_engine_block" },
+  "transitional_item": { "id": "createmotorsport:incomplete_engine" },
+  "loops": 10,
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        { "item": "createmotorsport:incomplete_engine" },
+        { "item": "createmotorsport:piston" }
+      ],
+      "results": [
+        { "id": "createmotorsport:incomplete_engine" }
+      ]
+    }
+  ],
+  "results": [
+    { "id": "createmotorsport:engine_block" }
+  ]
+}

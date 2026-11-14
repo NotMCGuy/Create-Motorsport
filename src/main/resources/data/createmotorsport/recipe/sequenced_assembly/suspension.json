@@ -1,0 +1,21 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": { "item": "createmotorsport:suspension_mount" },
+  "transitional_item": { "id": "createmotorsport:incomplete_suspension" },
+  "loops": 2,
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        { "item": "createmotorsport:incomplete_suspension" },
+        { "item": "createmotorsport:wishbone" }
+      ],
+      "results": [
+        { "id": "createmotorsport:incomplete_suspension" }
+      ]
+    }
+  ],
+  "results": [
+    { "id": "createmotorsport:suspension" }
+  ]
+}
