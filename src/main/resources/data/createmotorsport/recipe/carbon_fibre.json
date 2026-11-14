@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "CSC"
+  ],
+  "key": {
+    "C": {
+      "item": "minecraft:coal"
+    },
+    "S": {
+      "item": "minecraft:slime_ball"
+    }
+  },
+  "result": {
+    "id": "createmotorsport:carbon_fibre",
+    "count": 1
+  }
+}

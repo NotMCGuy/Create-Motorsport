@@ -3,6 +3,7 @@ package com.createmotorsport;
 import com.createmotorsport.registry.SpecRegistries;
 import com.createmotorsport.physics.world.Surfaces;
 import com.createmotorsport.physics.world.Gravity;
+//
 import com.createmotorsport.block.EngineBlock;
 import com.createmotorsport.block.SteeringWheelBlock;
 import com.createmotorsport.block.SuspensionBlock;
@@ -12,6 +13,16 @@ import com.createmotorsport.block.entity.EngineBlockEntity;
 import com.createmotorsport.block.entity.LapGateBlockEntity;
 import com.createmotorsport.block.entity.SteeringWheelBlockEntity;
 import com.createmotorsport.block.entity.SuspensionBlockEntity;
+
+import com.createmotorsport.block.UnfinishedEngineBlock;
+import com.createmotorsport.item.CarbonFibre;
+import com.createmotorsport.item.Piston;
+import com.createmotorsport.block.SuspensionMount;
+import com.createmotorsport.item.Wishbone;
+//
+
+import com.simibubi.create.content.processing.sequenced.SequencedAssemblyItem;
+
 import com.createmotorsport.menu.EngineMenu;
 import com.createmotorsport.menu.SteeringWheelMenu;
 import com.createmotorsport.menu.SuspensionMenu;
@@ -38,6 +49,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
@@ -309,7 +322,26 @@ public class CreateMotorsport {
                     DownFlapBlockEntity::new,
                     DOWN_FLAP_BLOCK.get()
             ).build(null));
+    public static final DeferredBlock<Block> UNFINISHED_ENGINE_BLOCK = BLOCKS.registerSimpleBlock(
+            "unfinished_engine_block",
+            BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.COLOR_GRAY)
+                     .strength(2.0f, 6.0f)
+                    .sound(SoundType.STONE));
+            
+    public static final DeferredItem<BlockItem> UNFINISHED_ENGINE_BLOCK_ITEM =
+                    ITEMS.registerSimpleBlockItem("unfinished_engine_block", UNFINISHED_ENGINE_BLOCK);
 
+    public static final DeferredBlock<Block> SUSPENSION_MOUNT = BLOCKS.registerSimpleBlock(
+            "suspension_mount",
+            BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.COLOR_GRAY)
+                    .strength(2.0f, 6.0f)
+                    .sound(SoundType.STONE));
+                            
+    public static final DeferredItem<BlockItem> SUSPENSION_MOUNT_ITEM =
+                    ITEMS.registerSimpleBlockItem("suspension_mount", SUSPENSION_MOUNT);                
+                    
     public static final DeferredHolder<MenuType<?>, MenuType<EngineMenu>> ENGINE_MENU = MENUS.register(
             "engine",
             () -> IMenuTypeExtension.create((id, inv, buf) -> new EngineMenu(id, inv, buf.readBlockPos(),
@@ -330,6 +362,12 @@ public class CreateMotorsport {
                             new com.createmotorsport.menu.LapGateMenu(id, inv, buf.readBlockPos())));
     public static final DeferredItem<Item> EXHAUST_MANIFOLD = ITEMS.registerSimpleItem("exhaust_manifold", new Item.Properties().stacksTo(16));
     public static final DeferredItem<Item> AIR_INTAKE = ITEMS.registerSimpleItem("air_intake", new Item.Properties().stacksTo(16));
+    public static final DeferredItem<SequencedAssemblyItem> INCOMPLETE_ENGINE = ITEMS.register(
+            "incomplete_engine",
+            () -> new SequencedAssemblyItem(new Item.Properties()));
+    public static final DeferredItem<SequencedAssemblyItem> INCOMPLETE_SUSPENSION = ITEMS.register(
+            "incomplete_suspension",
+            () -> new SequencedAssemblyItem(new Item.Properties()));
 
     public static final DeferredHolder<SoundEvent, SoundEvent> ENGINE_IDLE = registerSound("engine_idle");
     public static final DeferredHolder<SoundEvent, SoundEvent> ENGINE_LOW = registerSound("engine_low");
@@ -365,6 +403,11 @@ public class CreateMotorsport {
                         output.accept(STEERING_WHEEL_ITEM.get());
                         output.accept(DOWN_FLAP_ITEM.get());
                         output.accept(LAP_GATE_ITEM.get());
+                        output.accept(UNFINISHED_ENGINE_BLOCK_ITEM.get());
+                        output.accept(SUSPENSION_MOUNT.get());
+                        output.accept(CarbonFibre.CARBON_FIBRE.get());
+                        output.accept(Piston.PISTON.get());
+                        output.accept(Wishbone.WISHBONE.get());
                         acceptTires(parameters, output);
                     })
                     .build());
@@ -399,6 +442,9 @@ public class CreateMotorsport {
         modEventBus.addListener((net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent event) ->
                 event.registerBlockEntity(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK,
                         FUEL_TANK_ENTITY.get(), (tank, side) -> tank.tank));
+        CarbonFibre.init();
+        Piston.init();
+        Wishbone.init();
         BLOCKS.register(modEventBus);
         ITEMS.register(modEventBus);
         DATA_COMPONENTS.register(modEventBus);

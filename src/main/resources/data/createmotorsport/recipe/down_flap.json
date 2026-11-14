@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "  C",
+    "CCC",
+    "LR "
+  ],
+  "key": {
+    "C": {
+      "item": "createmotorsport:carbon_fibre"
+    },
+    "R": {
+      "item": "create:redstone_link"
+    },
+    "L": {
+      "item": "create:electron_tube"
+    }
+  },
+  "result": {
+    "id": "createmotorsport:down_flap",
+    "count": 1
+  }
+}
